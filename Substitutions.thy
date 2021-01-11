@@ -44,7 +44,7 @@ syntax
   "_SubstUpd" :: "[logic, smaplets] => logic" ("_/'(_')" [900,0] 900)
   "_Subst"    :: "smaplets => logic"            ("(1[_])")
   "_PSubst"   :: "smaplets => logic"            ("(1\<lparr>_\<rparr>)")
-  "_psubst"   :: "[logic, svars, uexprs] \<Rightarrow> logic"
+  "_psubst"   :: "[logic, svids, uexprs] \<Rightarrow> logic"
   "_subst"    :: "logic \<Rightarrow> uexprs \<Rightarrow> svids \<Rightarrow> logic" ("(_\<lbrakk>_'/_\<rbrakk>)" [990,0,0] 991)
   "_uexprs"   :: "[logic, uexprs] => uexprs" ("_,/ _")
   ""          :: "logic => uexprs" ("_")
@@ -69,17 +69,17 @@ subsection \<open> Substitution Laws \<close>
 named_theorems usubst and usubst_eval
 
 lemma subst_unrest [usubst]:
-  "\<lbrakk> vwb_lens x; &x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<mapsto>\<^sub>s e) \<dagger> v = \<sigma> \<dagger> v"
+  "\<lbrakk> vwb_lens x; $x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<mapsto>\<^sub>s e) \<dagger> v = \<sigma> \<dagger> v"
   by (auto simp add: expr_defs fun_eq_iff)
      (metis lens_override_def lens_scene_override mwb_lens_def var_alpha_def vwb_lens_mwb weak_lens.put_get)
 
 lemma subst_lookup_id [usubst]: "\<langle>id\<^sub>s\<rangle>\<^sub>s x = var x"
   by (simp add: expr_defs)
 
-lemma subst_id_var: "id\<^sub>s = (&\<^bold>v)\<^sub>e"
+lemma subst_id_var: "id\<^sub>s = ($\<^bold>v)\<^sub>e"
   by (simp add: expr_defs lens_defs)
 
-lemma subst_upd_id_lam [usubst]: "subst_upd (&\<^bold>v)\<^sub>e x v = subst_upd id\<^sub>s x v"
+lemma subst_upd_id_lam [usubst]: "subst_upd ($\<^bold>v)\<^sub>e x v = subst_upd id\<^sub>s x v"
   by (simp add: subst_id_var)
 
 lemma subst_id [simp]: "id\<^sub>s \<circ> \<sigma> = \<sigma>" "\<sigma> \<circ> id\<^sub>s = \<sigma>"
@@ -94,11 +94,11 @@ expr_ctr subst_app
 
 term "(f (\<sigma> \<dagger> e))\<^sub>e"
 
-term "(\<forall> x. x + &y > &z)\<^sub>e"
+term "(\<forall> x. x + $y > $z)\<^sub>e"
 
 term "(\<forall> k. P\<lbrakk>\<guillemotleft>k\<guillemotright>/x\<rbrakk>)\<^sub>e"
 
-lemma subst_var [usubst]: "\<sigma> \<dagger> (&x)\<^sub>e = \<langle>\<sigma>\<rangle>\<^sub>s x"
+lemma subst_var [usubst]: "\<sigma> \<dagger> ($x)\<^sub>e = \<langle>\<sigma>\<rangle>\<^sub>s x"
   by (simp add: expr_defs)
 
 text \<open> We can't use this as simplification unfortunately as the expression structure is too
@@ -144,7 +144,7 @@ lemma usubst_upd_comm2:
   by (auto simp add: subst_upd_def assms comp_def lens_indep_comm)
 
 lemma usubst_upd_var_id [usubst]:
-  "vwb_lens x \<Longrightarrow> [x \<mapsto>\<^sub>s &x] = id\<^sub>s"
+  "vwb_lens x \<Longrightarrow> [x \<mapsto>\<^sub>s $x] = id\<^sub>s"
   by (simp add: subst_upd_def subst_id_def id_lens_def SEXP_def)
 
 subsection \<open> Evaluation \<close>

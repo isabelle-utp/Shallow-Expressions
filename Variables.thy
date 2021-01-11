@@ -25,12 +25,11 @@ definition res_alpha :: "('a \<Longrightarrow> 'b) \<Rightarrow> ('c \<Longright
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
   step is to introduce a collection of non-terminals. \<close>
   
-nonterminal svid and svids and svar and svars and salpha
+nonterminal svid and svids and salpha
 
 text \<open> These non-terminals correspond to the following syntactic entities. Non-terminal 
   @{typ "svid"} is an atomic variable identifier, and @{typ "svids"} is a list of identifier. 
-  @{typ "svar"} is a decorated variable, such as an input or output variable, and @{typ "svars"} is 
-  a list of decorated variables. @{typ "salpha"} is an alphabet or set of variables. Such sets can 
+  @{typ "salpha"} is an alphabet or set of variables. Such sets can 
   be constructed only through lens composition due to typing restrictions. Next we introduce some 
   syntax constructors. \<close>
    
@@ -40,8 +39,11 @@ syntax \<comment> \<open> Identifiers \<close>
   ""              :: "svid \<Rightarrow> svids" ("_")
   "_svid_list"    :: "svid \<Rightarrow> svids \<Rightarrow> svids" ("_,/ _")
   "_svid_alpha"   :: "svid" ("\<^bold>v")
+  "_svid_tuple"   :: "svids \<Rightarrow> svid" ("'(_')")
   "_svid_dot"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_:_" [999,998] 998)
   "_svid_res"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_\<restriction>_" [999,998] 998)
+  "_svid_fst"     :: "svid \<Rightarrow> svid" ("_\<^sup>\<lhd>" [997] 997)
+  "_svid_snd"     :: "svid \<Rightarrow> svid" ("_\<^sup>\<rhd>" [997] 997)
   "_mk_svid_list" :: "svids \<Rightarrow> logic" \<comment> \<open> Helper function for summing a list of identifiers \<close>
   "_svid_view"    :: "logic \<Rightarrow> svid" ("\<V>[_]") \<comment> \<open> View of a symmetric lens \<close>
   "_svid_coview"  :: "logic \<Rightarrow> svid" ("\<C>[_]") \<comment> \<open> Coview of a symmetric lens \<close>
@@ -53,14 +55,12 @@ text \<open> A variable can be decorated with an ampersand, to indicate it is a 
   
 syntax \<comment> \<open> Variable sets \<close>
   "_salphaid"    :: "id_position \<Rightarrow> salpha" ("_" [990] 990)
-  "_salphavar"   :: "svid \<Rightarrow> salpha" ("&_" [990] 990)
+  "_salphavar"   :: "svid \<Rightarrow> salpha" ("$_" [990] 990)
   "_salphaparen" :: "salpha \<Rightarrow> salpha" ("'(_')")
   "_salphacomp"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr ";" 75)
   "_salphaprod"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr "\<times>" 85)
   "_salpha_all"  :: "salpha" ("\<Sigma>")
   "_salpha_none" :: "salpha" ("\<emptyset>")
-  "_svar_nil"    :: "svar \<Rightarrow> svars" ("_")
-  "_svar_cons"   :: "svar \<Rightarrow> svars \<Rightarrow> svars" ("_,/ _")
   "_salphaset"   :: "svids \<Rightarrow> salpha" ("{_}")
   "_salphamk"    :: "logic \<Rightarrow> salpha"
 
@@ -69,10 +69,9 @@ text \<open> The terminals of an alphabet are either HOL identifiers or UTP vari
   a semi-colon or by a set-style construction $\{a,b,c\}$ with a list of UTP variables. \<close>
 
 syntax \<comment> \<open> Quotations \<close>
-  "_ualpha_set"  :: "svars \<Rightarrow> logic" ("{_}\<^sub>\<alpha>")  
   "_svid_set"    :: "svids \<Rightarrow> logic" ("{_}\<^sub>v")
   "_svid_empty"  :: "logic" ("{}\<^sub>v")
-  "_svar"        :: "svar \<Rightarrow> logic" ("'(_')\<^sub>v")
+  "_svar"        :: "svid \<Rightarrow> logic" ("'(_')\<^sub>v")
   
 text \<open> For various reasons, the syntax constructors above all yield specific grammar categories and
   will not parser at the HOL top level (basically this is to do with us wanting to reuse the syntax
@@ -85,8 +84,11 @@ translations
   "_svid x" \<rightharpoonup> "x"
   "_svlongid x" \<rightharpoonup> "x"
   "_svid_alpha" \<rightleftharpoons> "\<Sigma>"
+  "_svid_tuple xs" \<rightharpoonup> "_mk_svid_list xs"
   "_svid_dot x y" \<rightleftharpoons> "CONST ns_alpha x y"
-  "_svid_res x y" \<rightleftharpoons> "x /\<^sub>L y"
+  "_svid_res x y" \<rightleftharpoons> "x /\<^sub>L y" 
+  "_svid_fst x" \<rightleftharpoons> "_svid_dot fst\<^sub>L x"
+  "_svid_snd x" \<rightleftharpoons> "_svid_dot snd\<^sub>L x"
   "_mk_svid_list (_svid_list x xs)" \<rightharpoonup> "x +\<^sub>L _mk_svid_list xs"
   "_mk_svid_list x" \<rightharpoonup> "x"
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
@@ -98,16 +100,13 @@ translations
   "_salphacomp x y" \<rightharpoonup> "x \<squnion>\<^sub>S y"
   "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b"
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
-  "_svar_nil x" \<rightharpoonup> "x"
-  "_svar_cons x xs" \<rightharpoonup> "x +\<^sub>L xs"
   "_salphaset A" \<rightharpoonup> "_mk_svid_list A"  
-  "(_svar_cons x (_salphamk y))" \<leftharpoondown> "_salphamk (x +\<^sub>L y)" 
+  "(_svid_list x (_salphamk y))" \<leftharpoondown> "_salphamk (x +\<^sub>L y)" 
   "x" \<leftharpoondown> "_salphamk x"
   "_salpha_all" \<rightleftharpoons> "1\<^sub>L"
   "_salpha_none" \<rightleftharpoons> "0\<^sub>L"
 
   \<comment> \<open> Quotations \<close>
-  "_ualpha_set A" \<rightharpoonup> "A"
   "_svid_set A" \<rightharpoonup> "_mk_svid_list A"
   "_svid_empty" \<rightharpoonup> "0\<^sub>L"
   "_svar x" \<rightharpoonup> "x"

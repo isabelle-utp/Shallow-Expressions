@@ -77,7 +77,7 @@ syntax
   "_sexp_state" :: "id"
   "_sexp_quote" :: "logic \<Rightarrow> logic" ("'(_')\<^sub>e")
   "_sexp_lit"   :: "logic \<Rightarrow> logic" ("\<guillemotleft>_\<guillemotright>")
-  "_sexp_var"   :: "svid \<Rightarrow> logic" ("&_" [990] 990)
+  "_sexp_var"   :: "svid \<Rightarrow> logic" ("$_" [990] 990)
   "_sexp_evar"  :: "id_position \<Rightarrow> logic" ("@_" [999] 999)
   "_sexp_pqt"   :: "logic \<Rightarrow> sexp" ("[_]\<^sub>e")
 
@@ -113,7 +113,7 @@ text \<open> The main directive is the $e$ subscripted brackets, @{term "(e)\<^s
 
   \begin{enumerate}
     \item a new $\lambda$ abstraction over the state variable $s$ is wrapped around $e$;
-    \item every occurrence of free lens @{term "&x"} in $e$ is replace by @{term "get\<^bsub>x\<^esub> s"};
+    \item every occurrence of free lens @{term "$x"} in $e$ is replace by @{term "get\<^bsub>x\<^esub> s"};
     \item every occurrence of an expression variable @{term "e"} is replaced by @{term "e s"}.
   \end{enumerate}
 
@@ -136,12 +136,12 @@ term "(f + g)\<^sub>e"
 text \<open> Now, @{term f} and @{term g} are both parsed as literals, and so the term is 
   @{term "[\<lambda>\<s>. f + g]\<^sub>e"}. Alternatively, we could have a lens in the expression: \<close>
 
-term "(&x + g)\<^sub>e"
+term "($x + g)\<^sub>e"
 
 text \<open> This gives the term @{term "[\<lambda>\<s>. get\<^bsub>x\<^esub> \<s> + g]\<^sub>e"}. Although we have default behaviours
   for parsing, we can use different markup to coerce identifiers to particular variable kinds. \<close>
 
-term "(&x + @g)\<^sub>e"
+term "($x + @g)\<^sub>e"
 
 text \<open> This gives @{term "[\<lambda>\<s>. get\<^bsub>x\<^esub> \<s> + g \<s>]\<^sub>e"}, the we have requested that @{term "g"} is 
   treated as an expression variable. We can do similar with literal, as show below. \<close>
@@ -158,10 +158,12 @@ term "(@x)\<^sub>e"
 
 term "SEXP(\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v)"
 
-term "(v \<in> (&xs) \<union> (&f) ys \<union> {} \<and> @e)\<^sub>e"
+term "(v \<in> ($xs) \<union> ($f) ys \<union> {} \<and> @e)\<^sub>e"
 
 pretty_exprs
 expr_vars
+
+term "($x\<^sup>\<lhd> = $x\<^sup>\<rhd>)\<^sub>e"
 
 text \<open> The pretty printer works even when we don't use the parser, as shown below. \<close>
 
