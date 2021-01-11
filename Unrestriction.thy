@@ -19,6 +19,9 @@ translations
 
 named_theorems unrest
 
+lemma unrest_empty [unrest]: "\<emptyset> \<sharp> P"
+  by (simp add: expr_defs lens_defs)
+
 lemma unrest_var_union [unrest]:
   "\<lbrakk> x \<sharp> P; y \<sharp> P \<rbrakk> \<Longrightarrow> x;y \<sharp> P"
   by (simp add: expr_defs lens_defs)

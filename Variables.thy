@@ -10,8 +10,14 @@ text \<open> Variables can also be used to effectively define sets of variables.
   the universal alphabet ($\Sigma$) to be the bijective lens @{term "1\<^sub>L"}. This characterises
   the whole of the source type, and thus is effectively the set of all alphabet variables. \<close>
 
-definition univ_alpha :: "('\<alpha> \<Longrightarrow> '\<alpha>)" ("\<Sigma>") where
-[lens_defs]: "univ_alpha \<equiv> 1\<^sub>L"
+definition univ_var :: "('\<alpha> \<Longrightarrow> '\<alpha>)" where
+[lens_defs]: "univ_var = 1\<^sub>L"
+
+definition univ_alpha :: "'s scene" where
+[lens_defs]: "univ_alpha = \<top>\<^sub>S"
+
+definition emp_alpha :: "'s scene" where
+[lens_defs]: "emp_alpha = \<bottom>\<^sub>S"
 
 definition var_alpha :: "('a \<Longrightarrow> 's) \<Rightarrow> 's scene" where
 [lens_defs]: "var_alpha x = lens_scene x"
@@ -63,6 +69,7 @@ syntax \<comment> \<open> Variable sets \<close>
   "_salpha_none" :: "salpha" ("\<emptyset>")
   "_salphaset"   :: "svids \<Rightarrow> salpha" ("{_}")
   "_salphamk"    :: "logic \<Rightarrow> salpha"
+  "_mk_alpha_list" :: "svids \<Rightarrow> logic"
 
 text \<open> The terminals of an alphabet are either HOL identifiers or UTP variable identifiers. 
   We support two ways of constructing alphabets; by composition of smaller alphabets using
@@ -83,7 +90,7 @@ translations
   \<comment> \<open> Identifiers \<close>
   "_svid x" \<rightharpoonup> "x"
   "_svlongid x" \<rightharpoonup> "x"
-  "_svid_alpha" \<rightleftharpoons> "\<Sigma>"
+  "_svid_alpha" \<rightleftharpoons> "CONST univ_var"
   "_svid_tuple xs" \<rightharpoonup> "_mk_svid_list xs"
   "_svid_dot x y" \<rightleftharpoons> "CONST ns_alpha x y"
   "_svid_res x y" \<rightleftharpoons> "x /\<^sub>L y" 
@@ -91,6 +98,9 @@ translations
   "_svid_snd x" \<rightleftharpoons> "_svid_dot snd\<^sub>L x"
   "_mk_svid_list (_svid_list x xs)" \<rightharpoonup> "x +\<^sub>L _mk_svid_list xs"
   "_mk_svid_list x" \<rightharpoonup> "x"
+  "_mk_alpha_list (_svid_list x xs)" \<rightharpoonup> "CONST var_alpha x \<squnion>\<^sub>S _mk_alpha_list xs"
+  "_mk_alpha_list x" \<rightharpoonup> "CONST var_alpha x"
+
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
   "_svid_coview a" => "\<C>\<^bsub>a\<^esub>"
 
@@ -98,16 +108,16 @@ translations
   "_salphaparen a" \<rightharpoonup> "a"
   "_salphaid x" \<rightharpoonup> "x"
   "_salphacomp x y" \<rightharpoonup> "x \<squnion>\<^sub>S y"
-  "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b"
+(*  "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b" *)
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
   "_salphaset A" \<rightharpoonup> "_mk_svid_list A"  
   "(_svid_list x (_salphamk y))" \<leftharpoondown> "_salphamk (x +\<^sub>L y)" 
   "x" \<leftharpoondown> "_salphamk x"
-  "_salpha_all" \<rightleftharpoons> "1\<^sub>L"
-  "_salpha_none" \<rightleftharpoons> "0\<^sub>L"
+  "_salpha_all" \<rightleftharpoons> "CONST univ_alpha"
+  "_salpha_none" \<rightleftharpoons> "CONST emp_alpha"
 
   \<comment> \<open> Quotations \<close>
-  "_svid_set A" \<rightharpoonup> "_mk_svid_list A"
+  "_svid_set A" \<rightharpoonup> "_mk_alpha_list A"
   "_svid_empty" \<rightharpoonup> "0\<^sub>L"
   "_svar x" \<rightharpoonup> "x"
 
