@@ -154,8 +154,6 @@ term "(\<guillemotleft>f\<guillemotright> (@e))\<^sub>e"
 
 term "(@f + @g)\<^sub>e"
 
-
-
 term "(@x)\<^sub>e"
 
 term "SEXP(\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v)"

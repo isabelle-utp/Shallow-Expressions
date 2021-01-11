@@ -10,8 +10,17 @@ text \<open> Variables can also be used to effectively define sets of variables.
   the universal alphabet ($\Sigma$) to be the bijective lens @{term "1\<^sub>L"}. This characterises
   the whole of the source type, and thus is effectively the set of all alphabet variables. \<close>
 
-abbreviation (input) univ_alpha :: "('\<alpha> \<Longrightarrow> '\<alpha>)" ("\<Sigma>") where
-"univ_alpha \<equiv> 1\<^sub>L"
+definition univ_alpha :: "('\<alpha> \<Longrightarrow> '\<alpha>)" ("\<Sigma>") where
+[lens_defs]: "univ_alpha \<equiv> 1\<^sub>L"
+
+definition var_alpha :: "('a \<Longrightarrow> 's) \<Rightarrow> 's scene" where
+[lens_defs]: "var_alpha x = lens_scene x"
+
+definition ns_alpha :: "('b \<Longrightarrow> 'c) \<Rightarrow> ('a \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
+[lens_defs]: "ns_alpha a x = x ;\<^sub>L a"
+
+definition res_alpha :: "('a \<Longrightarrow> 'b) \<Rightarrow> ('c \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
+[lens_defs]: "res_alpha x a = x /\<^sub>L a"
 
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
   step is to introduce a collection of non-terminals. \<close>
@@ -28,7 +37,7 @@ text \<open> These non-terminals correspond to the following syntactic entities.
 syntax \<comment> \<open> Identifiers \<close>
   "_svid"         :: "id_position \<Rightarrow> svid" ("_" [999] 999)
   "_svlongid"     :: "longid_position \<Rightarrow> svid" ("_" [999] 999)
-  "_svid_unit"    :: "svid \<Rightarrow> svids" ("_")
+  ""              :: "svid \<Rightarrow> svids" ("_")
   "_svid_list"    :: "svid \<Rightarrow> svids \<Rightarrow> svids" ("_,/ _")
   "_svid_alpha"   :: "svid" ("\<^bold>v")
   "_svid_dot"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_:_" [999,998] 998)
@@ -43,8 +52,8 @@ text \<open> A variable can be decorated with an ampersand, to indicate it is a 
   decorations can be and are added later. \<close>
   
 syntax \<comment> \<open> Variable sets \<close>
-  "_salphaid"    :: "svid \<Rightarrow> salpha" ("_" [990] 990)
-  "_salphavar"   :: "svar \<Rightarrow> salpha" ("_" [990] 990)
+  "_salphaid"    :: "id_position \<Rightarrow> salpha" ("_" [990] 990)
+  "_salphavar"   :: "svid \<Rightarrow> salpha" ("&_" [990] 990)
   "_salphaparen" :: "salpha \<Rightarrow> salpha" ("'(_')")
   "_salphacomp"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr ";" 75)
   "_salphaprod"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr "\<times>" 85)
@@ -76,19 +85,19 @@ translations
   "_svid x" \<rightharpoonup> "x"
   "_svlongid x" \<rightharpoonup> "x"
   "_svid_alpha" \<rightleftharpoons> "\<Sigma>"
-  "_svid_dot x y" \<rightharpoonup> "y ;\<^sub>L x"
-  "_svid_res x y" \<rightharpoonup> "x /\<^sub>L y"
-  "_mk_svid_list (_svid_unit x)" \<rightharpoonup> "x"
+  "_svid_dot x y" \<rightleftharpoons> "CONST ns_alpha x y"
+  "_svid_res x y" \<rightleftharpoons> "x /\<^sub>L y"
   "_mk_svid_list (_svid_list x xs)" \<rightharpoonup> "x +\<^sub>L _mk_svid_list xs"
+  "_mk_svid_list x" \<rightharpoonup> "x"
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
   "_svid_coview a" => "\<C>\<^bsub>a\<^esub>"
 
   \<comment> \<open> Alphabets \<close>
   "_salphaparen a" \<rightharpoonup> "a"
   "_salphaid x" \<rightharpoonup> "x"
-  "_salphacomp x y" \<rightharpoonup> "x +\<^sub>L y"
+  "_salphacomp x y" \<rightharpoonup> "x \<squnion>\<^sub>S y"
   "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b"
-  "_salphavar x" \<rightharpoonup> "x"
+  "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
   "_svar_nil x" \<rightharpoonup> "x"
   "_svar_cons x xs" \<rightharpoonup> "x +\<^sub>L xs"
   "_salphaset A" \<rightharpoonup> "_mk_svid_list A"  

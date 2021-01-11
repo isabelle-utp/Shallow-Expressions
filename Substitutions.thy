@@ -1,3 +1,5 @@
+section \<open> Substitutions \<close>
+
 theory Substitutions
   imports Unrestriction
 begin
@@ -30,42 +32,36 @@ translations
   "_unrest_usubst x p" == "CONST unrest_usubst x p"                                           
   "_unrest_usubst (_salphaset (_salphamk (x +\<^sub>L y))) P"  <= "_unrest_usubst (x +\<^sub>L y) P"
 
-definition par_subst :: "'s subst \<Rightarrow> ('a \<Longrightarrow> 's) \<Rightarrow> ('b \<Longrightarrow> 's) \<Rightarrow> 's subst \<Rightarrow> 's subst"
-  where [expr_defs]: "par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2 = (\<lambda> s. (s \<oplus>\<^sub>L (\<sigma>\<^sub>1 s) on A) \<oplus>\<^sub>L (\<sigma>\<^sub>2 s) on B)"
+definition par_subst :: "'s subst \<Rightarrow> 's scene \<Rightarrow> 's scene \<Rightarrow> 's subst \<Rightarrow> 's subst"
+  where [expr_defs]: "par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2 = (\<lambda> s. (s \<oplus>\<^sub>S (\<sigma>\<^sub>1 s) on A) \<oplus>\<^sub>S (\<sigma>\<^sub>2 s) on B)"
 
-nonterminal uexprs and smaplet and smaplets and salphas
+nonterminal uexprs and smaplet and smaplets
 
 syntax
-  "_smaplet"  :: "[salpha, logic] => smaplet"             ("_ /\<mapsto>\<^sub>s/ _")
+  "_smaplet"  :: "[svid, logic] => smaplet"             ("_ /\<mapsto>\<^sub>s/ _")
   ""          :: "smaplet => smaplets"            ("_")
   "_SMaplets" :: "[smaplet, smaplets] => smaplets" ("_,/ _")
   "_SubstUpd" :: "[logic, smaplets] => logic" ("_/'(_')" [900,0] 900)
   "_Subst"    :: "smaplets => logic"            ("(1[_])")
   "_PSubst"   :: "smaplets => logic"            ("(1\<lparr>_\<rparr>)")
   "_psubst"   :: "[logic, svars, uexprs] \<Rightarrow> logic"
-  "_subst"    :: "logic \<Rightarrow> uexprs \<Rightarrow> salphas \<Rightarrow> logic" ("(_\<lbrakk>_'/_\<rbrakk>)" [990,0,0] 991)
+  "_subst"    :: "logic \<Rightarrow> uexprs \<Rightarrow> svids \<Rightarrow> logic" ("(_\<lbrakk>_'/_\<rbrakk>)" [990,0,0] 991)
   "_uexprs"   :: "[logic, uexprs] => uexprs" ("_,/ _")
   ""          :: "logic => uexprs" ("_")
-  "_salphas"  :: "[salpha, salphas] => salphas" ("_,/ _")
-  ""          :: "salpha => salphas" ("_")
   "_par_subst" :: "logic \<Rightarrow> salpha \<Rightarrow> salpha \<Rightarrow> logic \<Rightarrow> logic" ("_ [_|_]\<^sub>s _" [100,0,0,101] 101)
     
 translations
   "_SubstUpd m (_SMaplets xy ms)"     == "_SubstUpd (_SubstUpd m xy) ms"
   "_SubstUpd m (_smaplet x y)"        == "CONST subst_upd m x (y)\<^sub>e"
-(*  "_SubstUpd m (_smaplet x y)"        <= "CONST subst_upd m x y" *)
   "_Subst ms"                         == "_SubstUpd id\<^sub>s ms"
   "_Subst (_SMaplets ms1 ms2)"        <= "_SubstUpd (_Subst ms1) ms2"
   "_PSubst ms"                        == "_SubstUpd nil\<^sub>s ms"
   "_PSubst (_SMaplets ms1 ms2)"       <= "_SubstUpd (_PSubst ms1) ms2"
   "_SMaplets ms1 (_SMaplets ms2 ms3)" <= "_SMaplets (_SMaplets ms1 ms2) ms3"
   "_subst P es vs" => "CONST subst_app (_psubst id\<^sub>s vs es) P"
-  "_psubst m (_salphas x xs) (_uexprs v vs)" => "_psubst (_psubst m x v) xs vs"
+  "_psubst m (_svid_list x xs) (_uexprs v vs)" => "_psubst (_psubst m x v) xs vs"
   "_psubst m x v"  => "CONST subst_upd m x (v)\<^sub>e"
   "_subst P v x" <= "CONST subst_app (CONST subst_upd id\<^sub>s x (v)\<^sub>e) P"
-(*
-  "_subst P v x" <= "_subst P (_spvar x) v"
-*)
   "_par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2" == "CONST par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2"
 
 subsection \<open> Substitution Laws \<close>
@@ -73,8 +69,9 @@ subsection \<open> Substitution Laws \<close>
 named_theorems usubst and usubst_eval
 
 lemma subst_unrest [usubst]:
-  "\<lbrakk> vwb_lens x; x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<mapsto>\<^sub>s e) \<dagger> v = \<sigma> \<dagger> v"
+  "\<lbrakk> vwb_lens x; &x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<mapsto>\<^sub>s e) \<dagger> v = \<sigma> \<dagger> v"
   by (auto simp add: expr_defs fun_eq_iff)
+     (metis lens_override_def lens_scene_override mwb_lens_def var_alpha_def vwb_lens_mwb weak_lens.put_get)
 
 lemma subst_lookup_id [usubst]: "\<langle>id\<^sub>s\<rangle>\<^sub>s x = var x"
   by (simp add: expr_defs)
@@ -94,11 +91,6 @@ lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^su
 (* FIXME: Figure out how to make laws like this parse and simplify *)
 
 expr_ctr subst_app
-
-(*
-translations 
-  "CONST subst_app \<sigma> e" <= "CONST subst_app \<sigma> e _sexp_state"
-*)
 
 term "(f (\<sigma> \<dagger> e))\<^sub>e"
 
