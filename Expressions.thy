@@ -44,6 +44,9 @@ abbreviation (input) bop
   :: "('a \<Rightarrow> 'b \<Rightarrow> 'c) \<Rightarrow> ('a, 's) expr \<Rightarrow> ('b, 's) expr \<Rightarrow> ('c, 's) expr" where
 "bop f e\<^sub>1 e\<^sub>2 \<equiv> (\<lambda> s. f (e\<^sub>1 s) (e\<^sub>2 s))"
 
+definition taut :: "(bool, 's) expr \<Rightarrow> bool" where
+[expr_defs]: "taut e = (\<forall> s. e s)"
+
 subsection \<open> Lifting Parser and Printer \<close>
 
 text \<open> The lifting parser creates a parser directive that converts an expression to a 
@@ -80,6 +83,7 @@ syntax
   "_sexp_var"   :: "svid \<Rightarrow> logic" ("$_" [990] 990)
   "_sexp_evar"  :: "id_position \<Rightarrow> logic" ("@_" [999] 999)
   "_sexp_pqt"   :: "logic \<Rightarrow> sexp" ("[_]\<^sub>e")
+  "_sexp_taut"  :: "logic \<Rightarrow> logic" ("`_`")
 
 ML_file \<open>Lift_Expr.ML\<close>
 
@@ -107,6 +111,7 @@ print_translation \<open>
 
 translations
   "_sexp_var x" => "get\<^bsub>x\<^esub> _sexp_state"
+  "_sexp_taut p" == "CONST taut (p)\<^sub>e"
 
 text \<open> The main directive is the $e$ subscripted brackets, @{term "(e)\<^sub>e"}. This converts the 
   expression $e$ to a boxed $\lambda$ term. Essentially, the parser behaviour is as follows:
