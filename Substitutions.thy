@@ -13,8 +13,13 @@ definition subst_nil :: "('s\<^sub>1, 's\<^sub>2) psubst" ("nil\<^sub>s")
 definition subst_id :: "'s subst" ("id\<^sub>s") 
   where [expr_defs]: "subst_id = (\<lambda>s. s)"
 
-definition subst_app :: "'s subst \<Rightarrow> ('a, 's) expr \<Rightarrow> ('a, 's) expr" (infix "\<dagger>" 65) 
+definition subst_app :: "'s subst \<Rightarrow> ('a, 's) expr \<Rightarrow> ('a, 's) expr" 
   where [expr_defs]: "subst_app \<sigma> e = (\<lambda> s. e (\<sigma> s))"
+
+syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
+
+translations
+  "_subst_app \<sigma> e" == "CONST subst_app \<sigma> (e)\<^sub>e"
 
 definition subst_upd :: "'s subst \<Rightarrow> ('a \<Longrightarrow> 's) \<Rightarrow> ('a, 's) expr \<Rightarrow> 's subst"
   where [expr_defs]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
@@ -98,16 +103,16 @@ term "(\<forall> x. x + $y > $z)\<^sub>e"
 
 term "(\<forall> k. P\<lbrakk>\<guillemotleft>k\<guillemotright>/x\<rbrakk>)\<^sub>e"
 
-lemma subst_var [usubst]: "\<sigma> \<dagger> ($x)\<^sub>e = \<langle>\<sigma>\<rangle>\<^sub>s x"
+lemma subst_var [usubst]: "\<sigma> \<dagger> $x = \<langle>\<sigma>\<rangle>\<^sub>s x"
   by (simp add: expr_defs)
 
 text \<open> We can't use this as simplification unfortunately as the expression structure is too
   ambiguous to support automatic rewriting. \<close>
 
-lemma subst_uop: "\<sigma> \<dagger> (\<guillemotleft>f\<guillemotright> e)\<^sub>e = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e))\<^sub>e"
+lemma subst_uop: "\<sigma> \<dagger> \<guillemotleft>f\<guillemotright> e = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e))\<^sub>e"
   by (simp add: expr_defs)
 
-lemma subst_bop: "\<sigma> \<dagger> (\<guillemotleft>f\<guillemotright> e\<^sub>1 e\<^sub>2)\<^sub>e = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e\<^sub>1) (\<sigma> \<dagger> e\<^sub>2))\<^sub>e"
+lemma subst_bop: "\<sigma> \<dagger> \<guillemotleft>f\<guillemotright> e\<^sub>1 e\<^sub>2 = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e\<^sub>1) (\<sigma> \<dagger> e\<^sub>2))\<^sub>e"
   by (simp add: expr_defs)
 
 text \<open> A substitution update naturally yields the given expression. \<close>
@@ -146,6 +151,10 @@ lemma usubst_upd_comm2:
 lemma usubst_upd_var_id [usubst]:
   "vwb_lens x \<Longrightarrow> [x \<mapsto>\<^sub>s $x] = id\<^sub>s"
   by (simp add: subst_upd_def subst_id_def id_lens_def SEXP_def)
+
+lemma usubst_upd_pair [usubst]:
+  "x \<bowtie> y \<Longrightarrow> [(x, y) \<mapsto>\<^sub>s (e, f)] = [x \<mapsto>\<^sub>s e, y \<mapsto>\<^sub>s f]"
+  by (simp add: subst_upd_def lens_defs SEXP_def fun_eq_iff lens_indep_comm)
 
 subsection \<open> Evaluation \<close>
 
