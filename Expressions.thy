@@ -27,6 +27,8 @@ text \<open> The following constructor is used to syntactically mark functions t
 definition SEXP :: "('s \<Rightarrow> 'a) \<Rightarrow> ('a, 's) expr" ("[_]\<^sub>e") where
 [expr_defs]: "SEXP x = x"
 
+lemma SEXP_apply [simp]: "SEXP e s = (e s)" by (simp add: SEXP_def)
+
 lemma SEXP_idem [simp]: "[[e]\<^sub>e]\<^sub>e = [e]\<^sub>e" by (simp add: SEXP_def)
 
 text \<open> We can create the core constructs of a simple expression language as indicated below. \<close>
@@ -103,7 +105,7 @@ print_translation \<open>
   [(@{const_syntax "SEXP"}
    , fn ctx => fn ts =>
      if (FullExprs.get (Proof_Context.theory_of ctx)) 
-     then Syntax.const @{syntax_const "_sexp_pqt"} $ hd ts 
+     then Term.list_comb (Syntax.const @{syntax_const "_sexp_pqt"}, ts)
      else
      Syntax.const @{syntax_const "_sexp_quote"} 
      $ Lift_Expr.print_expr ctx (betapply ((hd ts), Syntax.const @{syntax_const "_sexp_state"})))]
@@ -163,7 +165,8 @@ term "(@x)\<^sub>e"
 
 term "SEXP(\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v)"
 
-term "(v \<in> ($xs) \<union> ($f) ys \<union> {} \<and> @e)\<^sub>e"
+
+term "(v \<in> $xs \<union> ($f) ys \<union> {} \<and> @e)\<^sub>e"
 
 pretty_exprs
 expr_vars
@@ -173,5 +176,13 @@ term "($x\<^sup>\<lhd> = $x\<^sup>\<rhd>)\<^sub>e"
 text \<open> The pretty printer works even when we don't use the parser, as shown below. \<close>
 
 term "[\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v]\<^sub>e"
+
+subsection \<open> Reasoning \<close>
+
+lemma taut_True [simp]: "`True` = True"
+  by (simp add: taut_def)
+
+lemma taut_False [simp]: "`False` = False"
+  by (simp add: taut_def)
 
 end
