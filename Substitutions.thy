@@ -122,6 +122,11 @@ lemma subst_lookup_upd [usubst]:
   shows "\<langle>\<sigma>(x \<mapsto>\<^sub>s v)\<rangle>\<^sub>s x = (v)\<^sub>e"
   using assms by (simp add: expr_defs)
 
+lemma subst_lookup_upd_diff [usubst]:
+  assumes "x \<bowtie> y"
+  shows "\<langle>\<sigma>(y \<mapsto>\<^sub>s v)\<rangle>\<^sub>s x = \<langle>\<sigma>\<rangle>\<^sub>s x"
+  using assms by (simp add: expr_defs)
+
 text \<open> Substitution update is idempotent. \<close>
 
 lemma usubst_upd_idem [usubst]:
