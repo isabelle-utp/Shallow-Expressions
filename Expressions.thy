@@ -79,13 +79,15 @@ text \<open> Next, we create some syntactic constants and define parse and print
   them. \<close>
 
 syntax
-  "_sexp_state" :: "id"
-  "_sexp_quote" :: "logic \<Rightarrow> logic" ("'(_')\<^sub>e")
-  "_sexp_lit"   :: "logic \<Rightarrow> logic" ("\<guillemotleft>_\<guillemotright>")
-  "_sexp_var"   :: "svid \<Rightarrow> logic" ("$_" [990] 990)
-  "_sexp_evar"  :: "id_position \<Rightarrow> logic" ("@_" [999] 999)
-  "_sexp_pqt"   :: "logic \<Rightarrow> sexp" ("[_]\<^sub>e")
-  "_sexp_taut"  :: "logic \<Rightarrow> logic" ("`_`")
+  "_sexp_state"      :: "id"
+  "_sexp_quote"      :: "logic \<Rightarrow> logic" ("'(_')\<^sub>e")
+  \<comment> \<open> Convert the expression to a lambda term, but do not box it. \<close>
+  "_sexp_quote_1way" :: "logic \<Rightarrow> logic" ("'(_')\<^sup>e")
+  "_sexp_lit"        :: "logic \<Rightarrow> logic" ("\<guillemotleft>_\<guillemotright>")
+  "_sexp_var"        :: "svid \<Rightarrow> logic" ("$_" [990] 990)
+  "_sexp_evar"       :: "id_position \<Rightarrow> logic" ("@_" [999] 999)
+  "_sexp_pqt"        :: "logic \<Rightarrow> sexp" ("[_]\<^sub>e")
+  "_sexp_taut"       :: "logic \<Rightarrow> logic" ("`_`")
 
 ML_file \<open>Lift_Expr.ML\<close>
 
@@ -98,7 +100,13 @@ parse_translation \<open>
         [e] =>
             Syntax.const @{const_name SEXP} 
             $ (lambda (Syntax.free Lift_Expr.state_id) 
-                      (Lift_Expr.lift_expr ctx (Term_Position.strip_positions e))))]
+                      (Lift_Expr.lift_expr ctx (Term_Position.strip_positions e)))),
+   (@{syntax_const "_sexp_quote_1way"}
+   , fn ctx => fn terms =>
+      case terms of
+        [e] =>
+            (lambda (Syntax.free Lift_Expr.state_id) 
+                    (Lift_Expr.lift_expr ctx (Term_Position.strip_positions e))))]
 \<close>
 
 print_translation \<open>
@@ -131,6 +139,7 @@ text \<open> The main directive is the $e$ subscripted brackets, @{term "(e)\<^s
 full_exprs
 
 term "(f + g)\<^sub>e"
+term "(f + g)\<^sup>e"
 
 text \<open> The default behaviour of our parser is to recognise identifiers as expression variables.
   So, the above expression becomes the term @{term "[\<lambda>\<s>. f \<s> + g \<s>]\<^sub>e"}. We can easily change
@@ -178,6 +187,12 @@ text \<open> The pretty printer works even when we don't use the parser, as show
 term "[\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v]\<^sub>e"
 
 subsection \<open> Reasoning \<close>
+
+lemma expr_eq_iff: "P = Q \<longleftrightarrow> `P = Q`"
+  by (simp add: taut_def fun_eq_iff)
+
+lemma refine_iff_implies: "P \<le> Q \<longleftrightarrow> `P \<longrightarrow> Q`"
+  by (simp add: le_fun_def taut_def)
 
 lemma taut_True [simp]: "`True` = True"
   by (simp add: taut_def)
