@@ -58,13 +58,14 @@ text \<open> A variable can be decorated with an ampersand, to indicate it is a 
   a dollar to indicate its an unprimed relational variable, or a dollar and ``acute'' symbol to 
   indicate its a primed relational variable. Isabelle's parser is extensible so additional
   decorations can be and are added later. \<close>
-  
+
 syntax \<comment> \<open> Variable sets \<close>
   "_salphaid"    :: "id_position \<Rightarrow> salpha" ("_" [990] 990)
   "_salphavar"   :: "svid \<Rightarrow> salpha" ("$_" [990] 990)
   "_salphaparen" :: "salpha \<Rightarrow> salpha" ("'(_')")
   "_salphacomp"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr ";" 75)
   "_salphaprod"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr "\<times>" 85)
+  "_salphacompl" :: "salpha \<Rightarrow> salpha" ("- _" [81] 80)
   "_salpha_all"  :: "salpha" ("\<Sigma>")
   "_salpha_none" :: "salpha" ("\<emptyset>")
   "_salphaset"   :: "svids \<Rightarrow> salpha" ("{_}")
@@ -108,9 +109,10 @@ translations
   "_salphaparen a" \<rightharpoonup> "a"
   "_salphaid x" \<rightharpoonup> "x"
   "_salphacomp x y" \<rightharpoonup> "x \<squnion>\<^sub>S y"
+  "_salphacompl x"  \<rightharpoonup> "- x"
 (*  "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b" *)
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
-  "_salphaset A" \<rightharpoonup> "_mk_svid_list A"  
+  "_salphaset A" \<rightharpoonup> "_mk_alpha_list A"  
   "(_svid_list x (_salphamk y))" \<leftharpoondown> "_salphamk (x +\<^sub>L y)" 
   "x" \<leftharpoondown> "_salphamk x"
   "_salpha_all" \<rightleftharpoons> "CONST univ_alpha"

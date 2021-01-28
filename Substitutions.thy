@@ -75,23 +75,23 @@ named_theorems usubst and usubst_eval
 
 lemma subst_unrest [usubst]:
   "\<lbrakk> vwb_lens x; $x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<mapsto>\<^sub>s e) \<dagger> v = \<sigma> \<dagger> v"
-  by (auto simp add: expr_defs fun_eq_iff)
-     (metis lens_override_def lens_scene_override mwb_lens_def var_alpha_def vwb_lens_mwb weak_lens.put_get)
+  by (expr_auto)
+     (metis lens_override_def lens_scene_override mwb_lens_def vwb_lens_mwb weak_lens.put_get)
 
 lemma subst_lookup_id [usubst]: "\<langle>id\<^sub>s\<rangle>\<^sub>s x = var x"
-  by (simp add: expr_defs)
+  by expr_simp
 
 lemma subst_id_var: "id\<^sub>s = ($\<^bold>v)\<^sub>e"
-  by (simp add: expr_defs lens_defs)
+  by expr_simp
 
 lemma subst_upd_id_lam [usubst]: "subst_upd ($\<^bold>v)\<^sub>e x v = subst_upd id\<^sub>s x v"
-  by (simp add: subst_id_var)
+  by expr_simp
 
 lemma subst_id [simp]: "id\<^sub>s \<circ> \<sigma> = \<sigma>" "\<sigma> \<circ> id\<^sub>s = \<sigma>"
-  by (auto simp add: expr_defs)
+  by expr_auto+
 
 lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^sub>L = \<sigma>"
-  by (simp add: expr_defs lens_defs)
+  by expr_simp
 
 (* FIXME: Figure out how to make laws like this parse and simplify *)
 
@@ -158,7 +158,7 @@ lemma usubst_upd_var_id [usubst]:
   by (simp add: subst_upd_def subst_id_def id_lens_def SEXP_def)
 
 lemma usubst_upd_pair [usubst]:
-  "x \<bowtie> y \<Longrightarrow> [(x, y) \<mapsto>\<^sub>s (e, f)] = [x \<mapsto>\<^sub>s e, y \<mapsto>\<^sub>s f]"
+  "x \<bowtie> y \<Longrightarrow> \<sigma>((x, y) \<mapsto>\<^sub>s (e, f)) = \<sigma>(x \<mapsto>\<^sub>s e, y \<mapsto>\<^sub>s f)"
   by (simp add: subst_upd_def lens_defs SEXP_def fun_eq_iff lens_indep_comm)
 
 subsection \<open> Evaluation \<close>

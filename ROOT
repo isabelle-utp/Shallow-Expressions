@@ -1,3 +1,3 @@
 session "Shallow-Expressions" = "Optics" + 
-  options [document = none]
+  options [document = false]
   theories Shallow_Expressions
