@@ -28,6 +28,14 @@ definition ns_alpha :: "('b \<Longrightarrow> 'c) \<Rightarrow> ('a \<Longrighta
 definition res_alpha :: "('a \<Longrightarrow> 'b) \<Rightarrow> ('c \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
 [lens_defs]: "res_alpha x a = x /\<^sub>L a"
 
+lemma idem_scene_var [simp]:
+  "vwb_lens x \<Longrightarrow> idem_scene (var_alpha x)"
+  by (simp add: lens_defs)
+
+lemma not_member_var_alpha [simp]: 
+  "\<lbrakk> vwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> x \<notin>\<^sub>S (var_alpha y)"
+  by (simp add: lens_indep_comm lens_member_def lens_override_def lens_scene_override scene_override_commute var_alpha_def)
+
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
   step is to introduce a collection of non-terminals. \<close>
   
