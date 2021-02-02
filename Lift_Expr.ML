@@ -29,8 +29,11 @@ fun lift_expr_aux ctx (Const (n', t), args) =
       _ => Term.list_comb (Const (n, t), args')
   end |
 lift_expr_aux ctx (Free (n, t), args) = 
-    let val consts = (Proof_Context.consts_of ctx)
+    let open Syntax
+        val consts = (Proof_Context.consts_of ctx)
         val {const_space, ...} = Consts.dest consts
+        val t' = case (Syntax.check_term ctx (Free (n, t))) of
+                   Free (_, t') => t' | _ => t
         \<comment> \<open> The name must be internalised in case it needs qualifying. \<close>
         val c = Consts.intern consts n in
         \<comment> \<open> If the name refers to a declared constant, then we lift it as a constant. \<close>
@@ -38,7 +41,12 @@ lift_expr_aux ctx (Free (n, t), args) =
           lift_expr_aux ctx (Const (c, t), args)
         \<comment> \<open> Otherwise, we leave it alone \<close>
         else
-          let val trm = if (LitVars.get (Proof_Context.theory_of ctx)) 
+          let val trm = 
+                \<comment> \<open> We check whether the free variable has a lens type, and if so lift it as one\<close>
+                case t' of 
+                 Type (\<^type_name>\<open>lens_ext\<close>, _) => const @{const_name lens_get} $ Free (n, t') $ free state_id |
+                 \<comment> \<open> Otherwise, we leave it alone, or apply it to the state variable if it's an expression constructor \<close>
+                 _ => if (LitVars.get (Proof_Context.theory_of ctx)) 
                         then Free (n, t) else Free (n, t) $ Syntax.free state_id
           in Term.list_comb (trm, map (lift_expr ctx) args) end
   end |
