@@ -36,6 +36,43 @@ lemma not_member_var_alpha [simp]:
   "\<lbrakk> vwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> x \<notin>\<^sub>S (var_alpha y)"
   by (simp add: lens_indep_comm lens_member_def lens_override_def lens_scene_override scene_override_commute var_alpha_def)
 
+lemma var_alpha_combine: "\<lbrakk> vwb_lens x; vwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> var_alpha x \<squnion>\<^sub>S var_alpha y = var_alpha (x +\<^sub>L y)"
+  by (simp add: lens_plus_scene var_alpha_def)
+
+lemma var_alpha_indep [simp]: 
+  assumes "vwb_lens x" "vwb_lens y"
+  shows "var_alpha x \<bowtie>\<^sub>S var_alpha y \<longleftrightarrow> x \<bowtie> y"
+  by (simp add: assms(1) assms(2) lens_indep_scene var_alpha_def)
+
+(* Some extra Scene laws; should be moved to Optics at some point *)
+
+lemma scene_le_iff_indep_inv:
+  "A \<bowtie>\<^sub>S - B \<longleftrightarrow> A \<le> B"
+  by (auto simp add: less_eq_scene_def scene_indep_override scene_override_commute)
+
+lemma get_scene_override_indep: "\<lbrakk> vwb_lens x; \<lbrakk>x\<rbrakk>\<^sub>\<sim> \<bowtie>\<^sub>S a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (s \<oplus>\<^sub>S s' on a) = get\<^bsub>x\<^esub> s"
+proof -
+  assume a1: "\<lbrakk>x\<rbrakk>\<^sub>\<sim> \<bowtie>\<^sub>S a"
+  assume a2: "vwb_lens x"
+  then have "\<forall>b ba bb. bb \<oplus>\<^sub>S b \<oplus>\<^sub>S ba on a on \<lbrakk>x\<rbrakk>\<^sub>\<sim> = bb \<oplus>\<^sub>S b on \<lbrakk>x\<rbrakk>\<^sub>\<sim>"
+    using a1 by (metis idem_scene_uminus indep_then_compl_in scene_indep_sym scene_override_commute subscene_eliminate vwb_impl_idem_scene)
+  then show ?thesis
+    using a2 by (metis lens_override_def lens_scene_override mwb_lens_def vwb_lens_mwb weak_lens.put_get)
+qed
+
+lemma get_scene_override_le: "\<lbrakk> vwb_lens x; \<lbrakk>x\<rbrakk>\<^sub>\<sim> \<le> a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (s \<oplus>\<^sub>S s' on a) = get\<^bsub>x\<^esub> s'"
+  by (metis get_scene_override_indep scene_le_iff_indep_inv scene_override_commute)
+
+lemma var_alpha_indep_compl [simp]: 
+  assumes "vwb_lens x" "vwb_lens y"
+  shows "var_alpha x \<bowtie>\<^sub>S - var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
+  by (simp add: assms scene_le_iff_indep_inv sublens_iff_subscene var_alpha_def)
+
+lemma var_alpha_subset [simp]: 
+  assumes "vwb_lens x" "vwb_lens y"
+  shows "var_alpha x \<le> var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
+  by (simp add: assms(1) assms(2) sublens_iff_subscene var_alpha_def)
+
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
   step is to introduce a collection of non-terminals. \<close>
   

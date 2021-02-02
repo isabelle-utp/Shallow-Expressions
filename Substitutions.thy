@@ -16,6 +16,9 @@ definition subst_id :: "'s subst" ("id\<^sub>s")
 definition subst_app :: "'s subst \<Rightarrow> ('a, 's) expr \<Rightarrow> ('a, 's) expr" 
   where [expr_defs]: "subst_app \<sigma> e = (\<lambda> s. e (\<sigma> s))"
 
+definition sset :: "'s scene \<Rightarrow> 's \<Rightarrow> 's subst" 
+  where [expr_defs]: "sset a s' = (\<lambda> s. s \<oplus>\<^sub>S s' on a)"
+
 syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
 
 translations
@@ -175,5 +178,18 @@ lemma get_subst_upd_same [usubst_eval]: "weak_lens x \<Longrightarrow> get\<^bsu
 lemma get_subst_upd_indep [usubst_eval]: 
   "x \<bowtie> y \<Longrightarrow> get\<^bsub>x\<^esub> ((\<sigma>(y \<mapsto>\<^sub>s e)) s) = get\<^bsub>x\<^esub> (\<sigma> s)"
   by (simp add: subst_upd_def)
+
+lemma unrest_ssubst: "(a \<sharp> P) \<longleftrightarrow> (\<forall> s'. sset a s' \<dagger> P = (P)\<^sub>e)"
+  by (auto simp add: expr_defs fun_eq_iff)
+  
+lemma get_subst_sset_out [usubst_eval]: "\<lbrakk> vwb_lens x; var_alpha x \<bowtie>\<^sub>S a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (sset a s' s) = get\<^bsub>x\<^esub> s"
+  by (simp add: expr_defs var_alpha_def get_scene_override_indep)
+
+lemma get_subst_sset_in [usubst_eval]: "\<lbrakk> vwb_lens x; var_alpha x \<le> a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (sset a s' s) = get\<^bsub>x\<^esub> s'"
+  by (simp add: get_scene_override_le sset_def var_alpha_def)
+
+text \<open> A tactic for proving unrestrictions by evaluating a special kind of substitution. \<close>
+
+method unrest = (simp add: unrest_ssubst var_alpha_combine usubst_eval)
 
 end
