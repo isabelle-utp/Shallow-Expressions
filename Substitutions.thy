@@ -13,7 +13,7 @@ definition subst_nil :: "('s\<^sub>1, 's\<^sub>2) psubst" ("nil\<^sub>s")
 definition subst_id :: "'s subst" ("id\<^sub>s") 
   where [expr_defs]: "subst_id = (\<lambda>s. s)"
 
-definition subst_app :: "'s subst \<Rightarrow> ('a, 's) expr \<Rightarrow> ('a, 's) expr" 
+definition subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a, 's\<^sub>2) expr \<Rightarrow> ('a, 's\<^sub>1) expr" 
   where [expr_defs]: "subst_app \<sigma> e = (\<lambda> s. e (\<sigma> s))"
 
 definition sset :: "'s scene \<Rightarrow> 's \<Rightarrow> 's subst" 
@@ -24,10 +24,10 @@ syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\
 translations
   "_subst_app \<sigma> e" == "CONST subst_app \<sigma> (e)\<^sub>e"
 
-definition subst_upd :: "'s subst \<Rightarrow> ('a \<Longrightarrow> 's) \<Rightarrow> ('a, 's) expr \<Rightarrow> 's subst"
+definition subst_upd :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst"
   where [expr_defs]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
 
-definition subst_lookup :: "('s\<^sub>1,'s\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr" ("\<langle>_\<rangle>\<^sub>s")
+definition subst_lookup :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr" ("\<langle>_\<rangle>\<^sub>s")
   where [expr_defs]: "\<langle>\<sigma>\<rangle>\<^sub>s x = (\<lambda> s. get\<^bsub>x\<^esub> (\<sigma> s))"
 
 definition unrest_usubst :: "('a \<Longrightarrow> 's) \<Rightarrow> 's subst \<Rightarrow> bool" 
