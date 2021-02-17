@@ -93,8 +93,8 @@ syntax \<comment> \<open> Identifiers \<close>
   "_svid_tuple"   :: "svids \<Rightarrow> svid" ("'(_')")
   "_svid_dot"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_:_" [999,998] 998)
   "_svid_res"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_\<restriction>_" [999,998] 998)
-  "_svid_fst"     :: "svid \<Rightarrow> svid" ("_\<^sup>\<lhd>" [997] 997)
-  "_svid_snd"     :: "svid \<Rightarrow> svid" ("_\<^sup>\<rhd>" [997] 997)
+  "_svid_fst"     :: "svid \<Rightarrow> svid" ("_\<^sup><" [997] 997)
+  "_svid_snd"     :: "svid \<Rightarrow> svid" ("_\<^sup>>" [997] 997)
   "_mk_svid_list" :: "svids \<Rightarrow> logic" \<comment> \<open> Helper function for summing a list of identifiers \<close>
   "_svid_view"    :: "logic \<Rightarrow> svid" ("\<V>[_]") \<comment> \<open> View of a symmetric lens \<close>
   "_svid_coview"  :: "logic \<Rightarrow> svid" ("\<C>[_]") \<comment> \<open> Coview of a symmetric lens \<close>

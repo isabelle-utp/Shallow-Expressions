@@ -180,7 +180,7 @@ term "(v \<in> $xs \<union> ($f) ys \<union> {} \<and> @e)\<^sub>e"
 pretty_exprs
 expr_vars
 
-term "($x\<^sup>\<lhd> = $x\<^sup>\<rhd>)\<^sub>e"
+term "($x\<^sup>< = $x\<^sup>>)\<^sub>e"
 
 text \<open> The pretty printer works even when we don't use the parser, as shown below. \<close>
 
