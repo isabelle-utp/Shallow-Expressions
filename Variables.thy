@@ -6,12 +6,17 @@ no_notation
   Set.member ("op :") and
   Set.member ("(_/ : _)" [51, 51] 50)
 
+declare fst_vwb_lens [simp] and snd_vwb_lens [simp]
+
 text \<open> Variables can also be used to effectively define sets of variables. Here we define the
   the universal alphabet ($\Sigma$) to be the bijective lens @{term "1\<^sub>L"}. This characterises
   the whole of the source type, and thus is effectively the set of all alphabet variables. \<close>
 
 definition univ_var :: "('\<alpha> \<Longrightarrow> '\<alpha>)" where
 [lens_defs]: "univ_var = 1\<^sub>L"
+
+lemma univ_var_vwb [simp]: "vwb_lens univ_var"
+  by (simp add: univ_var_def)
 
 definition univ_alpha :: "'s scene" where
 [lens_defs]: "univ_alpha = \<top>\<^sub>S"
@@ -24,6 +29,15 @@ definition var_alpha :: "('a \<Longrightarrow> 's) \<Rightarrow> 's scene" where
 
 definition ns_alpha :: "('b \<Longrightarrow> 'c) \<Rightarrow> ('a \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
 [lens_defs]: "ns_alpha a x = x ;\<^sub>L a"
+
+lemma ns_alpha_weak [simp]: "\<lbrakk> weak_lens a; weak_lens x \<rbrakk> \<Longrightarrow> weak_lens (ns_alpha a x)"
+  by (simp add: ns_alpha_def comp_weak_lens)
+
+lemma ns_alpha_vwb [simp]: "\<lbrakk> vwb_lens a; vwb_lens x \<rbrakk> \<Longrightarrow> vwb_lens (ns_alpha a x)"
+  by (simp add: ns_alpha_def comp_vwb_lens)
+
+lemma ns_alpha_indep_1 [simp]: "a \<bowtie> b \<Longrightarrow> ns_alpha a x \<bowtie> ns_alpha b y"
+  by (simp add: lens_indep_left_ext lens_indep_right_ext ns_alpha_def)
 
 definition res_alpha :: "('a \<Longrightarrow> 'b) \<Rightarrow> ('c \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
 [lens_defs]: "res_alpha x a = x /\<^sub>L a"
