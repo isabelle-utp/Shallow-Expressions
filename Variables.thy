@@ -39,6 +39,12 @@ lemma ns_alpha_vwb [simp]: "\<lbrakk> vwb_lens a; vwb_lens x \<rbrakk> \<Longrig
 lemma ns_alpha_indep_1 [simp]: "a \<bowtie> b \<Longrightarrow> ns_alpha a x \<bowtie> ns_alpha b y"
   by (simp add: lens_indep_left_ext lens_indep_right_ext ns_alpha_def)
 
+lemma ns_alpha_indep_2 [simp]: "a \<bowtie> y \<Longrightarrow> ns_alpha a x \<bowtie> y"
+  by (simp add: lens_indep_left_ext ns_alpha_def)
+
+lemma ns_alpha_indep_3 [simp]: "x \<bowtie> b \<Longrightarrow> x \<bowtie> ns_alpha b y"
+  by (simp add: lens_indep_sym)
+
 definition res_alpha :: "('a \<Longrightarrow> 'b) \<Rightarrow> ('c \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
 [lens_defs]: "res_alpha x a = x /\<^sub>L a"
 

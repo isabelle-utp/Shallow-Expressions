@@ -201,6 +201,6 @@ lemma taut_False [simp]: "`False` = False"
   by (simp add: taut_def)
 
 method expr_simp uses add = (simp add: expr_defs alpha_splits lens_defs add fun_eq_iff)
-method expr_auto uses add = (expr_simp, (auto)?)
+method expr_auto uses add = (expr_simp add: add; (auto simp add: alpha_splits add)?)
 
 end
