@@ -118,6 +118,7 @@ syntax \<comment> \<open> Identifiers \<close>
   "_mk_svid_list" :: "svids \<Rightarrow> logic" \<comment> \<open> Helper function for summing a list of identifiers \<close>
   "_svid_view"    :: "logic \<Rightarrow> svid" ("\<V>[_]") \<comment> \<open> View of a symmetric lens \<close>
   "_svid_coview"  :: "logic \<Rightarrow> svid" ("\<C>[_]") \<comment> \<open> Coview of a symmetric lens \<close>
+  "_svid_prod"    :: "svid \<Rightarrow> svid \<Rightarrow> svid" (infixr "\<times>" 85)
 
 text \<open> A variable can be decorated with an ampersand, to indicate it is a predicate variable, with 
   a dollar to indicate its an unprimed relational variable, or a dollar and ``acute'' symbol to 
@@ -129,7 +130,6 @@ syntax \<comment> \<open> Variable sets \<close>
   "_salphavar"   :: "svid \<Rightarrow> salpha" ("$_" [990] 990)
   "_salphaparen" :: "salpha \<Rightarrow> salpha" ("'(_')")
   "_salphacomp"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr ";" 75)
-  "_salphaprod"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr "\<times>" 85)
   "_salphacompl" :: "salpha \<Rightarrow> salpha" ("- _" [81] 80)
   "_salpha_all"  :: "salpha" ("\<Sigma>")
   "_salpha_none" :: "salpha" ("\<emptyset>")
@@ -162,6 +162,7 @@ translations
   "_svid_res x y" \<rightleftharpoons> "x /\<^sub>L y" 
   "_svid_fst x" \<rightleftharpoons> "_svid_dot fst\<^sub>L x"
   "_svid_snd x" \<rightleftharpoons> "_svid_dot snd\<^sub>L x"
+  "_svid_prod x y" \<rightleftharpoons> "x \<times>\<^sub>L y"
   "_mk_svid_list (_svid_list x xs)" \<rightharpoonup> "x +\<^sub>L _mk_svid_list xs"
   "_mk_svid_list x" \<rightharpoonup> "x"
   "_mk_alpha_list (_svid_list x xs)" \<rightharpoonup> "CONST var_alpha x \<squnion>\<^sub>S _mk_alpha_list xs"
