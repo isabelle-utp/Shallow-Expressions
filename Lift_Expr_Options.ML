@@ -35,7 +35,7 @@ let fun nolift_const thy (n, opt) =
          _ => raise Match
       end;
 in
-Outer_Syntax.command @{command_keyword "expr_ctr"} "declare that certain constants should not be lifted; the parameter indicates which arguments should be ignored as well"
+Outer_Syntax.command @{command_keyword "expr_ctr"} "declare that certain constants should not be lifted; the parameter indicates which arguments should be lifted"
     (Scan.repeat1 (Parse.term -- Scan.optional (Parse.$$$ "(" |-- Parse.!!! (Scan.repeat1 Parse.number --| Parse.$$$ ")")) [])
      >> (fn ns => 
          Toplevel.theory 
