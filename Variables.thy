@@ -1,6 +1,10 @@
+section \<open> Variables as Lenses \<close>
+
 theory Variables
-  imports "Optics.Optics"
+  imports "Optics.Optics" "HOL-Library.Adhoc_Overloading"
 begin
+
+subsection \<open> Constructors \<close>
 
 no_notation   
   Set.member ("op :") and
@@ -32,6 +36,9 @@ definition ns_alpha :: "('b \<Longrightarrow> 'c) \<Rightarrow> ('a \<Longrighta
 
 lemma ns_alpha_weak [simp]: "\<lbrakk> weak_lens a; weak_lens x \<rbrakk> \<Longrightarrow> weak_lens (ns_alpha a x)"
   by (simp add: ns_alpha_def comp_weak_lens)
+
+lemma ns_alpha_mwb [simp]: "\<lbrakk> mwb_lens a; mwb_lens x \<rbrakk> \<Longrightarrow> mwb_lens (ns_alpha a x)"
+  by (simp add: ns_alpha_def comp_mwb_lens)
 
 lemma ns_alpha_vwb [simp]: "\<lbrakk> vwb_lens a; vwb_lens x \<rbrakk> \<Longrightarrow> vwb_lens (ns_alpha a x)"
   by (simp add: ns_alpha_def comp_vwb_lens)
@@ -93,6 +100,8 @@ lemma var_alpha_subset [simp]:
   shows "var_alpha x \<le> var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
   by (simp add: assms(1) assms(2) sublens_iff_subscene var_alpha_def)
 
+subsection \<open> Syntax Translations \<close>
+
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
   step is to introduce a collection of non-terminals. \<close>
   
@@ -110,6 +119,7 @@ syntax \<comment> \<open> Identifiers \<close>
   ""              :: "svid \<Rightarrow> svids" ("_")
   "_svid_list"    :: "svid \<Rightarrow> svids \<Rightarrow> svids" ("_,/ _")
   "_svid_alpha"   :: "svid" ("\<^bold>v")
+  "_svid_index"   :: "id_position \<Rightarrow> logic \<Rightarrow> svid" ("_'(_')" [999] 999)
   "_svid_tuple"   :: "svids \<Rightarrow> svid" ("'(_')")
   "_svid_dot"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_:_" [999,998] 998)
   "_svid_res"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_\<restriction>_" [999,998] 998)
@@ -159,6 +169,7 @@ translations
   "_svid_alpha" \<rightleftharpoons> "CONST univ_var"
   "_svid_tuple xs" \<rightharpoonup> "_mk_svid_list xs"
   "_svid_dot x y" \<rightleftharpoons> "CONST ns_alpha x y"
+  "_svid_index x i" \<rightharpoonup> "x i"
   "_svid_res x y" \<rightleftharpoons> "x /\<^sub>L y" 
   "_svid_fst x" \<rightleftharpoons> "_svid_dot fst\<^sub>L x"
   "_svid_snd x" \<rightleftharpoons> "_svid_dot snd\<^sub>L x"

@@ -32,12 +32,16 @@ lemma unrest_neg_union:
   shows "(- (A ; B)) \<sharp> P"
   using assms by (simp add: unrest_def scene_override_commute scene_override_union)
 
+lemma unrest_lens:
+  "mwb_lens x \<Longrightarrow> ($x \<sharp> e) = (\<forall> s v. e (put\<^bsub>x\<^esub> s v) = e s)"
+  by (simp add: unrest_def var_alpha_def lens_scene_override comp_mwb_lens lens_override_def)
+     (metis mwb_lens.put_put)
+
 lemma unrest_subscene: "\<lbrakk> idem_scene a; a \<sharp> e; b \<subseteq>\<^sub>S a \<rbrakk> \<Longrightarrow> b \<sharp> e"
   by (metis (mono_tags, hide_lams) subscene_eliminate unrest_def)
 
-lemma unrest_lens_comp [unrest]: "\<lbrakk> vwb_lens x; vwb_lens y; $x \<sharp> e \<rbrakk> \<Longrightarrow> $x:y \<sharp> e"
-  by (simp add: expr_defs)
-     (metis comp_vwb_lens lens_comp_lb ns_alpha_def sublens_iff_subscene subscene_eliminate var_alpha_def vwb_impl_idem_scene)
+lemma unrest_lens_comp [unrest]: "\<lbrakk> mwb_lens x; mwb_lens y; $x \<sharp> e \<rbrakk> \<Longrightarrow> $x:y \<sharp> e"
+  by (simp add: unrest_lens, simp add: lens_comp_def ns_alpha_def)
 
 lemma unrest_lit [unrest]: "x \<sharp> \<guillemotleft>v\<guillemotright>"
   by (simp add: expr_defs)

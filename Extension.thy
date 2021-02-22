@@ -19,8 +19,8 @@ expr_ctr ares
 syntax 
   "_aext" :: "logic \<Rightarrow> svid \<Rightarrow> logic" (infixl "\<up>" 80)
   "_ares" :: "logic \<Rightarrow> svid \<Rightarrow> logic" (infixl "\<down>" 80)
-  "_pre"  :: "logic \<Rightarrow> logic" ("_\<^sup><" [999] 999)
-  "_post" :: "logic \<Rightarrow> logic" ("_\<^sup>>" [999] 999)
+  "_pre"  :: "logic \<Rightarrow> logic" ("_\<^sup><" [999] 1000)
+  "_post" :: "logic \<Rightarrow> logic" ("_\<^sup>>" [999] 1000)
 
 translations
   "_aext P a" == "CONST aext (P)\<^sub>e a"
