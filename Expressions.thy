@@ -49,6 +49,9 @@ abbreviation (input) bop
 definition taut :: "(bool, 's) expr \<Rightarrow> bool" where
 [expr_defs]: "taut e = (\<forall> s. e s)"
 
+definition expr_select :: "('a, 's) expr \<Rightarrow> ('b \<Longrightarrow> 'a) \<Rightarrow> ('b, 's) expr" where
+[expr_defs]: "expr_select e x = (\<lambda> s. get\<^bsub>x\<^esub> (e s))"
+
 subsection \<open> Lifting Parser and Printer \<close>
 
 text \<open> The lifting parser creates a parser directive that converts an expression to a 
@@ -88,6 +91,9 @@ syntax
   "_sexp_evar"       :: "id_position \<Rightarrow> logic" ("@_" [999] 999)
   "_sexp_pqt"        :: "logic \<Rightarrow> sexp" ("[_]\<^sub>e")
   "_sexp_taut"       :: "logic \<Rightarrow> logic" ("`_`")
+  "_sexp_select"     :: "logic \<Rightarrow> svid \<Rightarrow> logic" ("_:_" [1000, 999] 1000)
+
+expr_ctr expr_select
 
 ML_file \<open>Lift_Expr.ML\<close>
 
@@ -122,6 +128,7 @@ print_translation \<open>
 translations
   "_sexp_var x" => "get\<^bsub>x\<^esub> _sexp_state"
   "_sexp_taut p" == "CONST taut (p)\<^sub>e"
+  "_sexp_select e x" == "CONST expr_select (e)\<^sub>e x"
 
 text \<open> The main directive is the $e$ subscripted brackets, @{term "(e)\<^sub>e"}. This converts the 
   expression $e$ to a boxed $\lambda$ term. Essentially, the parser behaviour is as follows:
@@ -172,8 +179,11 @@ term "(@f + @g)\<^sub>e"
 
 term "(@x)\<^sub>e"
 
-term "SEXP(\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v)"
+term "($x:y:z)\<^sub>e"
 
+term "(($x:y):z)\<^sub>e"
+
+term "SEXP(\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v)"
 
 term "(v \<in> $xs \<union> ($f) ys \<union> {} \<and> @e)\<^sub>e"
 
