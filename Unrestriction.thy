@@ -37,6 +37,10 @@ lemma unrest_lens:
   by (simp add: unrest_def var_alpha_def lens_scene_override comp_mwb_lens lens_override_def)
      (metis mwb_lens.put_put)
 
+lemma unrest_compl_lens:
+  "mwb_lens x \<Longrightarrow> (- $x \<sharp> e) = (\<forall>s s'. e (put\<^bsub>x\<^esub> s' (get\<^bsub>x\<^esub> s)) = e s)"
+  by (simp add: unrest_def var_alpha_def lens_scene_override comp_mwb_lens lens_override_def scene_override_commute)
+
 lemma unrest_subscene: "\<lbrakk> idem_scene a; a \<sharp> e; b \<subseteq>\<^sub>S a \<rbrakk> \<Longrightarrow> b \<sharp> e"
   by (metis (mono_tags, hide_lams) subscene_eliminate unrest_def)
 

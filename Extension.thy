@@ -28,7 +28,14 @@ translations
   "_pre P" == "_aext P fst\<^sub>L"
   "_post P" == "_aext P snd\<^sub>L"
 
+lemma aext_var: "$x \<up> a = ($a:x)\<^sub>e"
+  by (simp add: expr_defs lens_defs)
+
 lemma ares_aext: "weak_lens a \<Longrightarrow> P \<up> a \<down> a = P"
   by (simp add: expr_defs)
+
+lemma aext_ares: "\<lbrakk> mwb_lens a; (- $a) \<sharp> P \<rbrakk> \<Longrightarrow> P \<down> a \<up> a = P"
+  unfolding unrest_compl_lens
+  by (auto simp add: expr_defs fun_eq_iff lens_create_def)
 
 end
