@@ -98,7 +98,7 @@ lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^su
 
 (* FIXME: Figure out how to make laws like this parse and simplify *)
 
-expr_ctr subst_app
+expr_ctr subst_app (0)
 
 term "(f (\<sigma> \<dagger> e))\<^sub>e"
 

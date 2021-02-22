@@ -21,7 +21,10 @@ fun lift_expr_aux ctx (Const (n', t), args) =
      else if (n = @{syntax_const "_sexp_evar"})
      then Term.list_comb (hd args $ free state_id, tl args')
      else if (member (op =) (Symtab.keys (NoLift.get (Proof_Context.theory_of ctx))) n)
-     then Term.list_comb (Const (n', t), args) $ free state_id
+     (* FIXME: Allow some parameters of an expression constructor to be ignored and not lifted *) 
+     then let val (SOME aopt) = Symtab.lookup (NoLift.get (Proof_Context.theory_of ctx)) n in
+          Term.list_comb (Const (n', t), map_index (fn (i, t) => if (member (op =) aopt i) then t else lift_expr ctx t) args) $ free state_id
+          end
      else
      case (Type_Infer_Context.const_type ctx n) of
       SOME (Type (\<^type_name>\<open>lens_ext\<close>, _)) 

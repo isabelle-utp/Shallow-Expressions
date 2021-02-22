@@ -13,8 +13,8 @@ definition sares :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s
 abbreviation "aext P a \<equiv> subst_app (saext a) P"
 abbreviation "ares P a \<equiv> subst_app (sares a) P"
 
-expr_ctr aext
-expr_ctr ares
+expr_ctr aext (1)
+expr_ctr ares (1)
 
 syntax 
   "_aext" :: "logic \<Rightarrow> svid \<Rightarrow> logic" (infixl "\<up>" 80)

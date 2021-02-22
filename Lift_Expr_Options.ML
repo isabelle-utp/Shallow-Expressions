@@ -23,20 +23,20 @@ Outer_Syntax.command @{command_keyword "pretty_exprs"} "pretty print expressions
   (Scan.succeed (Toplevel.theory (FullExprs.put false)));
 
 structure NoLift = Theory_Data
-  (type T = unit Symtab.table
+  (type T = int list Symtab.table
    val empty = Symtab.empty
    val extend = I
    val merge = Symtab.merge (K true));
 
-let fun nolift_const thy n =  
+let fun nolift_const thy (n, opt) =  
       let open Proof_Context
-      in case read_const {proper = true, strict = false} (init_global thy) n  of
-           Const (c, _) => NoLift.map (Symtab.update (c, ())) thy |
-           _ => raise Match
+      in case read_const {proper = true, strict = false} (init_global thy) n of
+         Const (c, _) => NoLift.map (Symtab.update (c, (map Value.parse_int opt))) thy |
+         _ => raise Match
       end;
 in
-Outer_Syntax.command @{command_keyword "expr_ctr"} "declare that certain constants should not be lifted"
-    (Scan.repeat1 (Parse.term)
+Outer_Syntax.command @{command_keyword "expr_ctr"} "declare that certain constants should not be lifted; the parameter indicates which arguments should be ignored as well"
+    (Scan.repeat1 (Parse.term -- Scan.optional (Parse.$$$ "(" |-- Parse.!!! (Scan.repeat1 Parse.number --| Parse.$$$ ")")) [])
      >> (fn ns => 
          Toplevel.theory 
          (fn thy => Library.foldl (fn (thy, n) => nolift_const thy n) (thy, ns))))
