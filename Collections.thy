@@ -27,7 +27,7 @@ lemma ind_lens_vwb [simp]: "\<lbrakk> \<And> i. vwb_lens (f i); \<And> i. $f(i) 
   by (unfold_locales, auto simp add: lens_defs expr_defs lens_indep.lens_put_irr2 lens_scene_override)
      (metis mwb_lens_weak vwb_lens_mwb weak_lens.put_get, metis mwb_lens.put_put vwb_lens_mwb)
 
-lemma src_ind_lens: "\<lbrakk> \<And> i. mwb_lens (f i); \<And> i. $f(i) \<sharp> e \<rbrakk> \<Longrightarrow> \<S>\<^bsub>dyn_lens f e\<^esub> = {s. s \<in> \<S>\<^bsub>f (e s)\<^esub>}"
+lemma src_dyn_lens: "\<lbrakk> \<And> i. mwb_lens (f i); \<And> i. $f(i) \<sharp> e \<rbrakk> \<Longrightarrow> \<S>\<^bsub>dyn_lens f e\<^esub> = {s. s \<in> \<S>\<^bsub>f (e s)\<^esub>}"
   by (auto simp add: lens_defs expr_defs lens_source_def lens_scene_override unrest)
      (metis mwb_lens.put_put)+
 
@@ -59,14 +59,14 @@ syntax
   "_svid_collection" :: "svid \<Rightarrow> logic \<Rightarrow> svid" ("_[_]" [999, 0] 999)
 
 translations
-  "_svid_collection x i" == "CONST dyn_lens_poly CONST collection_lens x i"
+  "_svid_collection x e" == "CONST dyn_lens_poly CONST collection_lens x (e)\<^sub>e"
 
 lemma source_ns_alpha: "\<lbrakk> mwb_lens a; mwb_lens x \<rbrakk> \<Longrightarrow> \<S>\<^bsub>ns_alpha a x\<^esub> = {s \<in> \<S>\<^bsub>a\<^esub>. get\<^bsub>a\<^esub> s \<in> \<S>\<^bsub>x\<^esub>}"
   by (simp add: ns_alpha_def source_lens_comp)
 
-lemma src_list_collection_lens [simp]:
+lemma defined_list_collection_lens [simp]:
   "\<lbrakk> vwb_lens x; $x \<sharp> e \<rbrakk> \<Longrightarrow> \<^bold>D(x[e]) = (e < length($x))\<^sub>e"
-  by (simp add: lens_defined_def src_ind_lens unrest source_ns_alpha source_list_collection_lens)
+  by (simp add: lens_defined_def src_dyn_lens unrest source_ns_alpha source_list_collection_lens)
      (simp add: lens_defs wb_lens.source_UNIV)
 
 end

@@ -38,4 +38,10 @@ lemma aext_ares: "\<lbrakk> mwb_lens a; (- $a) \<sharp> P \<rbrakk> \<Longrighta
   unfolding unrest_compl_lens
   by (auto simp add: expr_defs fun_eq_iff lens_create_def)
 
+lemma expr_pre [simp]: "e\<^sup>< (s\<^sub>1, s\<^sub>2) = (e)\<^sub>e s\<^sub>1"
+  by (simp add: saext_def subst_app_def)
+
+lemma expr_post [simp]: "e\<^sup>> (s\<^sub>1, s\<^sub>2) = (@e)\<^sub>e s\<^sub>2"
+  by (simp add: saext_def subst_app_def)
+
 end

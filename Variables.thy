@@ -218,4 +218,12 @@ let
 in [(@{syntax_const "_uvar_ty"}, K uvar_ty_tr)] end
 \<close>
 
+subsection \<open> Simplifications \<close>
+
+lemma get_pre [simp]: "get\<^bsub>(x\<^sup><)\<^sub>v\<^esub> (s\<^sub>1, s\<^sub>2) = get\<^bsub>x\<^esub> s\<^sub>1"
+  by (simp add: lens_defs)
+
+lemma get_post [simp]: "get\<^bsub>(x\<^sup>>)\<^sub>v\<^esub> (s\<^sub>1, s\<^sub>2) = get\<^bsub>x\<^esub> s\<^sub>2"
+  by (simp add: lens_defs)
+
 end
