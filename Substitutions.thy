@@ -16,6 +16,9 @@ definition subst_id :: "'s subst" ("id\<^sub>s")
 definition subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a, 's\<^sub>2) expr \<Rightarrow> ('a, 's\<^sub>1) expr" 
   where [expr_defs]: "subst_app \<sigma> e = (\<lambda> s. e (\<sigma> s))"
 
+definition subst_comp :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>1) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>2) psubst" (infixl "\<circ>\<^sub>s" 55) 
+    where [expr_defs]: "subst_comp = comp"
+
 definition sset :: "'s scene \<Rightarrow> 's \<Rightarrow> 's subst" 
   where [expr_defs]: "sset a s' = (\<lambda> s. s \<oplus>\<^sub>S s' on a)"
 
@@ -90,7 +93,7 @@ lemma subst_id_var: "id\<^sub>s = ($\<^bold>v)\<^sub>e"
 lemma subst_upd_id_lam [usubst]: "subst_upd ($\<^bold>v)\<^sub>e x v = subst_upd id\<^sub>s x v"
   by expr_simp
 
-lemma subst_id [simp]: "id\<^sub>s \<circ> \<sigma> = \<sigma>" "\<sigma> \<circ> id\<^sub>s = \<sigma>"
+lemma subst_id [simp]: "id\<^sub>s \<circ>\<^sub>s \<sigma> = \<sigma>" "\<sigma> \<circ>\<^sub>s id\<^sub>s = \<sigma>"
   by expr_auto+
 
 lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^sub>L = \<sigma>"
