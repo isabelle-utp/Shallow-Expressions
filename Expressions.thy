@@ -52,6 +52,9 @@ definition taut :: "(bool, 's) expr \<Rightarrow> bool" where
 definition expr_select :: "('a, 's) expr \<Rightarrow> ('b \<Longrightarrow> 'a) \<Rightarrow> ('b, 's) expr" where
 [expr_defs]: "expr_select e x = (\<lambda> s. get\<^bsub>x\<^esub> (e s))"
 
+definition expr_if :: "('a, 's) expr \<Rightarrow> (bool, 's) expr \<Rightarrow> ('a, 's) expr \<Rightarrow> ('a, 's) expr" where
+[expr_defs]: "expr_if P b Q = (\<lambda> s. if (b s) then P s else Q s)"
+
 subsection \<open> Lifting Parser and Printer \<close>
 
 text \<open> The lifting parser creates a parser directive that converts an expression to a 
@@ -92,8 +95,10 @@ syntax
   "_sexp_pqt"        :: "logic \<Rightarrow> sexp" ("[_]\<^sub>e")
   "_sexp_taut"       :: "logic \<Rightarrow> logic" ("`_`")
   "_sexp_select"     :: "logic \<Rightarrow> svid \<Rightarrow> logic" ("_:_" [1000, 999] 1000)
+  "_sexp_if"         :: "logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("(3_ \<triangleleft> _ \<triangleright>/ _)" [52,0,53] 52)
 
 expr_ctr expr_select
+expr_ctr expr_if
 
 ML_file \<open>Lift_Expr.ML\<close>
 
@@ -129,6 +134,7 @@ translations
   "_sexp_var x" => "get\<^bsub>x\<^esub> _sexp_state"
   "_sexp_taut p" == "CONST taut (p)\<^sub>e"
   "_sexp_select e x" == "CONST expr_select (e)\<^sub>e x"
+  "_sexp_if P b Q" == "CONST expr_if P (b)\<^sub>e Q"
 
 text \<open> The main directive is the $e$ subscripted brackets, @{term "(e)\<^sub>e"}. This converts the 
   expression $e$ to a boxed $\lambda$ term. Essentially, the parser behaviour is as follows:

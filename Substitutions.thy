@@ -53,7 +53,7 @@ syntax
   ""          :: "smaplet => smaplets"            ("_")
   "_SMaplets" :: "[smaplet, smaplets] => smaplets" ("_,/ _")
   "_SubstUpd" :: "[logic, smaplets] => logic" ("_/'(_')\<^sub>s" [900,0] 900)
-  "_Subst"    :: "smaplets => logic"            ("(1\<lbrakk>_\<rbrakk>)")
+  "_Subst"    :: "smaplets => logic"            ("(1[_]\<^sub>s)")
   "_PSubst"   :: "smaplets => logic"            ("(1\<lparr>_\<rparr>)")
   "_psubst"   :: "[logic, svids, uexprs] \<Rightarrow> logic"
   "_subst"    :: "logic \<Rightarrow> uexprs \<Rightarrow> svids \<Rightarrow> logic" ("(_\<lbrakk>_'/_\<rbrakk>)" [990,0,0] 991)
@@ -160,12 +160,44 @@ lemma usubst_upd_comm2:
   by (auto simp add: subst_upd_def assms comp_def lens_indep_comm)
 
 lemma usubst_upd_var_id [usubst]:
-  "vwb_lens x \<Longrightarrow> \<lbrakk>x \<mapsto> $x\<rbrakk> = id\<^sub>s"
+  "vwb_lens x \<Longrightarrow> [x \<mapsto> $x]\<^sub>s = id\<^sub>s"
   by (simp add: subst_upd_def subst_id_def id_lens_def SEXP_def)
 
 lemma usubst_upd_pair [usubst]:
   "x \<bowtie> y \<Longrightarrow> \<sigma>((x, y) \<mapsto> (e, f))\<^sub>s = \<sigma>(x \<mapsto> e, y \<mapsto> f)\<^sub>s"
   by (simp add: subst_upd_def lens_defs SEXP_def fun_eq_iff lens_indep_comm)
+
+lemma subst_upd_comp [usubst]:
+  "\<rho>(x \<mapsto> v)\<^sub>s \<circ>\<^sub>s \<sigma> = (\<rho> \<circ>\<^sub>s \<sigma>)(x \<mapsto> \<sigma> \<dagger> v)\<^sub>s"
+  by (simp add: expr_defs fun_eq_iff)
+
+subsection \<open> Ordering substitutions \<close>
+
+text \<open> A simplification procedure to reorder substitutions maplets lexicographically by variable syntax \<close>
+
+simproc_setup subst_order ("subst_upd (subst_upd \<sigma> x u) y v") =
+  \<open> (fn _ => fn ctx => fn ct => 
+        case (Thm.term_of ct) of
+          Const (@{const_name subst_upd}, _) $ (Const (@{const_name subst_upd}, _) $ s $ x $ u) $ y $ v
+            => if (YXML.content_of (Syntax.string_of_term ctx x) > YXML.content_of(Syntax.string_of_term ctx y))
+               then SOME (mk_meta_eq @{thm usubst_upd_comm})
+               else NONE  |
+          _ => NONE) 
+  \<close>
+
+subsection \<open> Conditional Substitution Laws \<close>
+
+lemma usubst_cond_upd_1 [usubst]:
+  "\<sigma>(x \<mapsto> u)\<^sub>s \<triangleleft> b \<triangleright> \<rho>(x \<mapsto> v)\<^sub>s = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<mapsto> (u \<triangleleft> b \<triangleright> v))\<^sub>s"
+  by expr_auto
+
+lemma usubst_cond_upd_2 [usubst]:
+  "\<lbrakk> vwb_lens x; x \<sharp>\<^sub>s \<rho> \<rbrakk> \<Longrightarrow> \<sigma>(x \<mapsto> u)\<^sub>s \<triangleleft> b \<triangleright> \<rho> = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<mapsto> (u \<triangleleft> b \<triangleright> ($x)\<^sub>e))\<^sub>s"
+  by (expr_auto, metis lens_override_def lens_override_idem)
+
+lemma usubst_cond_upd_3 [usubst]:
+  "\<lbrakk> vwb_lens x; x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<sigma> \<triangleleft> b \<triangleright> \<rho>(x \<mapsto> v)\<^sub>s = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<mapsto> (($x)\<^sub>e \<triangleleft> b \<triangleright> v))\<^sub>s"
+  by (expr_auto, metis lens_override_def lens_override_idem)
 
 subsection \<open> Evaluation \<close>
 
