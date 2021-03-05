@@ -49,11 +49,11 @@ definition par_subst :: "'s subst \<Rightarrow> 's scene \<Rightarrow> 's scene 
 nonterminal uexprs and smaplet and smaplets
 
 syntax
-  "_smaplet"  :: "[svid, logic] => smaplet"             ("_ /\<mapsto>/ _")
+  "_smaplet"  :: "[svid, logic] => smaplet"             ("_ \<leadsto>/ _")
   ""          :: "smaplet => smaplets"            ("_")
   "_SMaplets" :: "[smaplet, smaplets] => smaplets" ("_,/ _")
-  "_SubstUpd" :: "[logic, smaplets] => logic" ("_/'(_')\<^sub>s" [900,0] 900)
-  "_Subst"    :: "smaplets => logic"            ("(1[_]\<^sub>s)")
+  "_SubstUpd" :: "[logic, smaplets] => logic" ("_/'(_')" [900,0] 900)
+  "_Subst"    :: "smaplets => logic"            ("(1[_])")
   "_PSubst"   :: "smaplets => logic"            ("(1\<lparr>_\<rparr>)")
   "_psubst"   :: "[logic, svids, uexprs] \<Rightarrow> logic"
   "_subst"    :: "logic \<Rightarrow> uexprs \<Rightarrow> svids \<Rightarrow> logic" ("(_\<lbrakk>_'/_\<rbrakk>)" [990,0,0] 991)
@@ -80,7 +80,7 @@ subsection \<open> Substitution Laws \<close>
 named_theorems usubst and usubst_eval
 
 lemma subst_unrest [usubst]:
-  "\<lbrakk> vwb_lens x; $x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<mapsto> e)\<^sub>s \<dagger> v = \<sigma> \<dagger> v"
+  "\<lbrakk> vwb_lens x; $x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<dagger> v = \<sigma> \<dagger> v"
   by (expr_auto)
      (metis lens_override_def lens_scene_override mwb_lens_def vwb_lens_mwb weak_lens.put_get)
 
@@ -125,50 +125,50 @@ text \<open> A substitution update naturally yields the given expression. \<clos
     
 lemma subst_lookup_upd [usubst]:
   assumes "weak_lens x"
-  shows "\<langle>\<sigma>(x \<mapsto> v)\<^sub>s\<rangle>\<^sub>s x = (v)\<^sub>e"
+  shows "\<langle>\<sigma>(x \<leadsto> v)\<rangle>\<^sub>s x = (v)\<^sub>e"
   using assms by (simp add: expr_defs)
 
 lemma subst_lookup_upd_diff [usubst]:
   assumes "x \<bowtie> y"
-  shows "\<langle>\<sigma>(y \<mapsto> v)\<^sub>s\<rangle>\<^sub>s x = \<langle>\<sigma>\<rangle>\<^sub>s x"
+  shows "\<langle>\<sigma>(y \<leadsto> v)\<rangle>\<^sub>s x = \<langle>\<sigma>\<rangle>\<^sub>s x"
   using assms by (simp add: expr_defs)
 
 text \<open> Substitution update is idempotent. \<close>
 
 lemma usubst_upd_idem [usubst]:
   assumes "mwb_lens x"
-  shows "\<sigma>(x \<mapsto> u, x \<mapsto> v)\<^sub>s = \<sigma>(x \<mapsto> v)\<^sub>s"
+  shows "\<sigma>(x \<leadsto> u, x \<leadsto> v) = \<sigma>(x \<leadsto> v)"
   using assms by (simp add: expr_defs)
 
 lemma usubst_upd_idem_sub [usubst]:
   assumes "x \<subseteq>\<^sub>L y" "mwb_lens y"
-  shows "\<sigma>(x \<mapsto> u, y \<mapsto> v)\<^sub>s = \<sigma>(y \<mapsto> v)\<^sub>s"
+  shows "\<sigma>(x \<leadsto> u, y \<leadsto> v) = \<sigma>(y \<leadsto> v)"
   using assms by (simp add: expr_defs assms fun_eq_iff sublens_put_put)
 
 text \<open> Substitution updates commute when the lenses are independent. \<close>
     
 lemma usubst_upd_comm:
   assumes "x \<bowtie> y"
-  shows "\<sigma>(x \<mapsto> u, y \<mapsto> v)\<^sub>s = \<sigma>(y \<mapsto> v, x \<mapsto> u)\<^sub>s"
+  shows "\<sigma>(x \<leadsto> u, y \<leadsto> v) = \<sigma>(y \<leadsto> v, x \<leadsto> u)"
   using assms unfolding subst_upd_def
   by (auto simp add: subst_upd_def assms comp_def lens_indep_comm)
 
 lemma usubst_upd_comm2:
   assumes "z \<bowtie> y"
-  shows "\<sigma>(x \<mapsto> u, y \<mapsto> v, z \<mapsto> s)\<^sub>s = \<sigma>(x \<mapsto> u, z \<mapsto> s, y \<mapsto> v)\<^sub>s"
+  shows "\<sigma>(x \<leadsto> u, y \<leadsto> v, z \<leadsto> s) = \<sigma>(x \<leadsto> u, z \<leadsto> s, y \<leadsto> v)"
   using assms unfolding subst_upd_def
   by (auto simp add: subst_upd_def assms comp_def lens_indep_comm)
 
 lemma usubst_upd_var_id [usubst]:
-  "vwb_lens x \<Longrightarrow> [x \<mapsto> $x]\<^sub>s = id\<^sub>s"
+  "vwb_lens x \<Longrightarrow> [x \<leadsto> $x] = id\<^sub>s"
   by (simp add: subst_upd_def subst_id_def id_lens_def SEXP_def)
 
 lemma usubst_upd_pair [usubst]:
-  "x \<bowtie> y \<Longrightarrow> \<sigma>((x, y) \<mapsto> (e, f))\<^sub>s = \<sigma>(x \<mapsto> e, y \<mapsto> f)\<^sub>s"
+  "x \<bowtie> y \<Longrightarrow> \<sigma>((x, y) \<leadsto> (e, f)) = \<sigma>(x \<leadsto> e, y \<leadsto> f)"
   by (simp add: subst_upd_def lens_defs SEXP_def fun_eq_iff lens_indep_comm)
 
 lemma subst_upd_comp [usubst]:
-  "\<rho>(x \<mapsto> v)\<^sub>s \<circ>\<^sub>s \<sigma> = (\<rho> \<circ>\<^sub>s \<sigma>)(x \<mapsto> \<sigma> \<dagger> v)\<^sub>s"
+  "\<rho>(x \<leadsto> v) \<circ>\<^sub>s \<sigma> = (\<rho> \<circ>\<^sub>s \<sigma>)(x \<leadsto> \<sigma> \<dagger> v)"
   by (simp add: expr_defs fun_eq_iff)
 
 subsection \<open> Ordering substitutions \<close>
@@ -188,15 +188,15 @@ simproc_setup subst_order ("subst_upd (subst_upd \<sigma> x u) y v") =
 subsection \<open> Conditional Substitution Laws \<close>
 
 lemma usubst_cond_upd_1 [usubst]:
-  "\<sigma>(x \<mapsto> u)\<^sub>s \<triangleleft> b \<triangleright> \<rho>(x \<mapsto> v)\<^sub>s = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<mapsto> (u \<triangleleft> b \<triangleright> v))\<^sub>s"
+  "\<sigma>(x \<leadsto> u) \<triangleleft> b \<triangleright> \<rho>(x \<leadsto> v) = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (u \<triangleleft> b \<triangleright> v))"
   by expr_auto
 
 lemma usubst_cond_upd_2 [usubst]:
-  "\<lbrakk> vwb_lens x; x \<sharp>\<^sub>s \<rho> \<rbrakk> \<Longrightarrow> \<sigma>(x \<mapsto> u)\<^sub>s \<triangleleft> b \<triangleright> \<rho> = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<mapsto> (u \<triangleleft> b \<triangleright> ($x)\<^sub>e))\<^sub>s"
+  "\<lbrakk> vwb_lens x; x \<sharp>\<^sub>s \<rho> \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> u) \<triangleleft> b \<triangleright> \<rho> = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (u \<triangleleft> b \<triangleright> ($x)\<^sub>e))"
   by (expr_auto, metis lens_override_def lens_override_idem)
 
 lemma usubst_cond_upd_3 [usubst]:
-  "\<lbrakk> vwb_lens x; x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<sigma> \<triangleleft> b \<triangleright> \<rho>(x \<mapsto> v)\<^sub>s = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<mapsto> (($x)\<^sub>e \<triangleleft> b \<triangleright> v))\<^sub>s"
+  "\<lbrakk> vwb_lens x; x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<sigma> \<triangleleft> b \<triangleright> \<rho>(x \<leadsto> v) = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (($x)\<^sub>e \<triangleleft> b \<triangleright> v))"
   by (expr_auto, metis lens_override_def lens_override_idem)
 
 subsection \<open> Evaluation \<close>
@@ -207,11 +207,11 @@ lemma subst_SEXP [usubst_eval]: "\<sigma> \<dagger> [\<lambda> s. e s]\<^sub>e =
 lemma get_subst_id [usubst_eval]: "get\<^bsub>x\<^esub> (id\<^sub>s s) = get\<^bsub>x\<^esub> s"
   by (simp add: subst_id_def)
 
-lemma get_subst_upd_same [usubst_eval]: "weak_lens x \<Longrightarrow> get\<^bsub>x\<^esub> ((\<sigma>(x \<mapsto> e)\<^sub>s) s) = e s"
+lemma get_subst_upd_same [usubst_eval]: "weak_lens x \<Longrightarrow> get\<^bsub>x\<^esub> ((\<sigma>(x \<leadsto> e)) s) = e s"
   by (simp add: subst_upd_def SEXP_def)
 
 lemma get_subst_upd_indep [usubst_eval]: 
-  "x \<bowtie> y \<Longrightarrow> get\<^bsub>x\<^esub> ((\<sigma>(y \<mapsto> e)\<^sub>s) s) = get\<^bsub>x\<^esub> (\<sigma> s)"
+  "x \<bowtie> y \<Longrightarrow> get\<^bsub>x\<^esub> ((\<sigma>(y \<leadsto> e)) s) = get\<^bsub>x\<^esub> (\<sigma> s)"
   by (simp add: subst_upd_def)
 
 lemma unrest_ssubst: "(a \<sharp> P) \<longleftrightarrow> (\<forall> s'. sset a s' \<dagger> P = (P)\<^sub>e)"
