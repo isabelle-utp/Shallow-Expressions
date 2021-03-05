@@ -49,17 +49,19 @@ definition par_subst :: "'s subst \<Rightarrow> 's scene \<Rightarrow> 's scene 
 nonterminal uexprs and smaplet and smaplets
 
 syntax
-  "_smaplet"  :: "[svid, logic] => smaplet"             ("_ \<leadsto>/ _")
-  ""          :: "smaplet => smaplets"            ("_")
-  "_SMaplets" :: "[smaplet, smaplets] => smaplets" ("_,/ _")
-  "_SubstUpd" :: "[logic, smaplets] => logic" ("_/'(_')" [900,0] 900)
-  "_Subst"    :: "smaplets => logic"            ("(1[_])")
-  "_PSubst"   :: "smaplets => logic"            ("(1\<lparr>_\<rparr>)")
-  "_psubst"   :: "[logic, svids, uexprs] \<Rightarrow> logic"
-  "_subst"    :: "logic \<Rightarrow> uexprs \<Rightarrow> svids \<Rightarrow> logic" ("(_\<lbrakk>_'/_\<rbrakk>)" [990,0,0] 991)
-  "_uexprs"   :: "[logic, uexprs] => uexprs" ("_,/ _")
-  ""          :: "logic => uexprs" ("_")
-  "_par_subst" :: "logic \<Rightarrow> salpha \<Rightarrow> salpha \<Rightarrow> logic \<Rightarrow> logic" ("_ [_|_]\<^sub>s _" [100,0,0,101] 101)
+  "_smaplet"        :: "[svid, logic] => smaplet" ("_ \<leadsto>/ _")
+  ""                :: "smaplet => smaplets" ("_")
+  "_SMaplets"       :: "[smaplet, smaplets] => smaplets" ("_,/ _")
+  \<comment> \<open> A little syntax utility to extract a list of variable identifiers from a substitution \<close>
+  "_smaplets_svids" :: "smaplets \<Rightarrow> logic"
+  "_SubstUpd"       :: "[logic, smaplets] => logic" ("_/'(_')" [900,0] 900)
+  "_Subst"          :: "smaplets => logic" ("(1[_])")
+  "_PSubst"         :: "smaplets => logic" ("(1\<lparr>_\<rparr>)")
+  "_psubst"         :: "[logic, svids, uexprs] \<Rightarrow> logic"
+  "_subst"          :: "logic \<Rightarrow> uexprs \<Rightarrow> svids \<Rightarrow> logic" ("(_\<lbrakk>_'/_\<rbrakk>)" [990,0,0] 991)
+  "_uexprs"         :: "[logic, uexprs] => uexprs" ("_,/ _")
+  ""                :: "logic => uexprs" ("_")
+  "_par_subst"      :: "logic \<Rightarrow> salpha \<Rightarrow> salpha \<Rightarrow> logic \<Rightarrow> logic" ("_ [_|_]\<^sub>s _" [100,0,0,101] 101)
     
 translations
   "_SubstUpd m (_SMaplets xy ms)"     == "_SubstUpd (_SubstUpd m xy) ms"
@@ -69,6 +71,8 @@ translations
   "_PSubst ms"                        == "_SubstUpd nil\<^sub>s ms"
   "_PSubst (_SMaplets ms1 ms2)"       <= "_SubstUpd (_PSubst ms1) ms2"
   "_SMaplets ms1 (_SMaplets ms2 ms3)" <= "_SMaplets (_SMaplets ms1 ms2) ms3"
+  "_smaplets_svids (_SMaplets (_smaplet x e) ms)" => "x +\<^sub>L (_smaplets_svids ms)"
+  "_smaplets_svids (_smaplet x e)" => "x"
   "_subst P es vs" => "CONST subst_app (_psubst id\<^sub>s vs es) P"
   "_psubst m (_svid_list x xs) (_uexprs v vs)" => "_psubst (_psubst m x v) xs vs"
   "_psubst m x v"  => "CONST subst_upd m x (v)\<^sub>e"
