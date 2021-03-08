@@ -76,6 +76,9 @@ lemma var_alpha_indep [simp]:
 lemma scene_le_iff_indep_inv:
   "A \<bowtie>\<^sub>S - B \<longleftrightarrow> A \<le> B"
   by (auto simp add: less_eq_scene_def scene_indep_override scene_override_commute)
+                                                                     
+lemma idem_scene_uminus [simp]: "idem_scene X \<Longrightarrow> idem_scene (- X)"
+  by (simp add: uminus_scene_def idem_scene_def Abs_scene_inverse idem_overrider_axioms_def idem_overrider_def overrider.intro)
 
 lemma get_scene_override_indep: "\<lbrakk> vwb_lens x; \<lbrakk>x\<rbrakk>\<^sub>\<sim> \<bowtie>\<^sub>S a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (s \<oplus>\<^sub>S s' on a) = get\<^bsub>x\<^esub> s"
 proof -
