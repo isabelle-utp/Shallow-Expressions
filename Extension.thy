@@ -4,10 +4,10 @@ theory Extension
   imports Substitutions
 begin
 
-definition saext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>2, 's\<^sub>1) psubst" where
+definition saext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>2, 's\<^sub>1) psubst" ("_\<^sup>\<up>") where
 [expr_defs]: "saext a = get\<^bsub>a\<^esub>"
 
-definition sares :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst" where
+definition sares :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst" ("_\<^sub>\<down>") where
 [expr_defs]: "sares a = create\<^bsub>a\<^esub>"
 
 abbreviation "aext P a \<equiv> subst_app (saext a) P"

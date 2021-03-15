@@ -16,7 +16,7 @@ text \<open> Variables can also be used to effectively define sets of variables.
   the universal alphabet ($\Sigma$) to be the bijective lens @{term "1\<^sub>L"}. This characterises
   the whole of the source type, and thus is effectively the set of all alphabet variables. \<close>
 
-definition univ_var :: "('\<alpha> \<Longrightarrow> '\<alpha>)" where
+definition univ_var :: "('\<alpha> \<Longrightarrow> '\<alpha>)" ("\<^bold>v") where
 [lens_defs]: "univ_var = 1\<^sub>L"
 
 lemma univ_var_vwb [simp]: "vwb_lens univ_var"
