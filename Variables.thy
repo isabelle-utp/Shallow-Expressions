@@ -71,6 +71,20 @@ lemma var_alpha_indep [simp]:
   shows "var_alpha x \<bowtie>\<^sub>S var_alpha y \<longleftrightarrow> x \<bowtie> y"
   by (simp add: assms(1) assms(2) lens_indep_scene var_alpha_def)
 
+lemma pre_var_indep_prod [simp]: "x \<bowtie> a \<Longrightarrow> ns_alpha fst\<^sub>L x \<bowtie> a \<times>\<^sub>L b"
+  using lens_indep.lens_put_irr2
+  by (unfold_locales, force simp add: lens_defs prod.case_eq_if lens_indep_comm)+
+
+lemma post_var_indep_prod [simp]: "x \<bowtie> b \<Longrightarrow> ns_alpha snd\<^sub>L x \<bowtie> a \<times>\<^sub>L b"
+  using lens_indep.lens_put_irr2
+  by (unfold_locales, force simp add: lens_defs prod.case_eq_if lens_indep_comm)+
+
+declare lens_scene_override [simp]
+
+lemma var_alpha_override [simp]: 
+  "mwb_lens X \<Longrightarrow> s\<^sub>1 \<oplus>\<^sub>S s\<^sub>2 on var_alpha X = s\<^sub>1 \<oplus>\<^sub>L s\<^sub>2 on X"
+  by (simp add: var_alpha_def)
+
 (* Some extra Scene laws; should be moved to Optics at some point *)
 
 lemma scene_le_iff_indep_inv:
@@ -132,6 +146,7 @@ syntax \<comment> \<open> Identifiers \<close>
   "_svid_view"    :: "logic \<Rightarrow> svid" ("\<V>[_]") \<comment> \<open> View of a symmetric lens \<close>
   "_svid_coview"  :: "logic \<Rightarrow> svid" ("\<C>[_]") \<comment> \<open> Coview of a symmetric lens \<close>
   "_svid_prod"    :: "svid \<Rightarrow> svid \<Rightarrow> svid" (infixr "\<times>" 85)
+  "_svid_pow2"    :: "svid \<Rightarrow> svid" ("_\<^sup>2" [999] 999)
 
 text \<open> A variable can be decorated with an ampersand, to indicate it is a predicate variable, with 
   a dollar to indicate its an unprimed relational variable, or a dollar and ``acute'' symbol to 
@@ -177,6 +192,7 @@ translations
   "_svid_fst x" \<rightleftharpoons> "_svid_dot fst\<^sub>L x"
   "_svid_snd x" \<rightleftharpoons> "_svid_dot snd\<^sub>L x"
   "_svid_prod x y" \<rightleftharpoons> "x \<times>\<^sub>L y"
+  "_svid_pow2 x" \<rightharpoonup> "x \<times>\<^sub>L x"
   "_mk_svid_list (_svid_list x xs)" \<rightharpoonup> "x +\<^sub>L _mk_svid_list xs"
   "_mk_svid_list x" \<rightharpoonup> "x"
   "_mk_alpha_list (_svid_list x xs)" \<rightharpoonup> "CONST var_alpha x \<squnion>\<^sub>S _mk_alpha_list xs"

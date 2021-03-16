@@ -202,6 +202,19 @@ text \<open> The pretty printer works even when we don't use the parser, as show
 
 term "[\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v]\<^sub>e"
 
+text \<open> A grammar category for lifted expressions \<close>
+
+nonterminal sexpr
+
+syntax "_sexpr" :: "logic \<Rightarrow> sexpr" ("_")
+
+parse_translation \<open>
+  [(@{syntax_const "_sexpr"}, fn ctx => fn [e] => 
+    Syntax.const @{const_name SEXP} 
+            $ (lambda (Syntax.free Lift_Expr.state_id) 
+                      (Lift_Expr.lift_expr ctx (Term_Position.strip_positions e))))]
+\<close>
+
 subsection \<open> Reasoning \<close>
 
 lemma expr_eq_iff: "P = Q \<longleftrightarrow> `P = Q`"
@@ -216,7 +229,12 @@ lemma taut_True [simp]: "`True` = True"
 lemma taut_False [simp]: "`False` = False"
   by (simp add: taut_def)
 
-method expr_simp uses add = (simp add: expr_defs alpha_splits lens_defs add fun_eq_iff prod.case_eq_if)
+named_theorems expr_simps
+
+method expr_simp uses add = 
+  ((simp add: expr_simps)? \<comment> \<open> Perform any possible simplifications retaining the lens structure \<close>
+   ,simp add: expr_defs alpha_splits \<comment> \<open> Explode the rest \<close>
+    lens_defs add fun_eq_iff prod.case_eq_if)
 method expr_auto uses add = (expr_simp add: add; (auto simp add: alpha_splits add)?)
 
 end

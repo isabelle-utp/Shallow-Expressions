@@ -10,11 +10,24 @@ type_synonym 's subst = "'s \<Rightarrow> 's"
 definition subst_nil :: "('s\<^sub>1, 's\<^sub>2) psubst" ("nil\<^sub>s") 
   where [expr_defs]: "nil\<^sub>s = (\<lambda> s. undefined)"
 
-definition subst_id :: "'s subst" ("id\<^sub>s") 
+definition subst_id :: "'s subst" ("[\<leadsto>]") 
   where [expr_defs]: "subst_id = (\<lambda>s. s)"
 
-definition subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a, 's\<^sub>2) expr \<Rightarrow> ('a, 's\<^sub>1) expr" 
-  where [expr_defs]: "subst_app \<sigma> e = (\<lambda> s. e (\<sigma> s))"
+definition subst_aext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>2, 's\<^sub>1) psubst" ("_\<^sup>\<up>" [999] 999) where
+[expr_defs]: "subst_aext a = get\<^bsub>a\<^esub>"
+
+definition subst_ares :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst" ("_\<^sub>\<down>" [999] 999) where
+[expr_defs]: "subst_ares a = create\<^bsub>a\<^esub>"
+
+consts subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> 'p\<^sub>1 \<Rightarrow> 'p\<^sub>2"
+
+abbreviation "aext P a \<equiv> subst_app (a\<^sup>\<up>) P"
+abbreviation "ares P a \<equiv> subst_app (a\<^sub>\<down>) P"
+
+definition subst_app_expr :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a, 's\<^sub>2) expr \<Rightarrow> ('a, 's\<^sub>1) expr" 
+  where [expr_defs]: "subst_app_expr \<sigma> e = (\<lambda> s. e (\<sigma> s))"
+
+adhoc_overloading subst_app subst_app_expr
 
 definition subst_comp :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>1) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>2) psubst" (infixl "\<circ>\<^sub>s" 55) 
     where [expr_defs]: "subst_comp = comp"
@@ -25,7 +38,7 @@ definition sset :: "'s scene \<Rightarrow> 's \<Rightarrow> 's subst"
 syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
 
 translations
-  "_subst_app \<sigma> e" == "CONST subst_app \<sigma> (e)\<^sub>e"
+  "_subst_app \<sigma> e" == "CONST subst_app \<sigma> e"
 
 definition subst_upd :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst"
   where [expr_defs]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
@@ -66,17 +79,17 @@ syntax
 translations
   "_SubstUpd m (_SMaplets xy ms)"     == "_SubstUpd (_SubstUpd m xy) ms"
   "_SubstUpd m (_smaplet x y)"        == "CONST subst_upd m x (y)\<^sub>e"
-  "_Subst ms"                         == "_SubstUpd id\<^sub>s ms"
+  "_Subst ms"                         == "_SubstUpd [\<leadsto>] ms"
   "_Subst (_SMaplets ms1 ms2)"        <= "_SubstUpd (_Subst ms1) ms2"
   "_PSubst ms"                        == "_SubstUpd nil\<^sub>s ms"
   "_PSubst (_SMaplets ms1 ms2)"       <= "_SubstUpd (_PSubst ms1) ms2"
   "_SMaplets ms1 (_SMaplets ms2 ms3)" <= "_SMaplets (_SMaplets ms1 ms2) ms3"
   "_smaplets_svids (_SMaplets (_smaplet x e) ms)" => "x +\<^sub>L (_smaplets_svids ms)"
   "_smaplets_svids (_smaplet x e)" => "x"
-  "_subst P es vs" => "CONST subst_app (_psubst id\<^sub>s vs es) P"
+  "_subst P es vs" => "CONST subst_app (_psubst [\<leadsto>] vs es) P"
   "_psubst m (_svid_list x xs) (_uexprs v vs)" => "_psubst (_psubst m x v) xs vs"
   "_psubst m x v"  => "CONST subst_upd m x (v)\<^sub>e"
-  "_subst P v x" <= "CONST subst_app (CONST subst_upd id\<^sub>s x (v)\<^sub>e) P"
+  "_subst P v x" <= "CONST subst_app (CONST subst_upd [\<leadsto>] x (v)\<^sub>e) P"
   "_par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2" == "CONST par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2"
 
 subsection \<open> Substitution Laws \<close>
@@ -85,19 +98,18 @@ named_theorems usubst and usubst_eval
 
 lemma subst_unrest [usubst]:
   "\<lbrakk> vwb_lens x; $x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<dagger> v = \<sigma> \<dagger> v"
-  by (expr_auto)
-     (metis lens_override_def lens_scene_override mwb_lens_def vwb_lens_mwb weak_lens.put_get)
+  by expr_auto
 
-lemma subst_lookup_id [usubst]: "\<langle>id\<^sub>s\<rangle>\<^sub>s x = var x"
+lemma subst_lookup_id [usubst]: "\<langle>[\<leadsto>]\<rangle>\<^sub>s x = var x"
   by expr_simp
 
-lemma subst_id_var: "id\<^sub>s = ($\<^bold>v)\<^sub>e"
+lemma subst_id_var: "[\<leadsto>] = ($\<^bold>v)\<^sub>e"
   by expr_simp
 
-lemma subst_upd_id_lam [usubst]: "subst_upd ($\<^bold>v)\<^sub>e x v = subst_upd id\<^sub>s x v"
+lemma subst_upd_id_lam [usubst]: "subst_upd ($\<^bold>v)\<^sub>e x v = subst_upd [\<leadsto>] x v"
   by expr_simp
 
-lemma subst_id [simp]: "id\<^sub>s \<circ>\<^sub>s \<sigma> = \<sigma>" "\<sigma> \<circ>\<^sub>s id\<^sub>s = \<sigma>"
+lemma subst_id [simp]: "[\<leadsto>] \<circ>\<^sub>s \<sigma> = \<sigma>" "\<sigma> \<circ>\<^sub>s [\<leadsto>] = \<sigma>"
   by expr_auto+
 
 lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^sub>L = \<sigma>"
@@ -113,16 +125,16 @@ term "(\<forall> x. x + $y > $z)\<^sub>e"
 
 term "(\<forall> k. P\<lbrakk>\<guillemotleft>k\<guillemotright>/x\<rbrakk>)\<^sub>e"
 
-lemma subst_var [usubst]: "\<sigma> \<dagger> $x = \<langle>\<sigma>\<rangle>\<^sub>s x"
+lemma subst_var [usubst]: "\<sigma> \<dagger> ($x)\<^sub>e = \<langle>\<sigma>\<rangle>\<^sub>s x"
   by (simp add: expr_defs)
 
 text \<open> We can't use this as simplification unfortunately as the expression structure is too
   ambiguous to support automatic rewriting. \<close>
 
-lemma subst_uop: "\<sigma> \<dagger> \<guillemotleft>f\<guillemotright> e = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e))\<^sub>e"
+lemma subst_uop: "\<sigma> \<dagger> (\<guillemotleft>f\<guillemotright> e)\<^sub>e = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e))\<^sub>e"
   by (simp add: expr_defs)
 
-lemma subst_bop: "\<sigma> \<dagger> \<guillemotleft>f\<guillemotright> e\<^sub>1 e\<^sub>2 = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e\<^sub>1) (\<sigma> \<dagger> e\<^sub>2))\<^sub>e"
+lemma subst_bop: "\<sigma> \<dagger> (\<guillemotleft>f\<guillemotright> e\<^sub>1 e\<^sub>2)\<^sub>e = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e\<^sub>1) (\<sigma> \<dagger> e\<^sub>2))\<^sub>e"
   by (simp add: expr_defs)
 
 text \<open> A substitution update naturally yields the given expression. \<close>
@@ -164,7 +176,7 @@ lemma usubst_upd_comm2:
   by (auto simp add: subst_upd_def assms comp_def lens_indep_comm)
 
 lemma usubst_upd_var_id [usubst]:
-  "vwb_lens x \<Longrightarrow> [x \<leadsto> $x] = id\<^sub>s"
+  "vwb_lens x \<Longrightarrow> [x \<leadsto> $x] = [\<leadsto>]"
   by (simp add: subst_upd_def subst_id_def id_lens_def SEXP_def)
 
 lemma usubst_upd_pair [usubst]:
@@ -206,9 +218,9 @@ lemma usubst_cond_upd_3 [usubst]:
 subsection \<open> Evaluation \<close>
 
 lemma subst_SEXP [usubst_eval]: "\<sigma> \<dagger> [\<lambda> s. e s]\<^sub>e = [\<lambda> s. e (\<sigma> s)]\<^sub>e"
-  by (simp add: SEXP_def subst_app_def fun_eq_iff)
+  by (simp add: SEXP_def subst_app_expr_def fun_eq_iff)
 
-lemma get_subst_id [usubst_eval]: "get\<^bsub>x\<^esub> (id\<^sub>s s) = get\<^bsub>x\<^esub> s"
+lemma get_subst_id [usubst_eval]: "get\<^bsub>x\<^esub> ([\<leadsto>] s) = get\<^bsub>x\<^esub> s"
   by (simp add: subst_id_def)
 
 lemma get_subst_upd_same [usubst_eval]: "weak_lens x \<Longrightarrow> get\<^bsub>x\<^esub> ((\<sigma>(x \<leadsto> e)) s) = e s"
