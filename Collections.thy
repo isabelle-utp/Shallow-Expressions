@@ -12,6 +12,8 @@ definition lens_defined :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) e
 syntax "_lens_defined" :: "svid \<Rightarrow> logic" ("\<^bold>D'(_')")
 translations "_lens_defined x" == "CONST lens_defined x"
 
+expr_ctr lens_defined
+
 subsection \<open> Dynamic Lenses \<close>
 
 definition dyn_lens :: "('i \<Rightarrow> ('a \<Longrightarrow> 's)) \<Rightarrow> ('s \<Rightarrow> 'i) \<Rightarrow> ('a \<Longrightarrow> 's)" where
@@ -19,8 +21,8 @@ definition dyn_lens :: "('i \<Rightarrow> ('a \<Longrightarrow> 's)) \<Rightarro
 
 lemma dyn_lens_mwb [simp]: "\<lbrakk> \<And> i. mwb_lens (f i); \<And> i. $f(i) \<sharp> e \<rbrakk> \<Longrightarrow> mwb_lens (dyn_lens f e)"
   apply (unfold_locales, auto simp add: expr_defs lens_defs lens_indep.lens_put_irr2)
-  apply (metis lens_override_def lens_scene_override mwb_lens_weak weak_lens.put_get)
-  apply (metis lens_override_def lens_scene_override mwb_lens.put_put)
+  apply (metis lens_override_def mwb_lens_weak weak_lens.put_get)
+  apply (metis lens_override_def mwb_lens.put_put)
   done
 
 lemma ind_lens_vwb [simp]: "\<lbrakk> \<And> i. vwb_lens (f i); \<And> i. $f(i) \<sharp> e \<rbrakk> \<Longrightarrow> vwb_lens (dyn_lens f e)"
