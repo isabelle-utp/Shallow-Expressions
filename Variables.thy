@@ -80,6 +80,7 @@ lemma post_var_indep_prod [simp]: "x \<bowtie> b \<Longrightarrow> ns_alpha snd\
   by (unfold_locales, force simp add: lens_defs prod.case_eq_if lens_indep_comm)+
 
 declare lens_scene_override [simp]
+declare uminus_scene_twice [simp]
 
 lemma var_alpha_override [simp]: 
   "mwb_lens X \<Longrightarrow> s\<^sub>1 \<oplus>\<^sub>S s\<^sub>2 on var_alpha X = s\<^sub>1 \<oplus>\<^sub>L s\<^sub>2 on X"

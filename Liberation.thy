@@ -23,6 +23,13 @@ lemma liberate_lens [expr_simps]:
   "mwb_lens x \<Longrightarrow> P \\ $x = (\<lambda>s. \<exists>s'. P (s \<triangleleft>\<^bsub>x\<^esub> s'))"
   by (simp add: liberate_expr_def)
 
+lemma liberate_lens': "mwb_lens x \<Longrightarrow> P \\ $x = (\<lambda>s. \<exists>v. P (put\<^bsub>x\<^esub> s v))"
+  by (auto simp add: liberate_expr_def lens_defs fun_eq_iff)
+     (metis mwb_lens_weak weak_lens.put_get)
+
+lemma liberate_as_subst: "vwb_lens x \<Longrightarrow> e \\ $x = (\<exists> v. e\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>)\<^sub>e"
+  by (expr_simp, metis vwb_lens.put_eq)
+
 lemma unrest_liberate: "a \<sharp> P \\ a"
   by (expr_simp)
 

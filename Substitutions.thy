@@ -151,6 +151,10 @@ lemma subst_lookup_upd_diff [usubst]:
   shows "\<langle>\<sigma>(y \<leadsto> v)\<rangle>\<^sub>s x = \<langle>\<sigma>\<rangle>\<^sub>s x"
   using assms by (simp add: expr_defs)
 
+lemma subst_lookup_pair [usubst]: 
+  "\<langle>\<sigma>\<rangle>\<^sub>s (x +\<^sub>L y) = ((\<langle>\<sigma>\<rangle>\<^sub>s x, \<langle>\<sigma>\<rangle>\<^sub>s y))\<^sub>e"
+  by (expr_simp)
+
 text \<open> Substitution update is idempotent. \<close>
 
 lemma usubst_upd_idem [usubst]:
@@ -202,6 +206,14 @@ simproc_setup subst_order ("subst_upd (subst_upd \<sigma> x u) y v") =
                else NONE  |
           _ => NONE) 
   \<close>
+
+subsection \<open> Substitution Unrestriction Laws \<close>
+
+lemma unrest_subst_empty [unrest]: "x \<sharp>\<^sub>s [\<leadsto>]"
+  by (expr_simp)
+
+lemma unrest_subst_upd [unrest]: "\<lbrakk> vwb_lens x; x \<bowtie> y; $x \<sharp> (e)\<^sub>e; x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> x \<sharp>\<^sub>s \<sigma>(y \<leadsto> e)"
+  by (expr_auto add: lens_indep_comm)
 
 subsection \<open> Conditional Substitution Laws \<close>
 
