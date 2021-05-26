@@ -7,11 +7,14 @@ begin
 type_synonym ('s\<^sub>1, 's\<^sub>2) psubst = "'s\<^sub>1 \<Rightarrow> 's\<^sub>2"
 type_synonym 's subst = "'s \<Rightarrow> 's"
 
-definition subst_nil :: "('s\<^sub>1, 's\<^sub>2) psubst" ("nil\<^sub>s") 
-  where [expr_defs]: "nil\<^sub>s = (\<lambda> s. undefined)"
+definition subst_nil :: "('s\<^sub>1, 's\<^sub>2) psubst" ("\<lparr>\<leadsto>\<rparr>") 
+  where [expr_defs]: "\<lparr>\<leadsto>\<rparr> = (\<lambda> s. undefined)"
 
 definition subst_id :: "'s subst" ("[\<leadsto>]") 
   where [expr_defs]: "subst_id = (\<lambda>s. s)"
+
+definition subst_default :: "('s\<^sub>1, 's\<^sub>2::default) psubst" ("\<lblot>\<leadsto>\<rblot>") 
+  where [expr_defs]: "\<lblot>\<leadsto>\<rblot> = (\<lambda> s. default)"
 
 definition subst_aext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>2, 's\<^sub>1) psubst" ("_\<^sup>\<up>" [999] 999) where
 [expr_defs]: "subst_aext a = get\<^bsub>a\<^esub>"
@@ -72,6 +75,7 @@ syntax
   "_SubstUpd"       :: "[logic, smaplets] => logic" ("_/'(_')" [900,0] 900)
   "_Subst"          :: "smaplets => logic" ("(1[_])")
   "_PSubst"         :: "smaplets => logic" ("(1\<lparr>_\<rparr>)")
+  "_DSubst"         :: "smaplets \<Rightarrow> logic" ("(1\<lblot>_\<rblot>)")
   "_psubst"         :: "[logic, svids, uexprs] \<Rightarrow> logic"
   "_subst"          :: "logic \<Rightarrow> uexprs \<Rightarrow> svids \<Rightarrow> logic" ("(_\<lbrakk>_'/_\<rbrakk>)" [990,0,0] 991)
   "_uexprs"         :: "[logic, uexprs] => uexprs" ("_,/ _")
@@ -83,8 +87,10 @@ translations
   "_SubstUpd m (_smaplet x y)"        == "CONST subst_upd m x (y)\<^sub>e"
   "_Subst ms"                         == "_SubstUpd [\<leadsto>] ms"
   "_Subst (_SMaplets ms1 ms2)"        <= "_SubstUpd (_Subst ms1) ms2"
-  "_PSubst ms"                        == "_SubstUpd nil\<^sub>s ms"
+  "_PSubst ms"                        == "_SubstUpd \<lparr>\<leadsto>\<rparr> ms"
   "_PSubst (_SMaplets ms1 ms2)"       <= "_SubstUpd (_PSubst ms1) ms2"
+  "_DSubst ms"                        == "_SubstUpd \<lblot>\<leadsto>\<rblot> ms"
+  "_DSubst (_SMaplets ms1 ms2)"       <= "_SubstUpd (_DSubst ms1) ms2"
   "_SMaplets ms1 (_SMaplets ms2 ms3)" <= "_SMaplets (_SMaplets ms1 ms2) ms3"
   "_smaplets_svids (_SMaplets (_smaplet x e) ms)" => "x +\<^sub>L (_smaplets_svids ms)"
   "_smaplets_svids (_smaplet x e)" => "x"
@@ -93,6 +99,12 @@ translations
   "_psubst m x v"  => "CONST subst_upd m x (v)\<^sub>e"
   "_subst P v x" <= "CONST subst_app (CONST subst_upd [\<leadsto>] x (v)\<^sub>e) P"
   "_par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2" == "CONST par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2"
+
+expr_ctr subst_app
+expr_ctr subst_id
+expr_ctr subst_nil
+expr_ctr subst_default
+expr_ctr subst_upd
 
 subsection \<open> Substitution Laws \<close>
 
@@ -118,8 +130,6 @@ lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^su
   by expr_simp
 
 (* FIXME: Figure out how to make laws like this parse and simplify *)
-
-expr_ctr subst_app
 
 term "(f (\<sigma> \<dagger> e))\<^sub>e"
 
