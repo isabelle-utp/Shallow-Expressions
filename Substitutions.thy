@@ -106,6 +106,8 @@ expr_ctr subst_nil
 expr_ctr subst_default
 expr_ctr subst_upd
 
+ML_file \<open>Expr_Util.ML\<close>
+
 subsection \<open> Substitution Laws \<close>
 
 named_theorems usubst and usubst_eval
