@@ -2,12 +2,13 @@
 
 signature EXPR_UTIL =
 sig
+  val const_or_free: Proof.context -> string -> term
   val subst_tab: term -> term Symtab.table
   val tab_subst: Proof.context -> term Symtab.table -> term
   val log_vars: term -> string list
 end
 
-structure Expr_Util: EXPR_UTIL =
+structure Expr_Util : EXPR_UTIL =
 struct
 local
   open Syntax
@@ -26,7 +27,8 @@ in
   fun const_or_free ctx x = 
     let val consts = (Proof_Context.consts_of ctx)
         val {const_space, ...} = Consts.dest consts
-    in if (Name_Space.declared const_space x) then Const (x, dummyT) else Free (x, dummyT)
+        val c = Consts.intern consts x
+    in if (Name_Space.declared const_space c) then Const (c, dummyT) else Free (x, dummyT)
     end;
 
   (* Construct a substitution from a table *)
