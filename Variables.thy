@@ -118,6 +118,13 @@ lemma var_alpha_subset [simp]:
   shows "var_alpha x \<le> var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
   by (simp add: assms(1) assms(2) sublens_iff_subscene var_alpha_def)
 
+lemma uminus_top_scene [simp]: "- \<top>\<^sub>S = \<bottom>\<^sub>S"
+  by (simp add: top_scene_def bot_scene_def uminus_scene_def)
+     (metis top_scene.rep_eq top_scene_def)
+
+lemma scene_equiv_bot [simp]: "a \<approx>\<^sub>S b on \<bottom>\<^sub>S"
+  by (simp add: scene_equiv_def)
+
 subsection \<open> Syntax Translations \<close>
 
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
