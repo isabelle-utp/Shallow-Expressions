@@ -72,6 +72,7 @@ syntax
   "_SMaplets"       :: "[smaplet, smaplets] => smaplets" ("_,/ _")
   \<comment> \<open> A little syntax utility to extract a list of variable identifiers from a substitution \<close>
   "_smaplets_svids" :: "smaplets \<Rightarrow> logic"
+  "_of_svid_list"   :: "logic \<Rightarrow> svids"
   "_SubstUpd"       :: "[logic, smaplets] => logic" ("_/'(_')" [900,0] 900)
   "_Subst"          :: "smaplets => logic" ("(1[_])")
   "_PSubst"         :: "smaplets => logic" ("(1\<lparr>_\<rparr>)")
@@ -85,6 +86,10 @@ syntax
 translations
   "_SubstUpd m (_SMaplets xy ms)"     == "_SubstUpd (_SubstUpd m xy) ms"
   "_SubstUpd m (_smaplet x y)"        == "CONST subst_upd m x (y)\<^sub>e"
+  "_smaplet (_svid_tuple (_of_svid_list (x +\<^sub>L y))) e" <= "_smaplet (x +\<^sub>L y) e"
+  "_svid_list (_svid_tuple (_of_svid_list (x +\<^sub>L y))) (_of_svid_list z)" <= "_of_svid_list ((x +\<^sub>L y) +\<^sub>L z)"
+  "_svid_list x (_of_svid_list y)"    <= "_of_svid_list (x +\<^sub>L y)"
+  "x"                                 <= "_of_svid_list x"
   "_Subst ms"                         == "_SubstUpd [\<leadsto>] ms"
   "_Subst (_SMaplets ms1 ms2)"        <= "_SubstUpd (_Subst ms1) ms2"
   "_PSubst ms"                        == "_SubstUpd \<lparr>\<leadsto>\<rparr> ms"
