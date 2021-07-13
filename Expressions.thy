@@ -135,6 +135,7 @@ translations
   "_sexp_taut p" == "CONST taut (p)\<^sub>e"
   "_sexp_select e x" == "CONST expr_select (e)\<^sub>e x"
   "_sexp_if P b Q" == "CONST expr_if P (b)\<^sub>e Q"
+  "_sexp_var (_svid_tuple (_of_svid_list (x +\<^sub>L y)))" <= "_sexp_var (x +\<^sub>L y)"
 
 text \<open> The main directive is the $e$ subscripted brackets, @{term "(e)\<^sub>e"}. This converts the 
   expression $e$ to a boxed $\lambda$ term. Essentially, the parser behaviour is as follows:

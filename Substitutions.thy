@@ -42,6 +42,7 @@ syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\
 
 translations
   "_subst_app \<sigma> e" == "CONST subst_app \<sigma> e"
+  "_subst_app \<sigma> e" <= "_subst_app \<sigma> (e)\<^sub>e"
 
 definition subst_upd :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst"
   where [expr_defs]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
@@ -72,7 +73,6 @@ syntax
   "_SMaplets"       :: "[smaplet, smaplets] => smaplets" ("_,/ _")
   \<comment> \<open> A little syntax utility to extract a list of variable identifiers from a substitution \<close>
   "_smaplets_svids" :: "smaplets \<Rightarrow> logic"
-  "_of_svid_list"   :: "logic \<Rightarrow> svids"
   "_SubstUpd"       :: "[logic, smaplets] => logic" ("_/'(_')" [900,0] 900)
   "_Subst"          :: "smaplets => logic" ("(1[_])")
   "_PSubst"         :: "smaplets => logic" ("(1\<lparr>_\<rparr>)")
@@ -87,9 +87,6 @@ translations
   "_SubstUpd m (_SMaplets xy ms)"     == "_SubstUpd (_SubstUpd m xy) ms"
   "_SubstUpd m (_smaplet x y)"        == "CONST subst_upd m x (y)\<^sub>e"
   "_smaplet (_svid_tuple (_of_svid_list (x +\<^sub>L y))) e" <= "_smaplet (x +\<^sub>L y) e"
-  "_svid_list (_svid_tuple (_of_svid_list (x +\<^sub>L y))) (_of_svid_list z)" <= "_of_svid_list ((x +\<^sub>L y) +\<^sub>L z)"
-  "_svid_list x (_of_svid_list y)"    <= "_of_svid_list (x +\<^sub>L y)"
-  "x"                                 <= "_of_svid_list x"
   "_Subst ms"                         == "_SubstUpd [\<leadsto>] ms"
   "_Subst (_SMaplets ms1 ms2)"        <= "_SubstUpd (_Subst ms1) ms2"
   "_PSubst ms"                        == "_SubstUpd \<lparr>\<leadsto>\<rparr> ms"
@@ -103,9 +100,11 @@ translations
   "_psubst m (_svid_list x xs) (_uexprs v vs)" => "_psubst (_psubst m x v) xs vs"
   "_psubst m x v"  => "CONST subst_upd m x (v)\<^sub>e"
   "_subst P v x" <= "CONST subst_app (CONST subst_upd [\<leadsto>] x (v)\<^sub>e) P"
+  "_subst P v x" <= "_subst (_sexp_quote P)  v x"
+  "_subst P v (_svid_tuple (_of_svid_list (x +\<^sub>L y)))" <= "_subst P v (x +\<^sub>L y)"
   "_par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2" == "CONST par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2"
 
-expr_ctr subst_app
+expr_ctr subst_app (1)
 expr_ctr subst_id
 expr_ctr subst_nil
 expr_ctr subst_default

@@ -23,7 +23,12 @@ fun lift_expr_aux ctx (Const (n', t), args) =
      else if (member (op =) (Symtab.keys (NoLift.get (Proof_Context.theory_of ctx))) n)
      (* FIXME: Allow some parameters of an expression constructor to be ignored and not lifted *) 
      then let val (SOME aopt) = Symtab.lookup (NoLift.get (Proof_Context.theory_of ctx)) n in
-          Term.list_comb (Const (n', t), map_index (fn (i, t) => if (member (op =) aopt i) then lift_expr ctx t else t) args) $ free state_id
+          Term.list_comb 
+            (Const (n', t)
+            , map_index (fn (i, t) => 
+                         if (member (op =) aopt i) 
+                         then const @{const_name SEXP} $ (lambda (free state_id) (lift_expr ctx t)) 
+                         else t) args) $ free state_id
           end
      else
      case (Type_Infer_Context.const_type ctx n) of

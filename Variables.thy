@@ -151,6 +151,7 @@ syntax \<comment> \<open> Identifiers \<close>
   "_svid_fst"     :: "svid \<Rightarrow> svid" ("_\<^sup><" [997] 997)
   "_svid_snd"     :: "svid \<Rightarrow> svid" ("_\<^sup>>" [997] 997)
   "_mk_svid_list" :: "svids \<Rightarrow> logic" \<comment> \<open> Helper function for summing a list of identifiers \<close>
+  "_of_svid_list"   :: "logic \<Rightarrow> svids" \<comment> \<open> Reverse of the above \<close>
   "_svid_view"    :: "logic \<Rightarrow> svid" ("\<V>[_]") \<comment> \<open> View of a symmetric lens \<close>
   "_svid_coview"  :: "logic \<Rightarrow> svid" ("\<C>[_]") \<comment> \<open> Coview of a symmetric lens \<close>
   "_svid_prod"    :: "svid \<Rightarrow> svid \<Rightarrow> svid" (infixr "\<times>" 85)
@@ -208,6 +209,10 @@ translations
 
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
   "_svid_coview a" => "\<C>\<^bsub>a\<^esub>"
+
+  "_svid_list (_svid_tuple (_of_svid_list (x +\<^sub>L y))) (_of_svid_list z)" \<leftharpoondown> "_of_svid_list ((x +\<^sub>L y) +\<^sub>L z)"
+  "_svid_list x (_of_svid_list y)"    \<leftharpoondown> "_of_svid_list (x +\<^sub>L y)"
+  "x"                                 \<leftharpoondown> "_of_svid_list x"
 
   \<comment> \<open> Alphabets \<close>
   "_salphaparen a" \<rightharpoonup> "a"
