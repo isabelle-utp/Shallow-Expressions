@@ -6,9 +6,16 @@ begin
 
 subsection \<open> Constructors \<close>
 
+bundle Expression_Syntax
+begin
+
 no_notation   
   Set.member ("op :") and
   Set.member ("(_/ : _)" [51, 51] 50)
+
+end
+
+unbundle Expression_Syntax
 
 declare fst_vwb_lens [simp] and snd_vwb_lens [simp]
 
