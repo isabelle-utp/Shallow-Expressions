@@ -109,15 +109,11 @@ parse_translation \<open>
       case terms of
         [Const (@{const_syntax SEXP}, t) $ e] => Const (@{const_name SEXP}, t) $ e |
         [e] =>
-            Syntax.const @{const_name SEXP} 
-            $ (lambda (Syntax.free Lift_Expr.state_id) 
-                      (Lift_Expr.lift_expr ctx (Term_Position.strip_positions e)))),
+            Syntax.const @{const_name SEXP} $ Lift_Expr.mk_lift_expr ctx e),
    (@{syntax_const "_sexp_quote_1way"}
    , fn ctx => fn terms =>
       case terms of
-        [e] =>
-            (lambda (Syntax.free Lift_Expr.state_id) 
-                    (Lift_Expr.lift_expr ctx (Term_Position.strip_positions e))))]
+        [e] => Lift_Expr.mk_lift_expr ctx e)]
 \<close>
 
 print_translation \<open>
