@@ -132,6 +132,9 @@ lemma subst_upd_id_lam [usubst]: "subst_upd ($\<^bold>v)\<^sub>e x v = subst_upd
 lemma subst_id [simp]: "[\<leadsto>] \<circ>\<^sub>s \<sigma> = \<sigma>" "\<sigma> \<circ>\<^sub>s [\<leadsto>] = \<sigma>"
   by expr_auto+
 
+lemma subst_default_id [simp]: "\<lblot>\<leadsto>\<rblot> \<circ>\<^sub>s \<sigma> = \<lblot>\<leadsto>\<rblot>"
+  by (simp add: expr_defs comp_def)
+
 lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^sub>L = \<sigma>"
   by expr_simp
 

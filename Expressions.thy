@@ -230,8 +230,8 @@ named_theorems expr_simps
 
 method expr_simp uses add = 
   ((simp add: expr_simps)? \<comment> \<open> Perform any possible simplifications retaining the lens structure \<close>
-   ;simp add: expr_defs alpha_splits \<comment> \<open> Explode the rest \<close>
-    lens_defs add fun_eq_iff prod.case_eq_if)
+   ;((simp add: fun_eq_iff prod.case_eq_if alpha_splits expr_defs lens_defs add) ; \<comment> \<open> Explode the rest \<close>
+     (simp add: expr_defs lens_defs add)?))
 method expr_auto uses add = (expr_simp add: add; (auto simp add: alpha_splits add)?)
 
 end
