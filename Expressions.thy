@@ -232,6 +232,10 @@ method expr_simp uses add =
   ((simp add: expr_simps)? \<comment> \<open> Perform any possible simplifications retaining the lens structure \<close>
    ;((simp add: fun_eq_iff prod.case_eq_if alpha_splits expr_defs lens_defs add) ; \<comment> \<open> Explode the rest \<close>
      (simp add: expr_defs lens_defs add)?))
-method expr_auto uses add = (expr_simp add: add; (auto simp add: alpha_splits add)?)
+method expr_auto uses add = 
+  (expr_simp add: add; 
+   (auto simp add: alpha_splits add)?; 
+   (rename_alpha_vars)? \<comment> \<open> Rename any logical variables with v subscripts \<close>
+  )
 
 end
