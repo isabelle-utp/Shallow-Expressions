@@ -5,6 +5,7 @@ theory Shallow_Expressions_Z
     "Shallow-Expressions.Shallow_Expressions" 
     "Z_Toolkit.Relation_Lib"
     Collections_Z
+    Z_Store
 begin 
 
 text \<open> Allow substitution maplets to be written in a Z-like way. \<close>
