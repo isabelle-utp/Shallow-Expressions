@@ -32,7 +32,7 @@ fun mk_zstore x y z invs thy =
         Record_Default_Instance.mk_rec_default_instance n |>
         Local_Theory.exit_global o 
            (snd o Expression.add_locale (snd x) Binding.empty [] ([], []) ([fixes] @ assms) 
-            #> (fn ctx => snd (Local_Theory.notes (map_index (fn (i, (n, _)) => ((@{print} n, []), [([nth (Proof_Context.get_thms ctx "invariants") i],[])])) invs) ctx))
+            #> (fn ctx => snd (Local_Theory.notes (map_index (fn (i, (n, _)) => ((n, []), [([nth (Proof_Context.get_thms ctx "invariants") i],[])])) invs) ctx))
            ) |>
         (fn thy =>
                let val ctx = Named_Target.theory_init thy
