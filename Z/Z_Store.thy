@@ -20,6 +20,12 @@ fun read_parent NONE ctxt = (NONE, ctxt)
         Type (name, Ts) => (SOME (Ts, name), fold Variable.declare_typ Ts ctxt)
       | T => error ("Bad parent record specification: " ^ Syntax.string_of_typ ctxt T));
 
+(* Get the subset of the parameters that the locale's assumptions depend on *)
+fun dep_params_of thy l = 
+  case fst (Locale.specification_of thy l) of
+    SOME (Const (@{const_name Trueprop}, _) $ t) => map dest_Free (snd (Term.strip_comb t)) |
+    _ => []
+
 fun mk_zstore (raw_params, binding) raw_parent raw_fields invs thy = 
     let val ctx = Named_Target.theory_init thy
       (* Get the new type name *)
@@ -29,18 +35,20 @@ fun mk_zstore (raw_params, binding) raw_parent raw_fields invs thy =
       (* Name for the new invariant *)
       val assmsn = (n ^ "_invariants")
       val invn = n ^ "_inv"
-      val fixes = Element.Fixes (map (fn (n, t, s) => (n, SOME (Syntax.parse_typ ctx t), s)) raw_fields)
-      val assms = (if (invs = []) then [] else [Element.Assumes [((Binding.name assmsn, []), (map (fn (_, t) => (HOLogic.mk_Trueprop (Syntax.parse_term ctx t), [])) invs))]])
+      (* Need to enumerate all variables in a fake assumption *)
+      val invs = if invs = [] then [(Binding.empty, "True")] else invs
+      val fixes = Element.Fixes (map (fn (n, t, s) => (n, SOME t, s)) raw_fields)
+      val assms = [Element.Assumes [((Binding.name assmsn, []), (map (fn (_, t) => (t, [])) invs))]]
       val itb = Binding.make (invn ^ "_def", Position.none)
       val (parent, _) = (read_parent raw_parent (Proof_Context.init_global thy))
-      val locex = case parent of NONE => [] | SOME n => [(snd n, (("", false), (Expression.Named [], [])))]
+      val locex = case parent of NONE => [] | SOME n => [((snd n, Position.none), (("", false), (Expression.Named [], [])))]
 
       val ib = (SOME (Binding.make (invn, Position.none), SOME ("((" ^ varl ^ ")" ^ n ^ "_scheme) => bool"), NoSyn))
         open HOLogic in
         Lens_Utils.add_alphabet_cmd (raw_params, binding) raw_parent raw_fields thy |>
         Record_Default_Instance.mk_rec_default_instance n |>
         Local_Theory.exit_global o 
-           (snd o Expression.add_locale binding Binding.empty [] (locex, []) ([fixes] @ assms) 
+           (snd o Expression.add_locale_cmd binding Binding.empty [] (locex, []) ([fixes] @ assms)
             #> (fn ctx => snd (Local_Theory.notes (map_index (fn (i, (n, _)) => ((n, []), [([nth (Proof_Context.get_thms ctx assmsn) i],[])])) invs) ctx))
             #> (fn ctx =>
                   let val passms = case parent of NONE => [] | SOME (_, n) => Proof_Context.get_thms ctx ((Long_Name.base_name n) ^ "_invariants")                 
@@ -48,7 +56,7 @@ fun mk_zstore (raw_params, binding) raw_parent raw_fields invs thy =
            ) |>
         (fn thy => 
                let val Const (ln, _) = Syntax.read_term (Proof_Context.init_global thy) n 
-                   val vars = (map (Syntax.free o fst o fst) (Locale.params_of thy ln))
+                   val vars = (map (Syntax.free o fst) (dep_params_of thy ln))
                    val ctx = Named_Target.theory_init thy
                    val sinv = Term.list_comb (Syntax.free n, vars)
                    val (_, ctx') = Expr_Def.expr_def (itb, []) ib (mk_eq (Free (invn, dummyT), sinv)) ctx
