@@ -50,10 +50,10 @@ definition taut :: "(bool, 's) expr \<Rightarrow> bool" where
 [expr_defs]: "taut e = (\<forall> s. e s)"
 
 definition expr_select :: "('a, 's) expr \<Rightarrow> ('b \<Longrightarrow> 'a) \<Rightarrow> ('b, 's) expr" where
-[expr_defs]: "expr_select e x = (\<lambda> s. get\<^bsub>x\<^esub> (e s))"
+[expr_defs, code_unfold]: "expr_select e x = (\<lambda> s. get\<^bsub>x\<^esub> (e s))"
 
 definition expr_if :: "('a, 's) expr \<Rightarrow> (bool, 's) expr \<Rightarrow> ('a, 's) expr \<Rightarrow> ('a, 's) expr" where
-[expr_defs]: "expr_if P b Q = (\<lambda> s. if (b s) then P s else Q s)"
+[expr_defs, code_unfold]: "expr_if P b Q = (\<lambda> s. if (b s) then P s else Q s)"
 
 subsection \<open> Lifting Parser and Printer \<close>
 

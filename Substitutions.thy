@@ -8,19 +8,19 @@ type_synonym ('s\<^sub>1, 's\<^sub>2) psubst = "'s\<^sub>1 \<Rightarrow> 's\<^su
 type_synonym 's subst = "'s \<Rightarrow> 's"
 
 definition subst_nil :: "('s\<^sub>1, 's\<^sub>2) psubst" ("\<lparr>\<leadsto>\<rparr>") 
-  where [expr_defs]: "\<lparr>\<leadsto>\<rparr> = (\<lambda> s. undefined)"
+  where [expr_defs, code_unfold]: "\<lparr>\<leadsto>\<rparr> = (\<lambda> s. undefined)"
 
 definition subst_id :: "'s subst" ("[\<leadsto>]") 
-  where [expr_defs]: "subst_id = (\<lambda>s. s)"
+  where [expr_defs, code_unfold]: "subst_id = (\<lambda>s. s)"
 
 definition subst_default :: "('s\<^sub>1, 's\<^sub>2::default) psubst" ("\<lblot>\<leadsto>\<rblot>") 
-  where [expr_defs]: "\<lblot>\<leadsto>\<rblot> = (\<lambda> s. default)"
+  where [expr_defs, code_unfold]: "\<lblot>\<leadsto>\<rblot> = (\<lambda> s. default)"
 
 definition subst_aext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>2, 's\<^sub>1) psubst" ("_\<^sup>\<up>" [999] 999) where
-[expr_defs]: "subst_aext a = get\<^bsub>a\<^esub>"
+[expr_defs, code_unfold]: "subst_aext a = get\<^bsub>a\<^esub>"
 
 definition subst_ares :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst" ("_\<^sub>\<down>" [999] 999) where
-[expr_defs]: "subst_ares a = create\<^bsub>a\<^esub>"
+[expr_defs, code_unfold]: "subst_ares a = create\<^bsub>a\<^esub>"
 
 consts subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> 'p\<^sub>1 \<Rightarrow> 'p\<^sub>2"
 
@@ -33,10 +33,10 @@ definition subst_app_expr :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a,
 adhoc_overloading subst_app subst_app_expr
 
 definition subst_comp :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>1) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>2) psubst" (infixl "\<circ>\<^sub>s" 55) 
-    where [expr_defs]: "subst_comp = comp"
+    where [expr_defs, code_unfold]: "subst_comp = comp"
 
 definition sset :: "'s scene \<Rightarrow> 's \<Rightarrow> 's subst" 
-  where [expr_defs]: "sset a s' = (\<lambda> s. s \<oplus>\<^sub>S s' on a)"
+  where [expr_defs, code_unfold]: "sset a s' = (\<lambda> s. s \<oplus>\<^sub>S s' on a)"
 
 syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
 
@@ -45,10 +45,10 @@ translations
   "_subst_app \<sigma> e" <= "_subst_app \<sigma> (e)\<^sub>e"
 
 definition subst_upd :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst"
-  where [expr_defs]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
+  where [expr_defs, code_unfold]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
 
 definition subst_lookup :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr" ("\<langle>_\<rangle>\<^sub>s")
-  where [expr_defs]: "\<langle>\<sigma>\<rangle>\<^sub>s x = (\<lambda> s. get\<^bsub>x\<^esub> (\<sigma> s))"
+  where [expr_defs, code_unfold]: "\<langle>\<sigma>\<rangle>\<^sub>s x = (\<lambda> s. get\<^bsub>x\<^esub> (\<sigma> s))"
 
 expr_ctr subst_lookup
 
