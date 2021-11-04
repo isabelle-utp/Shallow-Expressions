@@ -158,6 +158,22 @@ lemma subst_uop: "\<sigma> \<dagger> (\<guillemotleft>f\<guillemotright> e)\<^su
 lemma subst_bop: "\<sigma> \<dagger> (\<guillemotleft>f\<guillemotright> e\<^sub>1 e\<^sub>2)\<^sub>e = (\<guillemotleft>f\<guillemotright> (\<sigma> \<dagger> e\<^sub>1) (\<sigma> \<dagger> e\<^sub>2))\<^sub>e"
   by (simp add: expr_defs)
 
+lemma subst_lit [usubst]: "\<sigma> \<dagger> (\<guillemotleft>v\<guillemotright>)\<^sub>e = (\<guillemotleft>v\<guillemotright>)\<^sub>e"
+  by (expr_simp)
+
+lemmas subst_basic_ops [usubst] =
+  subst_bop[where f=conj] 
+  subst_bop[where f=disj] 
+  subst_bop[where f=implies] 
+  subst_uop[where f=Not]
+  subst_bop[where f=HOL.eq] 
+  subst_bop[where f=less]
+  subst_bop[where f=less_eq]
+  subst_bop[where f=Set.member] 
+  subst_bop[where f=inf]
+  subst_bop[where f=sup]
+  subst_bop[where f=Pair]
+
 text \<open> A substitution update naturally yields the given expression. \<close>
     
 lemma subst_lookup_upd [usubst]:
