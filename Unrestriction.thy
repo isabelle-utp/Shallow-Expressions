@@ -49,7 +49,7 @@ lemma unrest_compl_lens [expr_simps]:
   by (simp add: unrest_expr_def var_alpha_def comp_mwb_lens lens_override_def scene_override_commute)
 
 lemma unrest_subscene: "\<lbrakk> idem_scene a; a \<sharp> e; b \<subseteq>\<^sub>S a \<rbrakk> \<Longrightarrow> b \<sharp> e"
-  by (metis (mono_tags, hide_lams) subscene_eliminate unrest_expr_def)
+  by (metis subscene_eliminate unrest_expr_def)
 
 lemma unrest_lens_comp [unrest]: "\<lbrakk> mwb_lens x; mwb_lens y; $x \<sharp> e \<rbrakk> \<Longrightarrow> $x:y \<sharp> e"
   by (simp add: unrest_lens, simp add: lens_comp_def ns_alpha_def)

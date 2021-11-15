@@ -95,26 +95,6 @@ lemma var_alpha_override [simp]:
 
 (* Some extra Scene laws; should be moved to Optics at some point *)
 
-lemma scene_le_iff_indep_inv:
-  "A \<bowtie>\<^sub>S - B \<longleftrightarrow> A \<le> B"
-  by (auto simp add: less_eq_scene_def scene_indep_override scene_override_commute)
-                                                                     
-lemma idem_scene_uminus [simp]: "idem_scene X \<Longrightarrow> idem_scene (- X)"
-  by (simp add: uminus_scene_def idem_scene_def Abs_scene_inverse idem_overrider_axioms_def idem_overrider_def overrider.intro)
-
-lemma get_scene_override_indep: "\<lbrakk> vwb_lens x; \<lbrakk>x\<rbrakk>\<^sub>\<sim> \<bowtie>\<^sub>S a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (s \<oplus>\<^sub>S s' on a) = get\<^bsub>x\<^esub> s"
-proof -
-  assume a1: "\<lbrakk>x\<rbrakk>\<^sub>\<sim> \<bowtie>\<^sub>S a"
-  assume a2: "vwb_lens x"
-  then have "\<forall>b ba bb. bb \<oplus>\<^sub>S b \<oplus>\<^sub>S ba on a on \<lbrakk>x\<rbrakk>\<^sub>\<sim> = bb \<oplus>\<^sub>S b on \<lbrakk>x\<rbrakk>\<^sub>\<sim>"
-    using a1 by (metis idem_scene_uminus indep_then_compl_in scene_indep_sym scene_override_commute subscene_eliminate vwb_impl_idem_scene)
-  then show ?thesis
-    using a2 by (metis lens_override_def lens_scene_override mwb_lens_def vwb_lens_mwb weak_lens.put_get)
-qed
-
-lemma get_scene_override_le: "\<lbrakk> vwb_lens x; \<lbrakk>x\<rbrakk>\<^sub>\<sim> \<le> a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (s \<oplus>\<^sub>S s' on a) = get\<^bsub>x\<^esub> s'"
-  by (metis get_scene_override_indep scene_le_iff_indep_inv scene_override_commute)
-
 lemma var_alpha_indep_compl [simp]: 
   assumes "vwb_lens x" "vwb_lens y"
   shows "var_alpha x \<bowtie>\<^sub>S - var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
@@ -124,13 +104,6 @@ lemma var_alpha_subset [simp]:
   assumes "vwb_lens x" "vwb_lens y"
   shows "var_alpha x \<le> var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
   by (simp add: assms(1) assms(2) sublens_iff_subscene var_alpha_def)
-
-lemma uminus_top_scene [simp]: "- \<top>\<^sub>S = \<bottom>\<^sub>S"
-  by (simp add: top_scene_def bot_scene_def uminus_scene_def)
-     (metis top_scene.rep_eq top_scene_def)
-
-lemma scene_equiv_bot [simp]: "a \<approx>\<^sub>S b on \<bottom>\<^sub>S"
-  by (simp add: scene_equiv_def)
 
 subsection \<open> Syntax Translations \<close>
 
