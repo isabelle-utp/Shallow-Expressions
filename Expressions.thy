@@ -92,6 +92,7 @@ syntax
   "_sexp_lit"        :: "logic \<Rightarrow> logic" ("\<guillemotleft>_\<guillemotright>")
   "_sexp_var"        :: "svid \<Rightarrow> logic" ("$_" [990] 990)
   "_sexp_evar"       :: "id_position \<Rightarrow> logic" ("@_" [999] 999)
+  "_sexp_evar"       :: "logic \<Rightarrow> logic" ("@'(_')" [999] 999)
   "_sexp_pqt"        :: "logic \<Rightarrow> sexp" ("[_]\<^sub>e")
   "_sexp_taut"       :: "logic \<Rightarrow> logic" ("`_`")
   "_sexp_select"     :: "logic \<Rightarrow> svid \<Rightarrow> logic" ("_:_" [1000, 999] 1000)
