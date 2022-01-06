@@ -1,7 +1,7 @@
 section \<open> Collections \<close>
 
 theory Collections
-  imports Unrestriction
+  imports Substitutions
 begin
 
 subsection \<open> Partial Lens Definedness \<close>
@@ -32,6 +32,12 @@ lemma ind_lens_vwb [simp]: "\<lbrakk> \<And> i. vwb_lens (f i); \<And> i. $f(i) 
 lemma src_dyn_lens: "\<lbrakk> \<And> i. mwb_lens (f i); \<And> i. $f(i) \<sharp> e \<rbrakk> \<Longrightarrow> \<S>\<^bsub>dyn_lens f e\<^esub> = {s. s \<in> \<S>\<^bsub>f (e s)\<^esub>}"
   by (auto simp add: lens_defs expr_defs lens_source_def lens_scene_override unrest)
      (metis mwb_lens.put_put)+
+
+lemma subst_lookup_dyn_lens [usubst]: "\<lbrakk> \<And> i. f i \<bowtie> x \<rbrakk> \<Longrightarrow> \<langle>subst_upd \<sigma> (dyn_lens f k) e\<rangle>\<^sub>s x = \<langle>\<sigma>\<rangle>\<^sub>s x"
+  by (expr_simp, metis (mono_tags, lifting) lens_indep.lens_put_irr2)
+
+lemma get_upd_dyn_lens [usubst_eval]: "\<lbrakk> \<And> i. f i \<bowtie> x \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (subst_upd \<sigma> (dyn_lens f k) e s) = get\<^bsub>x\<^esub> (\<sigma> s)"
+  by (expr_simp, metis lens_indep.lens_put_irr2)
 
 subsection \<open> Overloaded Collection Lens \<close>
 

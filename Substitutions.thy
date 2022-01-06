@@ -221,8 +221,8 @@ lemma usubst_upd_var_id [usubst]:
   by (simp add: subst_upd_def subst_id_def id_lens_def SEXP_def)
 
 lemma usubst_upd_pair [usubst]:
-  "x \<bowtie> y \<Longrightarrow> \<sigma>((x, y) \<leadsto> (e, f)) = \<sigma>(x \<leadsto> e, y \<leadsto> f)"
-  by (simp add: subst_upd_def lens_defs SEXP_def fun_eq_iff lens_indep_comm)
+  "\<sigma>((x, y) \<leadsto> (e, f)) = \<sigma>(y \<leadsto> f, x \<leadsto> e)"
+  by (simp add: subst_upd_def lens_defs SEXP_def fun_eq_iff)
 
 lemma subst_upd_comp [usubst]:
   "\<rho>(x \<leadsto> v) \<circ>\<^sub>s \<sigma> = (\<rho> \<circ>\<^sub>s \<sigma>)(x \<leadsto> \<sigma> \<dagger> v)"
