@@ -235,7 +235,7 @@ method expr_simp uses add =
      (simp add: expr_defs lens_defs add)?))
 method expr_auto uses add = 
   (expr_simp add: add; 
-   (auto simp add: alpha_splits add)?; 
+   (auto simp add: alpha_splits lens_defs add)?; 
    (rename_alpha_vars)? \<comment> \<open> Rename any logical variables with v subscripts \<close>
   )
 
