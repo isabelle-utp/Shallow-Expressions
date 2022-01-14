@@ -9,6 +9,8 @@ text \<open> This theory creates a command for adding Z-like state schemas. It c
   which can be used in program constructions, and an associated locale that groups together
   a set of assumptions. \<close>
 
+named_theorems z_defs and z_locale_defs
+
 ML_file \<open>Z_Store.ML\<close>
 
 end

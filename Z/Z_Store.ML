@@ -36,6 +36,7 @@ fun mk_zstore (raw_params, binding) raw_parent raw_fields invs thy =
       val itb = Binding.make (invn ^ "_def", Position.none)
       val (parent, _) = (read_parent raw_parent (Proof_Context.init_global thy))
       val locex = case parent of NONE => [] | SOME n => [((snd n, Position.none), (("", false), (Expression.Named [], [])))]
+      val z_defs = Attrib.check_src @{context} (Token.make_src ("z_defs", Position.none) [])
 
       val ib = (SOME (Binding.make (invn, Position.none), SOME ("((" ^ varl ^ ")" ^ n ^ "_scheme) => bool"), NoSyn))
         open HOLogic in
@@ -49,14 +50,18 @@ fun mk_zstore (raw_params, binding) raw_parent raw_fields invs thy =
                   in snd (Local_Theory.note ((Binding.name "invariants", []), (passms @ Proof_Context.get_thms ctx assmsn)) ctx) end)
            ) |>
         (fn thy => 
-               let val Const (ln, _) = Syntax.read_term (Proof_Context.init_global thy) n 
+               let open Attrib
+                   val Const (ln, _) = Syntax.read_term (Proof_Context.init_global thy) n 
+                   val loc_def = Global_Theory.get_thm thy (n ^ "_def")
+                   val z_locale_defs = attribute_global @{theory} (check_src @{context} (Token.make_src ("z_locale_defs", Position.none) []))
                    val vars = (map (Syntax.free o fst) (dep_params_of thy ln))
                    val ctx = Named_Target.theory_init thy
                    val sinv = Term.list_comb (Syntax.free n, vars)
-                   val (_, ctx') = Expr_Def.expr_def (itb, []) ib (mk_eq (Free (invn, dummyT), sinv)) ctx
+                   val (_, ctx') = Expr_Def.expr_def (itb, [z_defs]) ib (mk_eq (Free (invn, dummyT), sinv)) ctx
                    val thy' = Local_Theory.exit_global ctx'
+                   val thy'' = snd (Global_Theory.add_thm ((Binding.empty, loc_def), [z_locale_defs]) thy')
                in 
-                 thy'
+                 thy''
         end) |>
         (fn thy =>
                 let
