@@ -77,3 +77,19 @@ val _ =
       (@{keyword "="} |-- Scan.option (Parse.typ --| @{keyword "+"}) --
         Scan.repeat1 Parse.const_binding) -- Scan.optional (@{keyword "where"} |-- (Scan.repeat1 (Scan.optional (Parse.binding --| Parse.$$$ ":") (Binding.name "") -- Parse.term))) []
     >> (fn ((x, (y, z)), ts) => Toplevel.theory (ZStore.mk_zstore x y z ts)))
+
+val _ =
+let
+  open Expr_Def;
+  val z_defs = Attrib.check_src @{context} (Token.make_src ("z_defs", Position.none) [])
+in
+  Outer_Syntax.command \<^command_keyword>\<open>zexpr\<close> "define expressions over a Z store"
+    (((Parse.name --| @{keyword "is"}) -- Parse.term)  >> (fn (n, expr) => 
+        Toplevel.theory 
+          (fn thy => 
+            let val ctx = Named_Target.theory_init thy
+                val term = Const (@{const_name "HOL.eq"}, dummyT) $ Syntax.free n $ (Syntax.parse_term ctx expr)
+                val ctx' = snd (expr_def (Binding.name n, [z_defs]) NONE term ctx) 
+                val thy' = NoLift_Const.nolift_const (Local_Theory.exit_global ctx') (n, [])
+                in thy' end)))
+end
