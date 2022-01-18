@@ -89,7 +89,7 @@ in
           (fn thy => 
             let val ctx = Named_Target.theory_init thy
                 val term = Const (@{const_name "HOL.eq"}, dummyT) $ Syntax.free n $ (Syntax.parse_term ctx expr)
-                val ctx' = snd (expr_def (Binding.name n, [z_defs]) NONE term ctx) 
+                val ctx' = snd (expr_def (Binding.name (n ^ "_def"), [z_defs]) NONE term ctx) 
                 val thy' = NoLift_Const.nolift_const (Local_Theory.exit_global ctx') (n, [])
                 in thy' end)))
 end
