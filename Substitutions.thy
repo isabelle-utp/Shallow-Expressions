@@ -295,4 +295,8 @@ text \<open> A tactic for proving unrestrictions by evaluating a special kind of
 
 method unrest = (simp add: unrest_ssubst var_alpha_combine usubst_eval)
 
+text \<open> A tactic for evaluating substitutions. \<close>
+
+method subst_eval = (simp add: usubst_eval usubst unrest)
+
 end
