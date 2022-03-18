@@ -236,7 +236,7 @@ text \<open> A method for simplifying shallow expressions to HOL terms  \<close>
 
 method expr_simp uses add = 
   ((simp add: expr_simps)? \<comment> \<open> Perform any possible simplifications retaining the lens structure \<close>
-   ;((simp add: fun_eq_iff prod.case_eq_if alpha_splits expr_defs lens_defs add) ; \<comment> \<open> Explode the rest \<close>
+   ;((simp add: fun_eq_iff prod.case_eq_if alpha_splits expr_defs lens_defs add)? ; \<comment> \<open> Explode the rest \<close>
      (simp add: expr_defs lens_defs add)?))
 
 text \<open> A method for dealing with tautologies \<close>
@@ -244,7 +244,7 @@ text \<open> A method for dealing with tautologies \<close>
 method expr_taut uses add = 
   (rule tautI;
    expr_simp add: add; 
-   rename_alpha_vars)
+   rename_alpha_vars?)
 
 text \<open> A method for simplifying shallow expressions to HOL terms and applying @{method auto} \<close>
 
