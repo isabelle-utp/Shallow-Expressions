@@ -54,12 +54,16 @@ fun mk_zstore (raw_params, binding) raw_parent raw_fields invs thy =
                    val Const (ln, _) = Syntax.read_term (Proof_Context.init_global thy) n 
                    val loc_def = Global_Theory.get_thm thy (n ^ "_def")
                    val z_locale_defs = attribute_global @{theory} (check_src @{context} (Token.make_src ("z_locale_defs", Position.none) []))
+                   val loc_thms = [((Binding.empty, loc_def), [z_locale_defs])]
+                                  (* If there is a parent, then we also need to unfold the locale axioms definition *)
+                                  @ (if parent = NONE then [] 
+                                     else [((Binding.empty, Global_Theory.get_thm thy (n ^ "_axioms_def")), [z_locale_defs])])
                    val vars = (map (Syntax.free o fst) (dep_params_of thy ln))
                    val ctx = Named_Target.theory_init thy
                    val sinv = Term.list_comb (Syntax.free n, vars)
                    val (_, ctx') = Expr_Def.expr_def (itb, [z_defs]) ib (mk_eq (Free (invn, dummyT), sinv)) ctx
                    val thy' = Local_Theory.exit_global ctx'
-                   val thy'' = snd (Global_Theory.add_thm ((Binding.empty, loc_def), [z_locale_defs]) thy')
+                   val thy'' = snd (Global_Theory.add_thms loc_thms  thy')
                in 
                  thy''
         end) |>
