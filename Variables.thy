@@ -41,6 +41,12 @@ definition var_alpha :: "('a \<Longrightarrow> 's) \<Rightarrow> 's scene" where
 definition ns_alpha :: "('b \<Longrightarrow> 'c) \<Rightarrow> ('a \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
 [lens_defs]: "ns_alpha a x = x ;\<^sub>L a"
 
+definition var_fst :: "('a \<times> 'b \<Longrightarrow> 's) \<Rightarrow> ('a \<Longrightarrow> 's)" where
+[lens_defs]: "var_fst x = fst\<^sub>L ;\<^sub>L x" 
+
+definition var_snd :: "('a \<times> 'b \<Longrightarrow> 's) \<Rightarrow> ('b \<Longrightarrow> 's)" where
+[lens_defs]: "var_snd x = snd\<^sub>L ;\<^sub>L x" 
+
 lemma ns_alpha_weak [simp]: "\<lbrakk> weak_lens a; weak_lens x \<rbrakk> \<Longrightarrow> weak_lens (ns_alpha a x)"
   by (simp add: ns_alpha_def comp_weak_lens)
 
@@ -58,6 +64,30 @@ lemma ns_alpha_indep_2 [simp]: "a \<bowtie> y \<Longrightarrow> ns_alpha a x \<b
 
 lemma ns_alpha_indep_3 [simp]: "x \<bowtie> b \<Longrightarrow> x \<bowtie> ns_alpha b y"
   by (simp add: lens_indep_sym)
+
+lemma var_fst_mwb [simp]: "mwb_lens x \<Longrightarrow> mwb_lens (var_fst x)"
+  by (simp add: var_fst_def comp_mwb_lens)
+
+lemma var_snd_mwb [simp]: "mwb_lens x \<Longrightarrow> mwb_lens (var_snd x)"
+  by (simp add: var_snd_def comp_mwb_lens)
+
+lemma var_fst_vwb [simp]: "vwb_lens x \<Longrightarrow> vwb_lens (var_fst x)"
+  by (simp add: var_fst_def comp_vwb_lens)
+
+lemma var_snd_vwb [simp]: "vwb_lens x \<Longrightarrow> vwb_lens (var_snd x)"
+  by (simp add: var_snd_def comp_vwb_lens)
+
+lemma var_fst_indep_1 [simp]: "x \<bowtie> y \<Longrightarrow> var_fst x \<bowtie> y"
+  by (simp add: var_fst_def lens_indep_left_ext)
+
+lemma var_fst_indep_2 [simp]: "x \<bowtie> y \<Longrightarrow> x \<bowtie> var_fst y"
+  by (simp add: var_fst_def lens_indep_right_ext)
+
+lemma var_snd_indep_1 [simp]: "x \<bowtie> y \<Longrightarrow> var_snd x \<bowtie> y"
+  by (simp add: var_snd_def lens_indep_left_ext)
+
+lemma var_snd_indep_2 [simp]: "x \<bowtie> y \<Longrightarrow> x \<bowtie> var_snd y"
+  by (simp add: var_snd_def lens_indep_right_ext)
 
 definition res_alpha :: "('a \<Longrightarrow> 'b) \<Rightarrow> ('c \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
 [lens_defs]: "res_alpha x a = x /\<^sub>L a"
@@ -128,8 +158,10 @@ syntax \<comment> \<open> Identifiers \<close>
   "_svid_tuple"   :: "svids \<Rightarrow> svid" ("'(_')")
   "_svid_dot"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_:_" [999,998] 998)
   "_svid_res"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_\<restriction>_" [999,998] 998)
-  "_svid_fst"     :: "svid \<Rightarrow> svid" ("_\<^sup><" [997] 997)
-  "_svid_snd"     :: "svid \<Rightarrow> svid" ("_\<^sup>>" [997] 997)
+  "_svid_pre"     :: "svid \<Rightarrow> svid" ("_\<^sup><" [997] 997)
+  "_svid_post"    :: "svid \<Rightarrow> svid" ("_\<^sup>>" [997] 997)
+  "_svid_fst"     :: "svid \<Rightarrow> svid" ("_.1" [997] 997)
+  "_svid_snd"     :: "svid \<Rightarrow> svid" ("_.2" [997] 997)
   "_mk_svid_list" :: "svids \<Rightarrow> logic" \<comment> \<open> Helper function for summing a list of identifiers \<close>
   "_of_svid_list"   :: "logic \<Rightarrow> svids" \<comment> \<open> Reverse of the above \<close>
   "_svid_view"    :: "logic \<Rightarrow> svid" ("\<V>[_]") \<comment> \<open> View of a symmetric lens \<close>
@@ -178,8 +210,10 @@ translations
   "_svid_dot x y" \<rightleftharpoons> "CONST ns_alpha x y"
   "_svid_index x i" \<rightharpoonup> "x i"
   "_svid_res x y" \<rightleftharpoons> "x /\<^sub>L y" 
-  "_svid_fst x" \<rightleftharpoons> "_svid_dot fst\<^sub>L x"
-  "_svid_snd x" \<rightleftharpoons> "_svid_dot snd\<^sub>L x"
+  "_svid_pre x" \<rightleftharpoons> "_svid_dot fst\<^sub>L x"
+  "_svid_post x" \<rightleftharpoons> "_svid_dot snd\<^sub>L x"
+  "_svid_fst x" \<rightleftharpoons> "CONST var_fst x"
+  "_svid_snd x" \<rightleftharpoons> "CONST var_snd x"
   "_svid_prod x y" \<rightleftharpoons> "x \<times>\<^sub>L y"
   "_svid_pow2 x" \<rightharpoonup> "x \<times>\<^sub>L x"
   "_mk_svid_list (_svid_list x xs)" \<rightharpoonup> "x +\<^sub>L _mk_svid_list xs"

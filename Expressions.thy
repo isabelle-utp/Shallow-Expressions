@@ -196,6 +196,8 @@ expr_vars
 
 term "($x\<^sup>< = $x\<^sup>>)\<^sub>e"
 
+term "($x.1 = $y.2)\<^sub>e"
+
 text \<open> The pretty printer works even when we don't use the parser, as shown below. \<close>
 
 term "[\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v]\<^sub>e"
