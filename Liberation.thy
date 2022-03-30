@@ -16,6 +16,7 @@ syntax
 
 translations
   "_liberate P x" == "CONST liberate P x"
+  "_liberate P x" <= "_liberate (P)\<^sub>e x"
 
 expr_ctr liberate (0)
 
