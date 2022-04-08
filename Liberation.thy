@@ -46,6 +46,9 @@ lemma liberate_idem [simp]: "P \\ a \\ a = P \\ a"
 lemma liberate_commute [simp]: "a \<bowtie>\<^sub>S b \<Longrightarrow> P \\ a \\ b = P \\ b \\ a"
   using scene_override_commute_indep by (expr_auto, fastforce+)
 
+lemma liberate_true [simp]: "(True)\<^sub>e \\ a = (True)\<^sub>e"
+  by (expr_simp)
+
 lemma liberate_false [simp]: "(False)\<^sub>e \\ a = (False)\<^sub>e"
   by (expr_simp)
 
