@@ -63,6 +63,8 @@ lift_expr_aux _ (e, args) = Term.list_comb (e, args)
 and 
 lift_expr ctx (Abs (n, t, e)) = 
   if (n = state_id) then Abs (n, t, e) else Abs (n, t, lift_expr ctx e) |
+lift_expr ctx (Const ("_constrain", a) $ e $ t) = (Const ("_constrain", a) $ lift_expr ctx e $ t) |
+lift_expr ctx (Const ("_constrainAbs", a) $ e $ t) = (Const ("_constrainAbs", a) $ lift_expr ctx e $ t) |
 lift_expr ctx e = lift_expr_aux ctx (Term.strip_comb e)
 
 fun mk_lift_expr ctx e = 

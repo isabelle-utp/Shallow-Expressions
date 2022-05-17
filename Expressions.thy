@@ -187,6 +187,10 @@ term "($x:y:z)\<^sub>e"
 
 term "(($x:y):z)\<^sub>e"
 
+term "(x::nat)\<^sub>e"
+
+term "(\<forall> x::nat. x > 2)\<^sub>e"
+
 term "SEXP(\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v)"
 
 term "(v \<in> $xs \<union> ($f) ys \<union> {} \<and> @e)\<^sub>e"
