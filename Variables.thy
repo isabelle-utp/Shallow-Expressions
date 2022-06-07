@@ -96,10 +96,6 @@ lemma idem_scene_var [simp]:
   "vwb_lens x \<Longrightarrow> idem_scene (var_alpha x)"
   by (simp add: lens_defs)
 
-lemma not_member_var_alpha [simp]: 
-  "\<lbrakk> vwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> x \<notin>\<^sub>S (var_alpha y)"
-  by (simp add: lens_indep_comm lens_member_def lens_override_def lens_scene_override scene_override_commute var_alpha_def)
-
 lemma var_alpha_combine: "\<lbrakk> vwb_lens x; vwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> var_alpha x \<squnion>\<^sub>S var_alpha y = var_alpha (x +\<^sub>L y)"
   by (simp add: lens_plus_scene var_alpha_def)
 

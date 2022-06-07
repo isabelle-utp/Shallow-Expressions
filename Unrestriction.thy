@@ -65,10 +65,6 @@ lemma unrest_var [unrest]:
   by (auto simp add: unrest_expr_def scene_indep_override var_alpha_def)
      (metis lens_override_def lens_override_idem mwb_lens_weak vwb_lens_mwb weak_lens_def)
 
-lemma unrest_var': 
-  "x \<notin>\<^sub>S a \<Longrightarrow> a \<sharp> ($x)\<^sub>e"
-  by (simp add: unrest_expr_def)
-
 lemma unrest_var_single [unrest]:
   "\<lbrakk> mwb_lens x; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> ($y)\<^sub>e"
   by (simp add: expr_defs lens_indep.lens_put_irr2 lens_indep_sym lens_override_def var_alpha_def)
