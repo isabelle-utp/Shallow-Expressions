@@ -136,11 +136,11 @@ subsection \<open> Syntax Translations \<close>
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
   step is to introduce a collection of non-terminals. \<close>
   
-nonterminal svid and svids and salpha
+nonterminal svid and svids and salpha and sframe
 
 text \<open> These non-terminals correspond to the following syntactic entities. Non-terminal 
   @{typ "svid"} is an atomic variable identifier, and @{typ "svids"} is a list of identifier. 
-  @{typ "salpha"} is an alphabet or set of variables. Such sets can 
+  @{typ "salpha"} is an alphabet or set of variables. @{typ "sframe"} is a frame. Such sets can 
   be constructed only through lens composition due to typing restrictions. Next we introduce some 
   syntax constructors. \<close>
    
@@ -179,8 +179,13 @@ syntax \<comment> \<open> Variable sets \<close>
   "_salpha_all"  :: "salpha" ("\<Sigma>")
   "_salpha_none" :: "salpha" ("\<emptyset>")
   "_salphaset"   :: "svids \<Rightarrow> salpha" ("{_}")
+  "_sframeset"   :: "svids \<Rightarrow> sframe" ("\<lbrace>_\<rbrace>")
+  "_sframeunion" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixr "\<union>" 75)
+  "_sframeinter" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixr "\<inter>" 70)
+  "_sframe"      :: "sframe \<Rightarrow> salpha" ("_")
   "_salphamk"    :: "logic \<Rightarrow> salpha"
   "_mk_alpha_list" :: "svids \<Rightarrow> logic"
+  "_mk_frame_list" :: "svids \<Rightarrow> logic"
 
 text \<open> The terminals of an alphabet are either HOL identifiers or UTP variable identifiers. 
   We support two ways of constructing alphabets; by composition of smaller alphabets using
@@ -217,6 +222,11 @@ translations
   "_mk_alpha_list (_svid_list x xs)" \<rightharpoonup> "CONST var_alpha x \<squnion>\<^sub>S _mk_alpha_list xs"
   "_mk_alpha_list x" \<rightharpoonup> "CONST var_alpha x"
 
+  "_mk_frame_list (_svid_list x xs)" \<rightharpoonup> "CONST lens_insert x (_mk_frame_list xs)"
+  "_mk_frame_list x" \<rightharpoonup> "CONST lens_insert x \<lbrace>\<rbrace>"
+  "_sframeunion A B" \<rightharpoonup> "CONST frame_union A B"
+  "_sframeinter A B" \<rightharpoonup> "CONST frame_inter A B"
+
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
   "_svid_coview a" => "\<C>\<^bsub>a\<^esub>"
 
@@ -232,6 +242,8 @@ translations
 (*  "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b" *)
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
   "_salphaset A" \<rightharpoonup> "_mk_alpha_list A"  
+  "_sframe A" \<rightharpoonup> "CONST of_frame A"
+  "_sframeset A" \<rightharpoonup> "_mk_frame_list A"
   "(_svid_list x (_salphamk y))" \<leftharpoondown> "_salphamk (x +\<^sub>L y)" 
   "x" \<leftharpoondown> "_salphamk x"
   "_salpha_all" \<rightleftharpoons> "CONST univ_alpha"
