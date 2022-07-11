@@ -136,7 +136,7 @@ lemma var_alpha_subset [simp]:
 
 subsection \<open> Converting scenes to frames \<close>
 
-lemma var_alpha_empty [frame]: "\<bottom>\<^sub>S = \<lbrakk>\<lbrace>\<rbrace>\<rbrakk>\<^sub>F"
+lemma var_alpha_empty [frame]: "\<bottom>\<^sub>S = \<lbrakk>\<lbrace>\<rbrace>\<^sub>F\<rbrakk>\<^sub>F"
   by (simp add: bot_frame.rep_eq)
 
 lemma var_alpha_top [frame]: "\<top>\<^sub>S = \<lbrakk>\<top>\<^sub>F\<rbrakk>\<^sub>F"
@@ -258,7 +258,7 @@ translations
   "_mk_alpha_list x" \<rightharpoonup> "CONST var_alpha x"
 
   "_mk_frame_list (_svid_list x xs)" \<rightharpoonup> "CONST lens_insert x (_mk_frame_list xs)"
-  "_mk_frame_list x" \<rightharpoonup> "CONST lens_insert x \<lbrace>\<rbrace>"
+  "_mk_frame_list x" \<rightharpoonup> "CONST lens_insert x \<lbrace>\<rbrace>\<^sub>F"
 
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
   "_svid_coview a" => "\<C>\<^bsub>a\<^esub>"
