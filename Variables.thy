@@ -216,6 +216,7 @@ syntax \<comment> \<open> Variable sets \<close>
   "_salpha_all"  :: "salpha" ("\<Sigma>")
   "_salpha_none" :: "salpha" ("\<emptyset>")
   "_salphaset"   :: "svids \<Rightarrow> salpha" ("{_}")
+  "_sframeid"    :: "id \<Rightarrow> sframe" ("_")
   "_sframeset"   :: "svids \<Rightarrow> sframe_enum" ("\<lbrace>_\<rbrace>")
   "_sframeunion" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixr "\<union>" 75)
   "_sframeinter" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixr "\<inter>" 75)
@@ -284,6 +285,7 @@ translations
 (*  "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b" *)
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
   "_salphaset A" \<rightharpoonup> "_mk_alpha_list A"  
+  "_sframeid A" \<rightharpoonup> "A"
   "_sframeunion x y" \<rightharpoonup> "x \<union>\<^sub>F y"
   "_sframeinter x y" \<rightharpoonup> "x \<inter>\<^sub>F y"
   "_sframeminus x y" \<rightharpoonup> "x - y"
