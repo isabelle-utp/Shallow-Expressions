@@ -169,7 +169,7 @@ subsection \<open> Syntax Translations \<close>
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
   step is to introduce a collection of non-terminals. \<close>
   
-nonterminal svid and svids and salpha and sframe
+nonterminal svid and svids and salpha and sframe_enum and sframe
 
 text \<open> These non-terminals correspond to the following syntactic entities. Non-terminal 
   @{typ "svid"} is an atomic variable identifier, and @{typ "svids"} is a list of identifier. 
@@ -216,8 +216,15 @@ syntax \<comment> \<open> Variable sets \<close>
   "_salpha_all"  :: "salpha" ("\<Sigma>")
   "_salpha_none" :: "salpha" ("\<emptyset>")
   "_salphaset"   :: "svids \<Rightarrow> salpha" ("{_}")
-  "_sframeset"   :: "svids \<Rightarrow> sframe" ("\<lbrace>_\<rbrace>")
-  "_sframe"      :: "sframe \<Rightarrow> salpha" ("_")
+  "_sframeset"   :: "svids \<Rightarrow> sframe_enum" ("\<lbrace>_\<rbrace>")
+  "_sframeunion" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixr "\<union>" 75)
+  "_sframeinter" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixr "\<inter>" 75)
+  "_sframeminus" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixl "-" 65)
+  "_sframecompl" :: "sframe \<Rightarrow> sframe" ("- _" [81] 80)
+  "_sframe_all"  :: "sframe" ("\<Sigma>")
+  "_sframe_none" :: "sframe" ("\<emptyset>")
+  "_sframe_enum" :: "sframe_enum \<Rightarrow> sframe" ("_")
+  "_sframe_alpha" :: "sframe_enum \<Rightarrow> salpha" ("_")
   "_salphamk"    :: "logic \<Rightarrow> salpha"
   "_mk_alpha_list" :: "svids \<Rightarrow> logic"
   "_mk_frame_list" :: "svids \<Rightarrow> logic"
@@ -277,7 +284,12 @@ translations
 (*  "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b" *)
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
   "_salphaset A" \<rightharpoonup> "_mk_alpha_list A"  
-  "_sframe A" \<rightharpoonup> "CONST of_frame A"
+  "_sframeunion x y" \<rightharpoonup> "x \<union>\<^sub>F y"
+  "_sframeinter x y" \<rightharpoonup> "x \<inter>\<^sub>F y"
+  "_sframeminus x y" \<rightharpoonup> "x - y"
+  "_sframecompl x"  \<rightharpoonup> "- x"
+  "_sframe_enum A" \<rightharpoonup> "A"
+  "_sframe_alpha A" \<rightharpoonup> "CONST of_frame A"
   "_sframeset A" \<rightharpoonup> "_mk_frame_list A"
   "(_svid_list x (_salphamk y))" \<leftharpoondown> "_salphamk (x +\<^sub>L y)" 
   "x" \<leftharpoondown> "_salphamk x"
