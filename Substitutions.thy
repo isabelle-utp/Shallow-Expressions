@@ -35,6 +35,9 @@ adhoc_overloading subst_app subst_app_expr
 definition subst_comp :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>1) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>2) psubst" (infixl "\<circ>\<^sub>s" 55) 
     where [expr_defs, code_unfold]: "subst_comp = comp"
 
+text \<open> Create a substitution that copies the region from the given scene from a given state.
+  This is used primarily in calculating unrestriction conditions. \<close>
+
 definition sset :: "'s scene \<Rightarrow> 's \<Rightarrow> 's subst" 
   where [expr_defs, code_unfold]: "sset a s' = (\<lambda> s. s \<oplus>\<^sub>S s' on a)"
 
