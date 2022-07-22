@@ -27,13 +27,13 @@ lemma unrest_empty [unrest]: "\<emptyset> \<sharp> P"
   by (simp add: expr_defs lens_defs)
 
 lemma unrest_var_union [unrest]:
-  "\<lbrakk> x \<sharp> P; y \<sharp> P \<rbrakk> \<Longrightarrow> x;y \<sharp> P"
+  "\<lbrakk> A \<sharp> P; B \<sharp> P \<rbrakk> \<Longrightarrow> A \<union> B \<sharp> P"
   by (simp add: expr_defs lens_defs)
      (metis scene_override_union scene_override_unit scene_union_incompat)
 
 lemma unrest_neg_union:
   assumes "A ##\<^sub>S B" "- A \<sharp> P" "- B \<sharp> P"
-  shows "(- (A ; B)) \<sharp> P"
+  shows "(- (A \<union> B)) \<sharp> P"
   using assms by (simp add: unrest_expr_def scene_override_commute scene_override_union)
 
 text \<open> The following two laws greatly simplify proof when reasoning about unrestricted lens,

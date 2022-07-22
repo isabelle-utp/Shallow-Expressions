@@ -24,6 +24,12 @@ definition subst_ares :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow
 
 consts subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> 'p\<^sub>1 \<Rightarrow> 'p\<^sub>2"
 
+syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
+
+translations
+  "_subst_app \<sigma> e" == "CONST subst_app \<sigma> e"
+  "_subst_app \<sigma> e" <= "_subst_app \<sigma> (e)\<^sub>e"
+
 abbreviation "aext P a \<equiv> subst_app (a\<^sup>\<up>) P"
 abbreviation "ares P a \<equiv> subst_app (a\<^sub>\<down>) P"
 
@@ -35,14 +41,14 @@ adhoc_overloading subst_app subst_app_expr
 definition subst_comp :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>1) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>2) psubst" (infixl "\<circ>\<^sub>s" 55) 
     where [expr_defs, code_unfold]: "subst_comp = comp"
 
+text \<open> Create a substitution that copies the region from the given scene from a given state.
+  This is used primarily in calculating unrestriction conditions. \<close>
+
 definition sset :: "'s scene \<Rightarrow> 's \<Rightarrow> 's subst" 
   where [expr_defs, code_unfold]: "sset a s' = (\<lambda> s. s \<oplus>\<^sub>S s' on a)"
 
-syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
-
-translations
-  "_subst_app \<sigma> e" == "CONST subst_app \<sigma> e"
-  "_subst_app \<sigma> e" <= "_subst_app \<sigma> (e)\<^sub>e"
+syntax "_sset" :: "salpha \<Rightarrow> logic \<Rightarrow> logic" ("sset[_, _]")
+translations "_sset a P" == "CONST sset a P"
 
 definition subst_upd :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst"
   where [expr_defs, code_unfold]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
@@ -52,8 +58,8 @@ definition subst_lookup :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<
 
 expr_ctr subst_lookup
 
-definition unrest_usubst :: "('a \<Longrightarrow> 's) \<Rightarrow> 's subst \<Rightarrow> bool" 
-  where [expr_defs]: "unrest_usubst x \<sigma> = (\<forall> \<rho> v. \<sigma> (put\<^bsub>x\<^esub> \<rho> v) = put\<^bsub>x\<^esub> (\<sigma> \<rho>) v)"
+definition unrest_usubst :: "'s scene \<Rightarrow> 's subst \<Rightarrow> bool" 
+  where [expr_defs]: "unrest_usubst a \<sigma> = (\<forall> s s'. \<sigma> (s \<oplus>\<^sub>S s' on a) = (\<sigma> s) \<oplus>\<^sub>S s' on a)"
 
 syntax
   "_unrest_usubst" :: "salpha \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<sharp>\<^sub>s" 20)
@@ -115,6 +121,9 @@ ML_file \<open>Expr_Util.ML\<close>
 subsection \<open> Substitution Laws \<close>
 
 named_theorems usubst and usubst_eval
+
+lemma subst_id_apply [usubst]: "[\<leadsto>] \<dagger> P = P"
+  by (expr_auto)
 
 lemma subst_unrest [usubst]:
   "\<lbrakk> vwb_lens x; $x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<dagger> v = \<sigma> \<dagger> v"
@@ -244,10 +253,13 @@ simproc_setup subst_order ("subst_upd (subst_upd \<sigma> x u) y v") =
 
 subsection \<open> Substitution Unrestriction Laws \<close>
 
+lemma unrest_subst_lens [expr_simps]: "mwb_lens x \<Longrightarrow> ($x \<sharp>\<^sub>s \<sigma>) = (\<forall>s v. \<sigma> (put\<^bsub>x\<^esub> s v) = put\<^bsub>x\<^esub> (\<sigma> s) v)"
+  by (simp add: unrest_usubst_def, metis lens_override_def mwb_lens_weak weak_lens.create_get)
+
 lemma unrest_subst_empty [unrest]: "x \<sharp>\<^sub>s [\<leadsto>]"
   by (expr_simp)
 
-lemma unrest_subst_upd [unrest]: "\<lbrakk> vwb_lens x; x \<bowtie> y; $x \<sharp> (e)\<^sub>e; x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> x \<sharp>\<^sub>s \<sigma>(y \<leadsto> e)"
+lemma unrest_subst_upd [unrest]: "\<lbrakk> vwb_lens x; x \<bowtie> y; $x \<sharp> (e)\<^sub>e; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> $x \<sharp>\<^sub>s \<sigma>(y \<leadsto> e)"
   by (expr_auto add: lens_indep_comm)
 
 subsection \<open> Conditional Substitution Laws \<close>
@@ -257,11 +269,11 @@ lemma usubst_cond_upd_1 [usubst]:
   by expr_auto
 
 lemma usubst_cond_upd_2 [usubst]:
-  "\<lbrakk> vwb_lens x; x \<sharp>\<^sub>s \<rho> \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> u) \<triangleleft> b \<triangleright> \<rho> = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (u \<triangleleft> b \<triangleright> ($x)\<^sub>e))"
+  "\<lbrakk> vwb_lens x; $x \<sharp>\<^sub>s \<rho> \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> u) \<triangleleft> b \<triangleright> \<rho> = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (u \<triangleleft> b \<triangleright> ($x)\<^sub>e))"
   by (expr_auto, metis lens_override_def lens_override_idem)
 
 lemma usubst_cond_upd_3 [usubst]:
-  "\<lbrakk> vwb_lens x; x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<sigma> \<triangleleft> b \<triangleright> \<rho>(x \<leadsto> v) = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (($x)\<^sub>e \<triangleleft> b \<triangleright> v))"
+  "\<lbrakk> vwb_lens x; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<sigma> \<triangleleft> b \<triangleright> \<rho>(x \<leadsto> v) = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (($x)\<^sub>e \<triangleleft> b \<triangleright> v))"
   by (expr_auto, metis lens_override_def lens_override_idem)
 
 subsection \<open> Evaluation \<close>
@@ -290,6 +302,9 @@ lemma get_subst_sset_in [usubst_eval]: "\<lbrakk> vwb_lens x; var_alpha x \<le> 
 
 lemma get_subst_aext [usubst_eval]: "get\<^bsub>x\<^esub> (subst_aext a s) = get\<^bsub>ns_alpha a x\<^esub> s"
   by (expr_simp)
+
+lemma unrest_sset_lens [unrest]: "\<lbrakk> mwb_lens x; mwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp>\<^sub>s sset[$y, s]"
+  by (simp add: sset_def unrest_subst_lens lens_indep_comm lens_override_def)
 
 text \<open> A tactic for proving unrestrictions by evaluating a special kind of substitution. \<close>
 

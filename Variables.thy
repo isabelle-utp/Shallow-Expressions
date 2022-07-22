@@ -47,6 +47,9 @@ definition var_fst :: "('a \<times> 'b \<Longrightarrow> 's) \<Rightarrow> ('a \
 definition var_snd :: "('a \<times> 'b \<Longrightarrow> 's) \<Rightarrow> ('b \<Longrightarrow> 's)" where
 [lens_defs]: "var_snd x = snd\<^sub>L ;\<^sub>L x" 
 
+abbreviation var_member :: "('a \<Longrightarrow> 's) \<Rightarrow> 's scene \<Rightarrow> bool" (infix "\<in>\<^sub>v" 50) where
+"x \<in>\<^sub>v A \<equiv> var_alpha x \<le> A"
+
 lemma ns_alpha_weak [simp]: "\<lbrakk> weak_lens a; weak_lens x \<rbrakk> \<Longrightarrow> weak_lens (ns_alpha a x)"
   by (simp add: ns_alpha_def comp_weak_lens)
 
@@ -126,21 +129,51 @@ lemma var_alpha_indep_compl [simp]:
   shows "var_alpha x \<bowtie>\<^sub>S - var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
   by (simp add: assms scene_le_iff_indep_inv sublens_iff_subscene var_alpha_def)
 
-lemma var_alpha_subset [simp]: 
+lemma var_alpha_subset [simp]:
   assumes "vwb_lens x" "vwb_lens y"
   shows "var_alpha x \<le> var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
   by (simp add: assms(1) assms(2) sublens_iff_subscene var_alpha_def)
+
+subsection \<open> Converting scenes to frames \<close>
+
+lemma var_alpha_empty [frame]: "\<bottom>\<^sub>S = \<lbrakk>\<lbrace>\<rbrace>\<^sub>F\<rbrakk>\<^sub>F"
+  by (simp add: bot_frame.rep_eq)
+
+lemma var_alpha_top [frame]: "\<top>\<^sub>S = \<lbrakk>\<top>\<^sub>F\<rbrakk>\<^sub>F"
+  by (simp add: top_frame.rep_eq)
+
+lemma var_alpha_insert_frame [simp]:
+  "var_lens x \<Longrightarrow> var_alpha x \<squnion>\<^sub>S \<lbrakk>A\<rbrakk>\<^sub>F = \<lbrakk>lens_insert x A\<rbrakk>\<^sub>F"
+  by (simp add: lens_scene_insert_frame var_alpha_def)
+
+lemma var_alpha_uminus [simp]: "- \<lbrakk>A\<rbrakk>\<^sub>F = \<lbrakk>- A\<rbrakk>\<^sub>F"
+  by (simp add: uminus_frame.rep_eq)
+
+lemma var_alpha_minus [simp]: "\<lbrakk>A\<rbrakk>\<^sub>F - \<lbrakk>B\<rbrakk>\<^sub>F = \<lbrakk>A - B\<rbrakk>\<^sub>F"
+  by (simp add: minus_frame.rep_eq minus_scene_def)
+
+lemma var_alpha_union [simp]: "\<lbrakk>A\<rbrakk>\<^sub>F \<squnion>\<^sub>S \<lbrakk>B\<rbrakk>\<^sub>F = \<lbrakk>A \<union>\<^sub>F B\<rbrakk>\<^sub>F"
+  by (simp add: sup_frame.rep_eq)
+
+lemma var_alpha_inter [simp]: "\<lbrakk>A\<rbrakk>\<^sub>F \<sqinter>\<^sub>S \<lbrakk>B\<rbrakk>\<^sub>F = \<lbrakk>A \<inter>\<^sub>F B\<rbrakk>\<^sub>F"
+  by (simp add: inf_frame.rep_eq)
+                                                            
+lemma var_member_iff [simp]: "var_lens x \<Longrightarrow> x \<in>\<^sub>v \<lbrakk>A\<rbrakk>\<^sub>F \<longleftrightarrow> x \<in>\<^sub>F A"
+  by (simp add: lens_frame.rep_eq lens_member_def less_eq_frame.rep_eq var_alpha_def)
+
+lemma var_indep_iff [simp]: "ebasis_lens x \<Longrightarrow> var_alpha x \<bowtie>\<^sub>S \<lbrakk>A\<rbrakk>\<^sub>F \<longleftrightarrow> x \<notin>\<^sub>F A"
+  by (simp add: basis_lens_not_member_indep var_alpha_def)
 
 subsection \<open> Syntax Translations \<close>
 
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
   step is to introduce a collection of non-terminals. \<close>
   
-nonterminal svid and svids and salpha
+nonterminal svid and svids and salpha and sframe_enum and sframe
 
 text \<open> These non-terminals correspond to the following syntactic entities. Non-terminal 
   @{typ "svid"} is an atomic variable identifier, and @{typ "svids"} is a list of identifier. 
-  @{typ "salpha"} is an alphabet or set of variables. Such sets can 
+  @{typ "salpha"} is an alphabet or set of variables. @{typ "sframe"} is a frame. Such sets can 
   be constructed only through lens composition due to typing restrictions. Next we introduce some 
   syntax constructors. \<close>
    
@@ -170,17 +203,32 @@ text \<open> A variable can be decorated with an ampersand, to indicate it is a 
   indicate its a primed relational variable. Isabelle's parser is extensible so additional
   decorations can be and are added later. \<close>
 
+term "(-)"
+
 syntax \<comment> \<open> Variable sets \<close>
   "_salphaid"    :: "id_position \<Rightarrow> salpha" ("_" [990] 990)
   "_salphavar"   :: "svid \<Rightarrow> salpha" ("$_" [990] 990)
   "_salphaparen" :: "salpha \<Rightarrow> salpha" ("'(_')")
-  "_salphacomp"  :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr ";" 75)
+  "_salphaunion" :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr "\<union>" 75)
+  "_salphainter" :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixr "\<inter>" 75)
+  "_salphaminus" :: "salpha \<Rightarrow> salpha \<Rightarrow> salpha" (infixl "-" 65)
   "_salphacompl" :: "salpha \<Rightarrow> salpha" ("- _" [81] 80)
   "_salpha_all"  :: "salpha" ("\<Sigma>")
   "_salpha_none" :: "salpha" ("\<emptyset>")
   "_salphaset"   :: "svids \<Rightarrow> salpha" ("{_}")
+  "_sframeid"    :: "id \<Rightarrow> sframe" ("_")
+  "_sframeset"   :: "svids \<Rightarrow> sframe_enum" ("\<lbrace>_\<rbrace>")
+  "_sframeunion" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixr "\<union>" 75)
+  "_sframeinter" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixr "\<inter>" 75)
+  "_sframeminus" :: "sframe \<Rightarrow> sframe \<Rightarrow> sframe" (infixl "-" 65)
+  "_sframecompl" :: "sframe \<Rightarrow> sframe" ("- _" [81] 80)
+  "_sframe_all"  :: "sframe" ("\<Sigma>")
+  "_sframe_none" :: "sframe" ("\<emptyset>")
+  "_sframe_enum" :: "sframe_enum \<Rightarrow> sframe" ("_")
+  "_sframe_alpha" :: "sframe_enum \<Rightarrow> salpha" ("_")
   "_salphamk"    :: "logic \<Rightarrow> salpha"
   "_mk_alpha_list" :: "svids \<Rightarrow> logic"
+  "_mk_frame_list" :: "svids \<Rightarrow> logic"
 
 text \<open> The terminals of an alphabet are either HOL identifiers or UTP variable identifiers. 
   We support two ways of constructing alphabets; by composition of smaller alphabets using
@@ -217,6 +265,9 @@ translations
   "_mk_alpha_list (_svid_list x xs)" \<rightharpoonup> "CONST var_alpha x \<squnion>\<^sub>S _mk_alpha_list xs"
   "_mk_alpha_list x" \<rightharpoonup> "CONST var_alpha x"
 
+  "_mk_frame_list (_svid_list x xs)" \<rightharpoonup> "CONST lens_insert x (_mk_frame_list xs)"
+  "_mk_frame_list x" \<rightharpoonup> "CONST lens_insert x \<lbrace>\<rbrace>\<^sub>F"
+
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
   "_svid_coview a" => "\<C>\<^bsub>a\<^esub>"
 
@@ -227,11 +278,21 @@ translations
   \<comment> \<open> Alphabets \<close>
   "_salphaparen a" \<rightharpoonup> "a"
   "_salphaid x" \<rightharpoonup> "x"
-  "_salphacomp x y" \<rightharpoonup> "x \<squnion>\<^sub>S y"
+  "_salphaunion x y" \<rightharpoonup> "x \<squnion>\<^sub>S y"
+  "_salphainter x y" \<rightharpoonup> "x \<sqinter>\<^sub>S y"
+  "_salphaminus x y" \<rightharpoonup> "x - y"
   "_salphacompl x"  \<rightharpoonup> "- x"
 (*  "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b" *)
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
   "_salphaset A" \<rightharpoonup> "_mk_alpha_list A"  
+  "_sframeid A" \<rightharpoonup> "A"
+  "_sframeunion x y" \<rightharpoonup> "x \<union>\<^sub>F y"
+  "_sframeinter x y" \<rightharpoonup> "x \<inter>\<^sub>F y"
+  "_sframeminus x y" \<rightharpoonup> "x - y"
+  "_sframecompl x"  \<rightharpoonup> "- x"
+  "_sframe_enum A" \<rightharpoonup> "A"
+  "_sframe_alpha A" \<rightharpoonup> "CONST of_frame A"
+  "_sframeset A" \<rightharpoonup> "_mk_frame_list A"
   "(_svid_list x (_salphamk y))" \<leftharpoondown> "_salphamk (x +\<^sub>L y)" 
   "x" \<leftharpoondown> "_salphamk x"
   "_salpha_all" \<rightleftharpoons> "CONST univ_alpha"
