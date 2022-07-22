@@ -122,6 +122,9 @@ subsection \<open> Substitution Laws \<close>
 
 named_theorems usubst and usubst_eval
 
+lemma subst_id_apply [usubst]: "[\<leadsto>] \<dagger> P = P"
+  by (expr_auto)
+
 lemma subst_unrest [usubst]:
   "\<lbrakk> vwb_lens x; $x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<dagger> v = \<sigma> \<dagger> v"
   by expr_auto
