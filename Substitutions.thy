@@ -300,6 +300,9 @@ lemma get_subst_sset_in [usubst_eval]: "\<lbrakk> vwb_lens x; var_alpha x \<le> 
 lemma get_subst_aext [usubst_eval]: "get\<^bsub>x\<^esub> (subst_aext a s) = get\<^bsub>ns_alpha a x\<^esub> s"
   by (expr_simp)
 
+lemma unrest_sset_lens [unrest]: "\<lbrakk> mwb_lens x; mwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp>\<^sub>s sset[$y, s]"
+  by (simp add: sset_def unrest_subst_lens lens_indep_comm lens_override_def)
+
 text \<open> A tactic for proving unrestrictions by evaluating a special kind of substitution. \<close>
 
 method unrest = (simp add: unrest_ssubst var_alpha_combine usubst_eval)
