@@ -4,12 +4,8 @@ theory Liberation
   imports Extension
 begin
 
-consts liberate :: "'p \<Rightarrow> 's scene \<Rightarrow> 'p"
-
-definition liberate_expr :: "('s \<Rightarrow> bool) \<Rightarrow> 's scene \<Rightarrow> ('s \<Rightarrow> bool)" where
-[expr_defs]: "liberate_expr P x = (\<lambda> s. \<exists> s'. P (s \<oplus>\<^sub>S s' on x))"
-
-adhoc_overloading liberate liberate_expr
+definition liberate :: "('s \<Rightarrow> bool) \<Rightarrow> 's scene \<Rightarrow> ('s \<Rightarrow> bool)" where
+[expr_defs]: "liberate P x = (\<lambda> s. \<exists> s'. P (s \<oplus>\<^sub>S s' on x))"
 
 syntax
   "_liberate" :: "logic \<Rightarrow> salpha \<Rightarrow> logic" (infixl "\\" 80)
@@ -22,10 +18,10 @@ expr_ctr liberate (0)
 
 lemma liberate_lens [expr_simps]: 
   "mwb_lens x \<Longrightarrow> P \\ $x = (\<lambda>s. \<exists>s'. P (s \<triangleleft>\<^bsub>x\<^esub> s'))"
-  by (simp add: liberate_expr_def)
+  by (simp add: liberate_def)
 
 lemma liberate_lens': "mwb_lens x \<Longrightarrow> P \\ $x = (\<lambda>s. \<exists>v. P (put\<^bsub>x\<^esub> s v))"
-  by (auto simp add: liberate_expr_def lens_defs fun_eq_iff)
+  by (auto simp add: liberate_def lens_defs fun_eq_iff)
      (metis mwb_lens_weak weak_lens.put_get)
 
 lemma liberate_as_subst: "vwb_lens x \<Longrightarrow> e \\ $x = (\<exists> v. e\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>)\<^sub>e"

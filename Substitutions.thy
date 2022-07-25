@@ -22,7 +22,8 @@ definition subst_aext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow
 definition subst_ares :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst" ("_\<^sub>\<down>" [999] 999) where
 [expr_defs, code_unfold]: "subst_ares a = create\<^bsub>a\<^esub>"
 
-consts subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> 'p\<^sub>1 \<Rightarrow> 'p\<^sub>2"
+definition subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a, 's\<^sub>2) expr \<Rightarrow> ('a, 's\<^sub>1) expr" 
+  where [expr_defs]: "subst_app \<sigma> e = (\<lambda> s. e (\<sigma> s))"
 
 syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
 
@@ -32,11 +33,6 @@ translations
 
 abbreviation "aext P a \<equiv> subst_app (a\<^sup>\<up>) P"
 abbreviation "ares P a \<equiv> subst_app (a\<^sub>\<down>) P"
-
-definition subst_app_expr :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a, 's\<^sub>2) expr \<Rightarrow> ('a, 's\<^sub>1) expr" 
-  where [expr_defs]: "subst_app_expr \<sigma> e = (\<lambda> s. e (\<sigma> s))"
-
-adhoc_overloading subst_app subst_app_expr
 
 definition subst_comp :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>1) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>2) psubst" (infixl "\<circ>\<^sub>s" 55) 
     where [expr_defs, code_unfold]: "subst_comp = comp"
@@ -279,7 +275,7 @@ lemma usubst_cond_upd_3 [usubst]:
 subsection \<open> Evaluation \<close>
 
 lemma subst_SEXP [usubst_eval]: "\<sigma> \<dagger> [\<lambda> s. e s]\<^sub>e = [\<lambda> s. e (\<sigma> s)]\<^sub>e"
-  by (simp add: SEXP_def subst_app_expr_def fun_eq_iff)
+  by (simp add: SEXP_def subst_app_def fun_eq_iff)
 
 lemma get_subst_id [usubst_eval]: "get\<^bsub>x\<^esub> ([\<leadsto>] s) = get\<^bsub>x\<^esub> s"
   by (simp add: subst_id_def)

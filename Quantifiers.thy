@@ -4,24 +4,6 @@ theory Quantifiers
   imports Liberation
 begin
 
-consts ex_lens  :: "('a \<Longrightarrow> 's) \<Rightarrow> 'p \<Rightarrow> 'p"
-consts ex1_lens :: "('a \<Longrightarrow> 's) \<Rightarrow> 'p \<Rightarrow> 'p"
-consts all_lens :: "('a \<Longrightarrow> 's) \<Rightarrow> 'p \<Rightarrow> 'p"
-
-expr_ctr ex_lens (1)
-expr_ctr ex1_lens (1)
-expr_ctr all_lens (1)
-
-syntax 
-  "_ex_lens"  :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("\<exists> _ \<Zspot> _" [0, 20] 20)
-  "_ex1_lens" :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("\<exists>\<^sub>1 _ \<Zspot> _" [0, 20] 20)
-  "_all_lens" :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("\<forall> _ \<Zspot> _" [0, 20] 20)
-
-translations
-  "_ex_lens x P" == "CONST ex_lens x P"
-  "_ex1_lens x P" == "CONST ex1_lens x P"
-  "_all_lens x P" == "CONST all_lens x P"
-
 definition ex_expr :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) expr \<Rightarrow> (bool, 's) expr" where
 [expr_defs]: "ex_expr x e = (\<lambda> s. (\<exists> v. e (put\<^bsub>x\<^esub> s v)))"
 
@@ -31,10 +13,19 @@ definition ex1_expr :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) expr 
 definition all_expr :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) expr \<Rightarrow> (bool, 's) expr" where
 [expr_defs]: "all_expr x e = (\<lambda> s. (\<forall> v. e (put\<^bsub>x\<^esub> s v)))"
 
-adhoc_overloading
-  ex_lens ex_expr and
-  ex1_lens ex1_expr and
-  all_lens all_expr
+expr_ctr ex_expr (1)
+expr_ctr ex1_expr (1)
+expr_ctr all_expr (1)
+
+syntax 
+  "_ex_expr"  :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("\<exists> _ \<Zspot> _" [0, 20] 20)
+  "_ex1_expr" :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("\<exists>\<^sub>1 _ \<Zspot> _" [0, 20] 20)
+  "_all_expr" :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("\<forall> _ \<Zspot> _" [0, 20] 20)
+
+translations
+  "_ex_expr x P" == "CONST ex_expr x P"
+  "_ex1_expr x P" == "CONST ex1_expr x P"
+  "_all_expr x P" == "CONST all_expr x P"
 
 lemma ex_is_liberation: "mwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> P) = (P \\ $x)"
   by (expr_auto, metis mwb_lens_weak weak_lens.put_get)

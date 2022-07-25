@@ -34,10 +34,10 @@ lemma aext_ares: "\<lbrakk> mwb_lens a; (- $a) \<sharp> P \<rbrakk> \<Longrighta
   by (auto simp add: expr_defs fun_eq_iff lens_create_def)
 
 lemma expr_pre [simp]: "e\<^sup>< (s\<^sub>1, s\<^sub>2) = (e)\<^sub>e s\<^sub>1"
-  by (simp add: subst_aext_def subst_app_expr_def)
+  by (simp add: subst_aext_def subst_app_def)
 
 lemma expr_post [simp]: "e\<^sup>> (s\<^sub>1, s\<^sub>2) = (@e)\<^sub>e s\<^sub>2"
-  by (simp add: subst_aext_def subst_app_expr_def)
+  by (simp add: subst_aext_def subst_app_def)
 
 lemma unrest_aext_expr_lens [unrest]: "\<lbrakk> mwb_lens x; x \<bowtie> a \<rbrakk> \<Longrightarrow> $x \<sharp> (P \<up> a)"
   by (expr_simp add: lens_indep.lens_put_irr2)
