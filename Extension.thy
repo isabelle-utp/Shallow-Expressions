@@ -20,8 +20,8 @@ translations
   "_drop_pre P" == "_ares (P)\<^sub>e fst\<^sub>L"
   "_drop_post P" == "_ares (P)\<^sub>e snd\<^sub>L"
 
-expr_ctr aext
-expr_ctr ares
+expr_constructor aext
+expr_constructor ares
 
 lemma aext_var: "($x)\<^sub>e \<up> a = ($a:x)\<^sub>e"
   by (simp add: expr_defs lens_defs)

@@ -43,4 +43,14 @@ Outer_Syntax.command @{command_keyword "expr_ctr"} "declare that certain constan
     (Scan.repeat1 (Parse.term -- Scan.optional (Parse.$$$ "(" |-- Parse.!!! (Scan.repeat1 Parse.number --| Parse.$$$ ")")) [])
      >> (fn ns => 
          Toplevel.theory 
+         (fn thy => Library.foldl (fn (thy, n) => 
+                                   let open Markup 
+                                       val _ = Output.warning ("Command " ^ markup keyword1 "expr_ctr" ^ " is deprecated: use " ^ markup keyword1 "expr_constructor" ^ " instead.")
+                                   in NoLift_Const.nolift_const thy n end) (thy, ns))));
+
+Outer_Syntax.command @{command_keyword "expr_constructor"} "declare that certain constants are expression constructors; the parameter indicates which arguments should be lifted"
+    (Scan.repeat1 (Parse.term -- Scan.optional (Parse.$$$ "(" |-- Parse.!!! (Scan.repeat1 Parse.number --| Parse.$$$ ")")) [])
+     >> (fn ns => 
+         Toplevel.theory 
          (fn thy => Library.foldl (fn (thy, n) => NoLift_Const.nolift_const thy n) (thy, ns))));
+

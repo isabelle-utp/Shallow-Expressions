@@ -52,7 +52,7 @@ definition subst_upd :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Lon
 definition subst_lookup :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr" ("\<langle>_\<rangle>\<^sub>s")
   where [expr_defs, code_unfold]: "\<langle>\<sigma>\<rangle>\<^sub>s x = (\<lambda> s. get\<^bsub>x\<^esub> (\<sigma> s))"
 
-expr_ctr subst_lookup
+expr_constructor subst_lookup
 
 definition unrest_usubst :: "'s scene \<Rightarrow> 's subst \<Rightarrow> bool" 
   where [expr_defs]: "unrest_usubst a \<sigma> = (\<forall> s s'. \<sigma> (s \<oplus>\<^sub>S s' on a) = (\<sigma> s) \<oplus>\<^sub>S s' on a)"
@@ -106,11 +106,11 @@ translations
   "_subst P v (_svid_tuple (_of_svid_list (x +\<^sub>L y)))" <= "_subst P v (x +\<^sub>L y)"
   "_par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2" == "CONST par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2"
 
-expr_ctr subst_app (1)
-expr_ctr subst_id
-expr_ctr subst_nil
-expr_ctr subst_default
-expr_ctr subst_upd
+expr_constructor subst_app (1)
+expr_constructor subst_id
+expr_constructor subst_nil
+expr_constructor subst_default
+expr_constructor subst_upd
 
 ML_file \<open>Expr_Util.ML\<close>
 

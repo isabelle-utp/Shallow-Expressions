@@ -2,7 +2,7 @@ section \<open> Expressions \<close>
 
 theory Expressions
   imports Variables
-  keywords "pretty_exprs" "full_exprs" "lit_vars" "expr_vars" "expr_ctr" :: "thy_decl_block"
+  keywords "pretty_exprs" "full_exprs" "lit_vars" "expr_vars" "expr_ctr" "expr_constructor" :: "thy_decl_block"
 begin
 
 subsection \<open> Types and Constructs \<close>
@@ -98,8 +98,8 @@ syntax
   "_sexp_select"     :: "logic \<Rightarrow> svid \<Rightarrow> logic" ("_:_" [1000, 999] 1000)
   "_sexp_if"         :: "logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("(3_ \<triangleleft> _ \<triangleright>/ _)" [52,0,53] 52)
 
-expr_ctr expr_select
-expr_ctr expr_if
+expr_constructor expr_select
+expr_constructor expr_if
 
 ML_file \<open>Lift_Expr.ML\<close>
 

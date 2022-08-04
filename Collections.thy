@@ -12,7 +12,7 @@ definition lens_defined :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) e
 syntax "_lens_defined" :: "svid \<Rightarrow> logic" ("\<^bold>D'(_')")
 translations "_lens_defined x" == "CONST lens_defined x"
 
-expr_ctr lens_defined
+expr_constructor lens_defined
 
 subsection \<open> Dynamic Lenses \<close>
 

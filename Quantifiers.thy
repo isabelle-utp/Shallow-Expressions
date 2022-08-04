@@ -13,9 +13,9 @@ definition ex1_expr :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) expr 
 definition all_expr :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) expr \<Rightarrow> (bool, 's) expr" where
 [expr_defs]: "all_expr x e = (\<lambda> s. (\<forall> v. e (put\<^bsub>x\<^esub> s v)))"
 
-expr_ctr ex_expr (1)
-expr_ctr ex1_expr (1)
-expr_ctr all_expr (1)
+expr_constructor ex_expr (1)
+expr_constructor ex1_expr (1)
+expr_constructor all_expr (1)
 
 syntax 
   "_ex_expr"  :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("\<exists> _ \<Zspot> _" [0, 20] 20)

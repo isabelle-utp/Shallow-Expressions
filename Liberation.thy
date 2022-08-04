@@ -14,7 +14,7 @@ translations
   "_liberate P x" == "CONST liberate P x"
   "_liberate P x" <= "_liberate (P)\<^sub>e x"
 
-expr_ctr liberate (0)
+expr_constructor liberate (0)
 
 lemma liberate_lens [expr_simps]: 
   "mwb_lens x \<Longrightarrow> P \\ $x = (\<lambda>s. \<exists>s'. P (s \<triangleleft>\<^bsub>x\<^esub> s'))"
