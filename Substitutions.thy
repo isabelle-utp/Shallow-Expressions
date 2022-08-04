@@ -128,6 +128,9 @@ lemma subst_unrest [usubst]:
 lemma subst_lookup_id [usubst]: "\<langle>[\<leadsto>]\<rangle>\<^sub>s x = var x"
   by expr_simp
 
+lemma subst_lookup_aext [usubst]: "\<langle>a\<^sup>\<up>\<rangle>\<^sub>s x = get\<^bsub>ns_alpha a x\<^esub>"
+  by expr_auto
+
 lemma subst_id_var: "[\<leadsto>] = ($\<^bold>v)\<^sub>e"
   by expr_simp
 
@@ -141,6 +144,14 @@ lemma subst_default_id [simp]: "\<lblot>\<leadsto>\<rblot> \<circ>\<^sub>s \<sig
   by (simp add: expr_defs comp_def)
 
 lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^sub>L = \<sigma>"
+  by expr_simp
+
+lemma usubst_apply_twice [usubst]: 
+  "\<rho> \<dagger> (\<sigma> \<dagger> e) = (\<sigma> \<circ>\<^sub>s \<rho>) \<dagger> e"
+  by expr_simp
+
+lemma usubst_apply_twice_SEXP [usubst]: 
+  "\<rho> \<dagger> [\<sigma> \<dagger> e]\<^sub>e = (\<sigma> \<circ>\<^sub>s \<rho>) \<dagger> [e]\<^sub>e"
   by expr_simp
 
 (* FIXME: Figure out how to make laws like this parse and simplify *)

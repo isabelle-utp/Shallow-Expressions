@@ -68,6 +68,9 @@ lemma ns_alpha_indep_2 [simp]: "a \<bowtie> y \<Longrightarrow> ns_alpha a x \<b
 lemma ns_alpha_indep_3 [simp]: "x \<bowtie> b \<Longrightarrow> x \<bowtie> ns_alpha b y"
   by (simp add: lens_indep_sym)
 
+lemma ns_alpha_indep_4 [simp]: "\<lbrakk> mwb_lens a; x \<bowtie> y \<rbrakk> \<Longrightarrow> ns_alpha a x \<bowtie> ns_alpha a y"
+  by (simp add: ns_alpha_def)
+
 lemma var_fst_mwb [simp]: "mwb_lens x \<Longrightarrow> mwb_lens (var_fst x)"
   by (simp add: var_fst_def comp_mwb_lens)
 
@@ -164,6 +167,10 @@ lemma var_member_iff [simp]: "var_lens x \<Longrightarrow> x \<in>\<^sub>v \<lbr
 lemma var_indep_iff [simp]: "ebasis_lens x \<Longrightarrow> var_alpha x \<bowtie>\<^sub>S \<lbrakk>A\<rbrakk>\<^sub>F \<longleftrightarrow> x \<notin>\<^sub>F A"
   by (simp add: basis_lens_not_member_indep var_alpha_def)
 
+text \<open> We can transparently move from frames to scenes using the following coercion\<close>
+
+declare [[coercion of_frame]]
+
 subsection \<open> Syntax Translations \<close>
 
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
@@ -215,6 +222,8 @@ syntax \<comment> \<open> Variable sets \<close>
   "_salphacompl" :: "salpha \<Rightarrow> salpha" ("- _" [81] 80)
   "_salpha_all"  :: "salpha" ("\<Sigma>")
   "_salpha_none" :: "salpha" ("\<emptyset>")
+(*  "_salpha_pre"  :: "salpha \<Rightarrow> salpha" ("_\<^sup><" [989] 989)
+  "_salpha_post" :: "salpha \<Rightarrow> salpha" ("_\<^sup>>" [989] 989) *)
   "_salphaset"   :: "svids \<Rightarrow> salpha" ("{_}")
   "_sframeid"    :: "id \<Rightarrow> sframe" ("_")
   "_sframeset"   :: "svids \<Rightarrow> sframe_enum" ("\<lbrace>_\<rbrace>")
@@ -224,6 +233,8 @@ syntax \<comment> \<open> Variable sets \<close>
   "_sframecompl" :: "sframe \<Rightarrow> sframe" ("- _" [81] 80)
   "_sframe_all"  :: "sframe" ("\<Sigma>")
   "_sframe_none" :: "sframe" ("\<emptyset>")
+  "_sframe_pre"  :: "sframe \<Rightarrow> sframe" ("_\<^sup><" [989] 989)
+  "_sframe_post" :: "sframe \<Rightarrow> sframe" ("_\<^sup>>" [989] 989)
   "_sframe_enum" :: "sframe_enum \<Rightarrow> sframe" ("_")
   "_sframe_alpha" :: "sframe_enum \<Rightarrow> salpha" ("_")
   "_salphamk"    :: "logic \<Rightarrow> salpha"
@@ -282,6 +293,8 @@ translations
   "_salphainter x y" \<rightharpoonup> "x \<sqinter>\<^sub>S y"
   "_salphaminus x y" \<rightharpoonup> "x - y"
   "_salphacompl x"  \<rightharpoonup> "- x"
+(*  "_salpha_pre A" \<rightharpoonup> "A ;\<^sub>S fst\<^sub>L"
+  "_salpha_post A" \<rightharpoonup> "A ;\<^sub>S snd\<^sub>L" *)
 (*  "_salphaprod a b" \<rightleftharpoons> "a \<times>\<^sub>L b" *)
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
   "_salphaset A" \<rightharpoonup> "_mk_alpha_list A"  
@@ -290,6 +303,10 @@ translations
   "_sframeinter x y" \<rightharpoonup> "x \<inter>\<^sub>F y"
   "_sframeminus x y" \<rightharpoonup> "x - y"
   "_sframecompl x"  \<rightharpoonup> "- x"
+  "_sframe_all" \<rightharpoonup> "\<top>\<^sub>F"
+  "_sframe_none" \<rightharpoonup> "\<lbrace>\<rbrace>\<^sub>F"
+  "_sframe_pre A" \<rightharpoonup> "A ;\<^sub>F fst\<^sub>L"
+  "_sframe_post A" \<rightharpoonup> "A ;\<^sub>F snd\<^sub>L"
   "_sframe_enum A" \<rightharpoonup> "A"
   "_sframe_alpha A" \<rightharpoonup> "CONST of_frame A"
   "_sframeset A" \<rightharpoonup> "_mk_frame_list A"
