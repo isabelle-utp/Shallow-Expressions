@@ -260,4 +260,30 @@ method expr_auto uses add =
    (rename_alpha_vars)? \<comment> \<open> Rename any logical variables with v subscripts \<close>
   )
 
+subsection \<open> Algebraic laws \<close>
+
+lemma expr_if_idem [simp]: "P \<triangleleft> b \<triangleright> P = P"
+  by expr_auto
+
+lemma expr_if_sym: "P \<triangleleft> b \<triangleright> Q = Q \<triangleleft> \<not>b \<triangleright> P"
+  by expr_auto
+
+lemma expr_if_assoc: "(P \<triangleleft> b \<triangleright> Q) \<triangleleft> c \<triangleright> R = P \<triangleleft> b \<and> c \<triangleright> (Q \<triangleleft> c \<triangleright> R)"
+  by expr_auto
+
+lemma expr_if_distr: "P \<triangleleft> b \<triangleright> (Q \<triangleleft> c \<triangleright> R) = (P \<triangleleft> b \<triangleright> Q) \<triangleleft> c \<triangleright> (P \<triangleleft> b \<triangleright> R)"
+  by expr_auto
+
+lemma expr_if_true [simp]: "P \<triangleleft> True \<triangleright> Q = P"
+  by expr_auto
+
+lemma expr_if_false [simp]: "P \<triangleleft> False \<triangleright> Q = Q"
+  by expr_auto
+
+lemma expr_if_reach [simp]: "P \<triangleleft> b \<triangleright> (Q \<triangleleft> b \<triangleright> R) = P \<triangleleft> b \<triangleright> R"
+  by expr_auto
+
+lemma expr_if_disj [simp]: "P \<triangleleft> b \<triangleright> (P \<triangleleft> c \<triangleright> Q) = P \<triangleleft> b \<or> c \<triangleright> Q"
+  by expr_auto
+
 end
