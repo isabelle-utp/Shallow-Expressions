@@ -2,4 +2,4 @@ session "Shallow-Expressions-Z" = "Shallow-Expressions" +
   options [document = false]
   sessions
     "Z_Toolkit"
-  theories Shallow_Expressions_Z
+  theories Shallow_Expressions_Z Shallow_Expressions_Z_All
