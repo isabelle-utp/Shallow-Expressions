@@ -269,6 +269,10 @@ lemma unrest_subst_empty [unrest]: "x \<sharp>\<^sub>s [\<leadsto>]"
 lemma unrest_subst_upd [unrest]: "\<lbrakk> vwb_lens x; x \<bowtie> y; $x \<sharp> (e)\<^sub>e; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> $x \<sharp>\<^sub>s \<sigma>(y \<leadsto> e)"
   by (expr_auto add: lens_indep_comm)
 
+lemma unrest_subst_apply [unrest]:
+  "\<lbrakk> $x \<sharp> P; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> $x \<sharp> (\<sigma> \<dagger> P)"
+  by (expr_auto)
+
 subsection \<open> Conditional Substitution Laws \<close>
 
 lemma usubst_cond_upd_1 [usubst]:
