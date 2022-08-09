@@ -317,6 +317,18 @@ lemma get_subst_aext [usubst_eval]: "get\<^bsub>x\<^esub> (subst_aext a s) = get
 lemma unrest_sset_lens [unrest]: "\<lbrakk> mwb_lens x; mwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp>\<^sub>s sset[$y, s]"
   by (simp add: sset_def unrest_subst_lens lens_indep_comm lens_override_def)
 
+text \<open> If a variable is unrestricted in a substitution then it's application has no effect. \<close>
+
+lemma usubst_apply_unrest:
+  "\<lbrakk> vwb_lens x; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<langle>\<sigma>\<rangle>\<^sub>s x = var x"
+proof -
+  assume 1: "vwb_lens x" and "$x \<sharp>\<^sub>s \<sigma>"
+  hence "\<forall>s s'. \<sigma> (s \<oplus>\<^sub>L s' on x) = \<sigma> s \<oplus>\<^sub>L s' on x"
+    by (simp add: unrest_usubst_def)
+  thus "\<langle>\<sigma>\<rangle>\<^sub>s x = var x"
+    by (metis 1 lens_override_def lens_override_idem mwb_lens_weak subst_lookup_def vwb_lens_mwb weak_lens.put_get)
+qed
+
 text \<open> A tactic for proving unrestrictions by evaluating a special kind of substitution. \<close>
 
 method unrest = (simp add: unrest_ssubst var_alpha_combine usubst_eval)
