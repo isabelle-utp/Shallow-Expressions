@@ -118,6 +118,10 @@ lemma post_var_indep_prod [simp]: "x \<bowtie> b \<Longrightarrow> ns_alpha snd\
   using lens_indep.lens_put_irr2
   by (unfold_locales, force simp add: lens_defs prod.case_eq_if lens_indep_comm)+
 
+lemma lens_indep_impl_scene_indep_var [simp]:
+  "(X \<bowtie> Y) \<Longrightarrow> var_alpha X \<bowtie>\<^sub>S var_alpha Y"
+  by (simp add: var_alpha_def)
+
 declare lens_scene_override [simp]
 declare uminus_scene_twice [simp]
 
