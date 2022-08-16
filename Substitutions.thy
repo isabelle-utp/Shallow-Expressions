@@ -16,11 +16,11 @@ definition subst_id :: "'s subst" ("[\<leadsto>]")
 definition subst_default :: "('s\<^sub>1, 's\<^sub>2::default) psubst" ("\<lblot>\<leadsto>\<rblot>") 
   where [expr_defs, code_unfold]: "\<lblot>\<leadsto>\<rblot> = (\<lambda> s. default)"
 
-definition subst_aext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>2, 's\<^sub>1) psubst" ("_\<^sup>\<up>" [999] 999) where
-[expr_defs, code_unfold]: "subst_aext a = get\<^bsub>a\<^esub>"
+definition subst_ext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>2, 's\<^sub>1) psubst" ("_\<^sup>\<up>" [999] 999) where
+[expr_defs, code_unfold]: "subst_ext a = get\<^bsub>a\<^esub>"
 
-definition subst_ares :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst" ("_\<^sub>\<down>" [999] 999) where
-[expr_defs, code_unfold]: "subst_ares a = create\<^bsub>a\<^esub>"
+definition subst_res :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst" ("_\<^sub>\<down>" [999] 999) where
+[expr_defs, code_unfold]: "subst_res a = create\<^bsub>a\<^esub>"
 
 definition subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a, 's\<^sub>2) expr \<Rightarrow> ('a, 's\<^sub>1) expr" 
   where [expr_defs]: "subst_app \<sigma> e = (\<lambda> s. e (\<sigma> s))"
@@ -311,7 +311,7 @@ lemma get_subst_sset_out [usubst_eval]: "\<lbrakk> vwb_lens x; var_alpha x \<bow
 lemma get_subst_sset_in [usubst_eval]: "\<lbrakk> vwb_lens x; var_alpha x \<le> a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (sset a s' s) = get\<^bsub>x\<^esub> s'"
   by (simp add: get_scene_override_le sset_def var_alpha_def)
 
-lemma get_subst_aext [usubst_eval]: "get\<^bsub>x\<^esub> (subst_aext a s) = get\<^bsub>ns_alpha a x\<^esub> s"
+lemma get_subst_ext [usubst_eval]: "get\<^bsub>x\<^esub> (subst_ext a s) = get\<^bsub>ns_alpha a x\<^esub> s"
   by (expr_simp)
 
 lemma unrest_sset_lens [unrest]: "\<lbrakk> mwb_lens x; mwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp>\<^sub>s sset[$y, s]"
