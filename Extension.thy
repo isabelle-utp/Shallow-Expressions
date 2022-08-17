@@ -25,13 +25,15 @@ translations
 expr_constructor aext
 expr_constructor ares
 
-lemma aext_var: "($x)\<^sub>e \<up> a = ($a:x)\<^sub>e"
+named_theorems alpha
+
+lemma aext_var [alpha]: "($x)\<^sub>e \<up> a = ($a:x)\<^sub>e"
   by (simp add: expr_defs lens_defs)
 
-lemma ares_aext: "weak_lens a \<Longrightarrow> P \<up> a \<down> a = P"
+lemma ares_aext [alpha]: "weak_lens a \<Longrightarrow> P \<up> a \<down> a = P"
   by (simp add: expr_defs)
 
-lemma aext_ares: "\<lbrakk> mwb_lens a; (- $a) \<sharp> P \<rbrakk> \<Longrightarrow> P \<down> a \<up> a = P"
+lemma aext_ares [alpha]: "\<lbrakk> mwb_lens a; (- $a) \<sharp> P \<rbrakk> \<Longrightarrow> P \<down> a \<up> a = P"
   unfolding unrest_compl_lens
   by (auto simp add: expr_defs fun_eq_iff lens_create_def)
 
@@ -59,5 +61,21 @@ syntax
 translations
   "_subst_aext P a" == "CONST subst_aext P a"
   "_subst_ares P a" == "CONST subst_ares P a"
+
+lemma subst_id_ext [usubst]:
+  "vwb_lens x \<Longrightarrow> [\<leadsto>] \<up>\<^sub>s x = [\<leadsto>]"
+  by expr_auto
+
+lemma upd_subst_ext [alpha]:
+  "vwb_lens x \<Longrightarrow> \<sigma>(y \<leadsto> e) \<up>\<^sub>s x = (\<sigma> \<up>\<^sub>s x)(x:y \<leadsto> e \<up> x)"
+  by expr_auto
+
+lemma apply_subst_ext [alpha]:
+  "vwb_lens x \<Longrightarrow> (\<sigma> \<dagger> e) \<up> x = (\<sigma> \<up>\<^sub>s x) \<dagger> (e \<up> x)"
+  by (expr_auto)
+
+lemma subst_aext_comp [usubst]:
+  "vwb_lens a \<Longrightarrow> (\<sigma> \<up>\<^sub>s a) \<circ>\<^sub>s (\<rho> \<up>\<^sub>s a) = (\<sigma> \<circ>\<^sub>s \<rho>) \<up>\<^sub>s a"
+  by expr_auto
 
 end
