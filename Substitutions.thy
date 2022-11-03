@@ -244,6 +244,25 @@ lemma subst_upd_comp [usubst]:
   "\<rho>(x \<leadsto> v) \<circ>\<^sub>s \<sigma> = (\<rho> \<circ>\<^sub>s \<sigma>)(x \<leadsto> \<sigma> \<dagger> v)"
   by (simp add: expr_defs fun_eq_iff)
 
+subsection \<open> Proof rules \<close>
+
+text \<open> In proof, a lens can always be substituted for an arbitrary but fixed value. \<close>
+
+lemma taut_substI:
+  assumes "vwb_lens x" "\<And> v. `P\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>`"
+  shows "`P`"
+  using assms by (expr_simp, metis vwb_lens.put_eq)
+
+lemma eq_substI:
+  assumes "vwb_lens x" "\<And> v. P\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk> = Q\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>"
+  shows "P = Q"
+  using assms by (expr_simp, metis vwb_lens.put_eq)
+
+lemma less_eq_substI:
+  assumes "vwb_lens x" "\<And> v. P\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk> \<le> Q\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>"
+  shows "P \<le> Q"
+  using assms by (expr_simp, metis le_funE le_funI vwb_lens_def wb_lens.source_stability)
+
 subsection \<open> Ordering substitutions \<close>
 
 text \<open> A simplification procedure to reorder substitutions maplets lexicographically by variable syntax \<close>
