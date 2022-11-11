@@ -350,4 +350,7 @@ lemma get_pre [simp]: "get\<^bsub>(x\<^sup><)\<^sub>v\<^esub> (s\<^sub>1, s\<^su
 lemma get_post [simp]: "get\<^bsub>(x\<^sup>>)\<^sub>v\<^esub> (s\<^sub>1, s\<^sub>2) = get\<^bsub>x\<^esub> s\<^sub>2"
   by (simp add: lens_defs)
 
+lemma get_prod_decomp: "get\<^bsub>x\<^esub> s = (get\<^bsub>var_fst x\<^esub> s, get\<^bsub>var_snd x\<^esub> s)"
+  by (simp add: lens_defs)
+
 end

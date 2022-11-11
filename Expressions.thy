@@ -238,6 +238,17 @@ lemma tautI: "\<lbrakk> \<And> s. P s \<rbrakk> \<Longrightarrow> taut P"
 
 named_theorems expr_simps
 
+text \<open> Lemmas to help automation of expression reasoning \<close>
+
+lemma fst_case_sum [simp]: "fst (case p of Inl x \<Rightarrow> (a1 x, a2 x) | Inr x \<Rightarrow> (b1 x, b2 x)) = (case p of Inl x \<Rightarrow> a1 x | Inr x \<Rightarrow> b1 x)"
+  by (simp add: sum.case_eq_if)
+
+lemma snd_case_sum [simp]: "snd (case p of Inl x \<Rightarrow> (a1 x, a2 x) | Inr x \<Rightarrow> (b1 x, b2 x)) = (case p of Inl x \<Rightarrow> a2 x | Inr x \<Rightarrow> b2 x)"
+  by (simp add: sum.case_eq_if)
+
+lemma sum_case_apply [simp]: "(case p of Inl x \<Rightarrow> f x | Inr x \<Rightarrow> g x) y = (case p of Inl x \<Rightarrow> f x y | Inr x \<Rightarrow> g x y)"
+  by (simp add: sum.case_eq_if)
+
 text \<open> A method for simplifying shallow expressions to HOL terms  \<close>
 
 method expr_simp uses add = 
