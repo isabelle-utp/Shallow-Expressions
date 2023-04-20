@@ -70,7 +70,7 @@ definition par_subst :: "'s subst \<Rightarrow> 's scene \<Rightarrow> 's scene 
 nonterminal uexprs and smaplet and smaplets
 
 syntax
-  "_smaplet"        :: "[svid, logic] => smaplet" ("_ \<leadsto>/ _")
+  "_smaplet"        :: "[svid, logic] => smaplet" ("_ \<leadsto> _")
   ""                :: "smaplet => smaplets" ("_")
   "_SMaplets"       :: "[smaplet, smaplets] => smaplets" ("_,/ _")
   \<comment> \<open> A little syntax utility to extract a list of variable identifiers from a substitution \<close>
