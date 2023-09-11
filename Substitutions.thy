@@ -244,6 +244,10 @@ lemma subst_upd_comp [usubst]:
   "\<rho>(x \<leadsto> v) \<circ>\<^sub>s \<sigma> = (\<rho> \<circ>\<^sub>s \<sigma>)(x \<leadsto> \<sigma> \<dagger> v)"
   by (simp add: expr_defs fun_eq_iff)
 
+lemma swap_subst_inj: "\<lbrakk> vwb_lens x; vwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> inj [(x, y) \<leadsto> ($y, $x)]"
+  by (simp add: expr_defs lens_defs inj_on_def)
+     (metis lens_indep.lens_put_irr2 lens_indep_get vwb_lens.source_determination vwb_lens_def wb_lens_weak weak_lens.put_get)
+
 subsection \<open> Proof rules \<close>
 
 text \<open> In proof, a lens can always be substituted for an arbitrary but fixed value. \<close>
