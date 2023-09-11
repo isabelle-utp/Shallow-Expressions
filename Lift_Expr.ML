@@ -33,8 +33,14 @@ fun lift_expr_aux ctx (Const (n', t), args) =
           end
      else
      case (Type_Infer_Context.const_type ctx n) of
+      (* If it has a lens type, we insert the get function *)
       SOME (Type (\<^type_name>\<open>lens_ext\<close>, _)) 
         => Term.list_comb (const @{const_name lens_get} $ Const (n', t) $ free state_id, args') |
+      (* If the type of the constant has an input of type "'st", we assume it's a state and lift it *)
+      SOME (Type (\<^type_name>\<open>fun\<close>, [TFree (a, _), _])) 
+        => if a = fst (dest_TFree Lens_Lib.astateT) 
+           then Term.list_comb (Const (n', t), args) $ free state_id
+           else Term.list_comb (Const (n, t), args') |
       _ => Term.list_comb (Const (n, t), args')
   end |
 lift_expr_aux ctx (Free (n, t), args) = 
