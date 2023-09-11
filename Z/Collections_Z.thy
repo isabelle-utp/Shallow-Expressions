@@ -22,6 +22,11 @@ lemma defined_pfun_collection_lens [simp, code_unfold]:
   by (simp add: lens_defined_def src_dyn_lens unrest source_ns_alpha source_pfun_collection_lens)
      (simp add: lens_defs wb_lens.source_UNIV)
 
+lemma lens_defined_pfun_code [code_unfold]: 
+  "vwb_lens x \<Longrightarrow> lens_defined (ns_alpha x (pfun_collection_lens i)) = (\<guillemotleft>i\<guillemotright> \<in> pdom($x))\<^sub>e"
+  by (simp add: lens_defined_def src_dyn_lens unrest source_ns_alpha source_pfun_collection_lens)
+     (simp add: lens_defs wb_lens.source_UNIV)
+
 subsection \<open> Finite Function Collection Lens \<close>
 
 definition ffun_collection_lens :: "'a \<Rightarrow> 'b \<Longrightarrow> 'a \<Zffun> 'b" where

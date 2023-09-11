@@ -77,4 +77,9 @@ lemma defined_list_collection_lens [simp]:
   by (simp add: lens_defined_def src_dyn_lens unrest source_ns_alpha source_list_collection_lens)
      (simp add: lens_defs wb_lens.source_UNIV)
 
+lemma lens_defined_list_code [code_unfold]: 
+  "vwb_lens x \<Longrightarrow> lens_defined (ns_alpha x (list_collection_lens i)) = (\<guillemotleft>i\<guillemotright> < length($x))\<^sub>e"
+  by (simp add: lens_defined_def src_dyn_lens unrest source_ns_alpha source_list_collection_lens)
+     (simp add: lens_defs wb_lens.source_UNIV)
+
 end
