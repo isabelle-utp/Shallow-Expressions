@@ -46,6 +46,18 @@ lemma expr_post [simp]: "e\<^sup>> (s\<^sub>1, s\<^sub>2) = (@e)\<^sub>e s\<^sub
 lemma unrest_aext_expr_lens [unrest]: "\<lbrakk> mwb_lens x; x \<bowtie> a \<rbrakk> \<Longrightarrow> $x \<sharp> (P \<up> a)"
   by (expr_simp add: lens_indep.lens_put_irr2)
 
+lemma unrest_init_pre [unrest]: "\<lbrakk> mwb_lens x; $x \<sharp> e \<rbrakk> \<Longrightarrow> $x\<^sup>< \<sharp> e\<^sup><"
+  by expr_auto
+
+lemma unrest_init_post [unrest]: "mwb_lens x \<Longrightarrow> $x\<^sup>< \<sharp> e\<^sup>>"
+  by expr_auto
+
+lemma unrest_fin_pre [unrest]: "mwb_lens x \<Longrightarrow> $x\<^sup>> \<sharp> e\<^sup><"
+  by expr_auto
+
+lemma unrest_fin_post [unrest]: "\<lbrakk> mwb_lens x; $x \<sharp> e \<rbrakk> \<Longrightarrow> $x\<^sup>> \<sharp> e\<^sup>>"
+  by expr_auto
+
 subsection \<open> Substitutions \<close>
 
 definition subst_aext :: "'a subst \<Rightarrow> ('a \<Longrightarrow> 'b) \<Rightarrow> 'b subst"

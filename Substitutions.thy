@@ -354,10 +354,17 @@ qed
 
 text \<open> A tactic for proving unrestrictions by evaluating a special kind of substitution. \<close>
 
-method unrest = (simp add: unrest_ssubst var_alpha_combine usubst_eval)
+method unrest uses add = (simp add: add unrest_ssubst var_alpha_combine usubst_eval)
 
 text \<open> A tactic for evaluating substitutions. \<close>
 
-method subst_eval = (simp add: usubst_eval usubst unrest)
+method subst_eval uses add = (simp add: add usubst_eval usubst unrest)
+
+text \<open> We can exercise finer grained control over substitutions with the following method. \<close>
+
+declare vwb_lens_mwb [lens]
+declare mwb_lens_weak [lens]
+
+method subst_eval' = (simp only: lens usubst_eval usubst unrest SEXP_apply)
 
 end

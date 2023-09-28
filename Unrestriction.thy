@@ -69,6 +69,9 @@ lemma unrest_var_single [unrest]:
   "\<lbrakk> mwb_lens x; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> ($y)\<^sub>e"
   by (simp add: expr_defs lens_indep.lens_put_irr2 lens_indep_sym lens_override_def var_alpha_def)
 
+lemma unrest_get [unrest]: "\<lbrakk> mwb_lens x; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> get\<^bsub>y\<^esub>"
+  by (expr_simp, simp add: lens_indep.lens_put_irr2)
+
 lemma unrest_conj [unrest]:
   "\<lbrakk> x \<sharp> P; x \<sharp> Q \<rbrakk> \<Longrightarrow> x \<sharp> (P \<and> Q)\<^sub>e"
   by (auto simp add: expr_defs)

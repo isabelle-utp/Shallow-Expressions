@@ -30,6 +30,16 @@ translations
 lemma ex_is_liberation: "mwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> P) = (P \\ $x)"
   by (expr_auto, metis mwb_lens_weak weak_lens.put_get)
 
+lemma ex_unrest_iff: "\<lbrakk> mwb_lens x \<rbrakk> \<Longrightarrow> ($x \<sharp> P) \<longleftrightarrow> (\<exists> x \<Zspot> P) = P"
+  by (simp add: ex_is_liberation unrest_liberate_iff)
+
+lemma ex_unrest: "\<lbrakk> mwb_lens x; $x \<sharp> P \<rbrakk> \<Longrightarrow> (\<exists> x \<Zspot> P) = P"
+  using ex_unrest_iff by blast
+
+lemma unrest_ex_in [unrest]:
+  "\<lbrakk> mwb_lens y; x \<subseteq>\<^sub>L y \<rbrakk> \<Longrightarrow> $x \<sharp> (\<exists> y \<Zspot> P)"
+  by (simp add: ex_expr_def sublens_pres_mwb sublens_put_put unrest_lens)
+
 lemma ex_as_subst: "vwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> e) = (\<exists> v. e\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>)\<^sub>e"
   by expr_auto
 
@@ -46,6 +56,10 @@ lemma ex_false [simp]: "(\<exists> x \<Zspot> (False)\<^sub>e) = (False)\<^sub>e
   by (expr_simp)
 
 lemma ex_disj [simp]: "(\<exists> x \<Zspot> (P \<or> Q)\<^sub>e) = ((\<exists> x \<Zspot> P) \<or> (\<exists> x \<Zspot> Q))\<^sub>e"
+  by (expr_auto)
+
+lemma ex_plus:
+  "(\<exists> (y,x) \<Zspot> P) = (\<exists> x \<Zspot> \<exists> y \<Zspot> P)"
   by (expr_auto)
 
 lemma all_as_ex: "(\<forall> x \<Zspot> P) = (\<not> (\<exists> x \<Zspot> \<not> P))\<^sub>e"
