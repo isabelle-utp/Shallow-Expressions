@@ -249,14 +249,21 @@ lemma snd_case_sum [simp]: "snd (case p of Inl x \<Rightarrow> (a1 x, a2 x) | In
 lemma sum_case_apply [simp]: "(case p of Inl x \<Rightarrow> f x | Inr x \<Rightarrow> g x) y = (case p of Inl x \<Rightarrow> f x y | Inr x \<Rightarrow> g x y)"
   by (simp add: sum.case_eq_if)
 
-text \<open> A method for simplifying shallow expressions to HOL terms  \<close>
+text \<open> Proof methods for simplifying shallow expressions to HOL terms. The first retains the lens
+  structure, and the second removes it when alphabet lenses are present.  \<close>
 
-method expr_simp uses add = 
+method expr_lens_simp uses add = 
   ((simp add: expr_simps)? \<comment> \<open> Perform any possible simplifications retaining the lens structure \<close>
-   ;((simp add: fun_eq_iff prod.case_eq_if alpha_splits expr_defs lens_defs add)? ; \<comment> \<open> Explode the rest \<close>
+   ;((simp add: fun_eq_iff prod.case_eq_if expr_defs lens_defs add)? ; \<comment> \<open> Explode the rest \<close>
      (simp add: expr_defs lens_defs add)?))
 
-text \<open> A method for dealing with tautologies \<close>
+method expr_simp uses add = (expr_lens_simp add: alpha_defs alpha_splits add)
+
+text \<open> Methods for dealing with tautologies \<close>
+
+method expr_lens_taut uses add = 
+  (rule tautI;
+   expr_lens_simp add: add)
 
 method expr_taut uses add = 
   (rule tautI;
@@ -267,7 +274,7 @@ text \<open> A method for simplifying shallow expressions to HOL terms and apply
 
 method expr_auto uses add =
   (expr_simp add: add; 
-   (auto simp add: alpha_splits lens_defs add)?; 
+   (auto simp add: alpha_splits lens_defs alpha_defs add)?; 
    (rename_alpha_vars)? \<comment> \<open> Rename any logical variables with v subscripts \<close>
   )
 
