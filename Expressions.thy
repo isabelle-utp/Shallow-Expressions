@@ -304,7 +304,7 @@ lemma expr_if_reach [simp]: "P \<triangleleft> b \<triangleright> (Q \<trianglel
 lemma expr_if_disj [simp]: "P \<triangleleft> b \<triangleright> (P \<triangleleft> c \<triangleright> Q) = P \<triangleleft> b \<or> c \<triangleright> Q"
   by expr_auto
 
-lemma SEXP_expr_if [simp]: "[expr_if P b Q]\<^sub>e = expr_if P b Q"
+lemma SEXP_expr_if: "[expr_if P b Q]\<^sub>e = expr_if P b Q"
   by (simp add: SEXP_def)
 
 end
