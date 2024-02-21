@@ -1,7 +1,7 @@
 section \<open> Local State \<close>
 
 theory Local_State
-  imports "Variables"
+  imports "Expressions"
 begin
 
 text \<open> This theory supports ad-hoc extension of an alphabet type with a tuple of lenses constructed
@@ -18,6 +18,7 @@ syntax
   "_state_type" :: "pttrn \<Rightarrow> type"
   "_state_tuple" :: "type \<Rightarrow> pttrn \<Rightarrow> logic"
   "_state_lenses" :: "pttrn \<Rightarrow> logic \<Rightarrow> logic" ("localstate (_)/ over (_)" [0, 10] 10)
+  "_lvar_abs" :: "id \<Rightarrow> type \<Rightarrow> logic \<Rightarrow> logic"
 
 translations
   (type) "PAIRTYPE('a, 'b)" => (type) "'a \<times> 'b"
@@ -30,10 +31,36 @@ translations
   "_state_tuple st (CONST Pair (_constrain x t) vs)" =>
     "CONST Product_Type.Pair (_constrain x (_lensT t st)) (_state_tuple st vs)"
 
-ML \<open>
+ML \<open> 
+signature LIFT_EXPR_LVAR =
+sig
+val lift_expr_lvar: string -> term -> term
+val lift_lvar: string -> term -> term
+end
 
- \<close>
+structure Lift_Expr_LVar: LIFT_EXPR_LVAR =
+struct
 
+fun lift_expr_lvar n (Free (x, t')) =
+  let open Syntax; open Lift_Expr
+  in
+  if x = n then const @{const_name lens_get} $ Free (n, t') $ Bound 0
+  else Free (x, t')
+  end |
+lift_expr_lvar n (Free (x, t') $ Bound 0) =
+  lift_expr_lvar n (Free (x, t')) |
+lift_expr_lvar n (Abs (x, t', trm)) =
+  if x = n then Abs (x, t', trm) else Abs (x, t', lift_expr_lvar n trm) |
+lift_expr_lvar n (t1 $ t2) = lift_expr_lvar n t1 $ lift_expr_lvar n t2 |
+lift_expr_lvar _ trm = trm 
+
+fun lift_lvar n (Const (@{const_name SEXP}, t') $ e)
+  = (Const (@{const_name SEXP}, t') $ lift_expr_lvar n e) |
+lift_lvar n (t1 $ t2) = lift_lvar n t1 $ lift_lvar n t2 |
+lift_lvar _ trm = trm 
+
+end
+\<close>
 parse_translation \<open>
   let
     open HOLogic; open Syntax;
@@ -72,7 +99,14 @@ parse_translation \<open>
 
     fun state_lens ctx [vs, loc] = (state_lenses (var_decl_typs vs) (mk_tupleT (var_decl_typs vs)) loc);
   in
-  [("_state_lenses", state_lens)]
+  [("_state_lenses", state_lens),
+   (@{syntax_const "_lvar_abs"}
+   , fn ctx => fn terms => 
+     let val [Free (x, _), tty, trm] = terms 
+         val ty = Syntax_Phases.decode_typ tty
+         val lens = Type (@{type_name "lens_ext"}, [ty, dummyT, @{typ "unit"}])
+         val trm' = Lift_Expr_LVar.lift_lvar x trm
+     in Abs (x, lens, abstract_over (free x, trm')) end)]
   end
 \<close>
 
