@@ -57,6 +57,8 @@ lift_expr_lvar _ trm = trm
 fun lift_lvar n (Const (@{const_name SEXP}, t') $ e)
   = (Const (@{const_name SEXP}, t') $ lift_expr_lvar n e) |
 lift_lvar n (t1 $ t2) = lift_lvar n t1 $ lift_lvar n t2 |
+lift_lvar n (Abs (x, t', trm)) =
+  if x = n then Abs (x, t', trm) else Abs (x, t', lift_lvar n trm) |
 lift_lvar _ trm = trm 
 
 end
