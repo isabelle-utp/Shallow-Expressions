@@ -53,11 +53,19 @@ adhoc_overloading
 lemma vwb_fun_collection_lens [simp]: "vwb_lens (fun_collection_lens k)"
   by (simp add: fun_collection_lens_def fun_vwb_lens)
 
+lemma put_fun_collection_lens [simp]: 
+  "put\<^bsub>fun_collection_lens i\<^esub> = (\<lambda>f. fun_upd f i)"
+  by (simp add: fun_collection_lens_def fun_lens_def)
+
 lemma mwb_list_collection_lens [simp]: "mwb_lens (list_collection_lens i)"
   by (simp add: list_collection_lens_def list_mwb_lens)
 
 lemma source_list_collection_lens: "\<S>\<^bsub>list_collection_lens i\<^esub> = {xs. i < length xs}"
   by (simp add: list_collection_lens_def source_list_lens)
+
+lemma put_list_collection_lens [simp]: 
+  "put\<^bsub>list_collection_lens i\<^esub> = (\<lambda> xs. list_augment xs i)"
+  by (simp add: list_collection_lens_def list_lens_def)
 
 subsection \<open> Syntax for Collection Lenses \<close>
 
@@ -72,6 +80,10 @@ translations
 lemma source_ns_alpha: "\<lbrakk> mwb_lens a; mwb_lens x \<rbrakk> \<Longrightarrow> \<S>\<^bsub>ns_alpha a x\<^esub> = {s \<in> \<S>\<^bsub>a\<^esub>. get\<^bsub>a\<^esub> s \<in> \<S>\<^bsub>x\<^esub>}"
   by (simp add: ns_alpha_def source_lens_comp)
 
+lemma defined_vwb_lens [simp]: "vwb_lens x \<Longrightarrow> \<^bold>D(x) = (True)\<^sub>e"
+  by (simp add: lens_defined_def)
+     (metis UNIV_I vwb_lens_iff_mwb_UNIV_src)
+
 lemma defined_list_collection_lens [simp]:
   "\<lbrakk> vwb_lens x; $x \<sharp> e \<rbrakk> \<Longrightarrow> \<^bold>D(x[e]) = (e < length($x))\<^sub>e"
   by (simp add: lens_defined_def src_dyn_lens unrest source_ns_alpha source_list_collection_lens)
@@ -81,5 +93,12 @@ lemma lens_defined_list_code [code_unfold]:
   "vwb_lens x \<Longrightarrow> lens_defined (ns_alpha x (list_collection_lens i)) = (\<guillemotleft>i\<guillemotright> < length($x))\<^sub>e"
   by (simp add: lens_defined_def src_dyn_lens unrest source_ns_alpha source_list_collection_lens)
      (simp add: lens_defs wb_lens.source_UNIV)
+
+text \<open> The next theorem allows the simplification of a collection lens update \<close>
+
+lemma get_subst_upd_dyn_lens [simp]: 
+  "mwb_lens x \<Longrightarrow> get\<^bsub>x\<^esub> (subst_upd \<sigma> (dyn_lens_poly cl x (e)\<^sub>e) v s)
+                  = lens_put (cl (e (\<sigma> s))) (get\<^bsub>x\<^esub> (\<sigma> s)) (v s)"
+  by expr_simp
 
 end
