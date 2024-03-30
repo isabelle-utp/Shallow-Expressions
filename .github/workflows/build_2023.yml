@@ -5,9 +5,9 @@ jobs:
     name: Build Shallow-Expressions
     steps:
       - uses: actions/checkout@v3
-      - uses: lexbailey/isabelle-theory-build-github-action@v7
+      - uses: lexbailey/isabelle-theory-build-github-action@v8
         with:
-          isabelle-version: '2021-1'
+          isabelle-url: 'https://github.com/seL4/isabelle/archive/refs/tags/Isabelle2023.tar.gz'
           depends: 'https://github.com/isabelle-utp/Z_Toolkit.git@main'
           session-name: 'Shallow-Expressions Shallow-Expressions-Z'
           theory-root: '. Z'
