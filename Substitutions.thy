@@ -316,10 +316,10 @@ lemma subst_cond_upd_3 [usubst]:
   "\<lbrakk> vwb_lens x; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<sigma> \<triangleleft> b \<triangleright> \<rho>(x \<leadsto> v) = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (($x)\<^sub>e \<triangleleft> b \<triangleright> v))"
   by (expr_auto, metis lens_override_def lens_override_idem)
 
-lemma expr_if_bool_var_left: "vwb_lens x \<Longrightarrow> P \<triangleleft> $x \<triangleright> Q = P\<lbrakk>True/x\<rbrakk> \<triangleleft> $x \<triangleright> Q"
+lemma expr_if_bool_var_left: "vwb_lens x \<Longrightarrow> P\<lbrakk>True/x\<rbrakk> \<triangleleft> $x \<triangleright> Q = P \<triangleleft> $x \<triangleright> Q"
   by (expr_simp, metis (full_types) lens_override_def lens_override_idem)
 
-lemma expr_if_bool_var_right: "vwb_lens x \<Longrightarrow> P \<triangleleft> $x \<triangleright> Q = P \<triangleleft> $x \<triangleright> Q\<lbrakk>False/x\<rbrakk>"
+lemma expr_if_bool_var_right: "vwb_lens x \<Longrightarrow> P \<triangleleft> $x \<triangleright> Q\<lbrakk>False/x\<rbrakk> = P \<triangleleft> $x \<triangleright> Q"
   by (expr_simp, metis (full_types) lens_override_def lens_override_idem)
 
 lemma subst_expr_if [usubst]: "\<sigma> \<dagger> (P \<triangleleft> B \<triangleright> Q) = (\<sigma> \<dagger> P) \<triangleleft> (\<sigma> \<dagger> B) \<triangleright> (\<sigma> \<dagger> Q)"
