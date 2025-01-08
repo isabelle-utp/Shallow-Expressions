@@ -146,11 +146,14 @@ lemma subst_default_id [simp]: "\<lblot>\<leadsto>\<rblot> \<circ>\<^sub>s \<sig
 lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^sub>L = \<sigma>"
   by expr_simp
 
-lemma usubst_apply_twice [usubst]: 
+lemma subst_apply_SEXP [usubst]: "subst_app \<sigma> [e]\<^sub>e = [subst_app \<sigma> e]\<^sub>e"
+  by expr_simp
+
+lemma subst_apply_twice [usubst]: 
   "\<rho> \<dagger> (\<sigma> \<dagger> e) = (\<sigma> \<circ>\<^sub>s \<rho>) \<dagger> e"
   by expr_simp
 
-lemma usubst_apply_twice_SEXP [usubst]: 
+lemma subst_apply_twice_SEXP [usubst]: 
   "\<rho> \<dagger> [\<sigma> \<dagger> e]\<^sub>e = (\<sigma> \<circ>\<^sub>s \<rho>) \<dagger> [e]\<^sub>e"
   by expr_simp
 
@@ -161,6 +164,9 @@ term "(f (\<sigma> \<dagger> e))\<^sub>e"
 term "(\<forall> x. x + $y > $z)\<^sub>e"
 
 term "(\<forall> k. P\<lbrakk>\<guillemotleft>k\<guillemotright>/x\<rbrakk>)\<^sub>e"
+
+lemma subst_get [usubst]: "\<sigma> \<dagger> get\<^bsub>x\<^esub> = \<langle>\<sigma>\<rangle>\<^sub>s x"
+  by (simp add: expr_defs)
 
 lemma subst_var [usubst]: "\<sigma> \<dagger> ($x)\<^sub>e = \<langle>\<sigma>\<rangle>\<^sub>s x"
   by (simp add: expr_defs)
@@ -220,23 +226,23 @@ lemma usubst_upd_idem_sub [usubst]:
 
 text \<open> Substitution updates commute when the lenses are independent. \<close>
     
-lemma usubst_upd_comm:
+lemma subst_upd_comm:
   assumes "x \<bowtie> y"
   shows "\<sigma>(x \<leadsto> u, y \<leadsto> v) = \<sigma>(y \<leadsto> v, x \<leadsto> u)"
   using assms unfolding subst_upd_def
   by (auto simp add: subst_upd_def assms comp_def lens_indep_comm)
 
-lemma usubst_upd_comm2:
+lemma subst_upd_comm2:
   assumes "z \<bowtie> y"
   shows "\<sigma>(x \<leadsto> u, y \<leadsto> v, z \<leadsto> s) = \<sigma>(x \<leadsto> u, z \<leadsto> s, y \<leadsto> v)"
   using assms unfolding subst_upd_def
   by (auto simp add: subst_upd_def assms comp_def lens_indep_comm)
 
-lemma usubst_upd_var_id [usubst]:
+lemma subst_upd_var_id [usubst]:
   "vwb_lens x \<Longrightarrow> [x \<leadsto> $x] = [\<leadsto>]"
   by (simp add: subst_upd_def subst_id_def id_lens_def SEXP_def)
 
-lemma usubst_upd_pair [usubst]:
+lemma subst_upd_pair [usubst]:
   "\<sigma>((x, y) \<leadsto> (e, f)) = \<sigma>(y \<leadsto> f, x \<leadsto> e)"
   by (simp add: subst_upd_def lens_defs SEXP_def fun_eq_iff)
 
@@ -276,7 +282,7 @@ simproc_setup subst_order ("subst_upd (subst_upd \<sigma> x u) y v") =
         case (Thm.term_of ct) of
           Const (@{const_name subst_upd}, _) $ (Const (@{const_name subst_upd}, _) $ s $ x $ u) $ y $ v
             => if (YXML.content_of (Syntax.string_of_term ctx x) > YXML.content_of(Syntax.string_of_term ctx y))
-               then SOME (mk_meta_eq @{thm usubst_upd_comm})
+               then SOME (mk_meta_eq @{thm subst_upd_comm})
                else NONE  |
           _ => NONE) 
   \<close>
@@ -298,17 +304,26 @@ lemma unrest_subst_apply [unrest]:
 
 subsection \<open> Conditional Substitution Laws \<close>
 
-lemma usubst_cond_upd_1 [usubst]:
+lemma subst_cond_upd_1 [usubst]:
   "\<sigma>(x \<leadsto> u) \<triangleleft> b \<triangleright> \<rho>(x \<leadsto> v) = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (u \<triangleleft> b \<triangleright> v))"
   by expr_auto
 
-lemma usubst_cond_upd_2 [usubst]:
+lemma subst_cond_upd_2 [usubst]:
   "\<lbrakk> vwb_lens x; $x \<sharp>\<^sub>s \<rho> \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> u) \<triangleleft> b \<triangleright> \<rho> = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (u \<triangleleft> b \<triangleright> ($x)\<^sub>e))"
   by (expr_auto, metis lens_override_def lens_override_idem)
 
-lemma usubst_cond_upd_3 [usubst]:
+lemma subst_cond_upd_3 [usubst]:
   "\<lbrakk> vwb_lens x; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<sigma> \<triangleleft> b \<triangleright> \<rho>(x \<leadsto> v) = (\<sigma> \<triangleleft> b \<triangleright> \<rho>)(x \<leadsto> (($x)\<^sub>e \<triangleleft> b \<triangleright> v))"
   by (expr_auto, metis lens_override_def lens_override_idem)
+
+lemma expr_if_bool_var_left: "vwb_lens x \<Longrightarrow> P \<triangleleft> $x \<triangleright> Q = P\<lbrakk>True/x\<rbrakk> \<triangleleft> $x \<triangleright> Q"
+  by (expr_simp, metis (full_types) lens_override_def lens_override_idem)
+
+lemma expr_if_bool_var_right: "vwb_lens x \<Longrightarrow> P \<triangleleft> $x \<triangleright> Q = P \<triangleleft> $x \<triangleright> Q\<lbrakk>False/x\<rbrakk>"
+  by (expr_simp, metis (full_types) lens_override_def lens_override_idem)
+
+lemma subst_expr_if [usubst]: "\<sigma> \<dagger> (P \<triangleleft> B \<triangleright> Q) = (\<sigma> \<dagger> P) \<triangleleft> (\<sigma> \<dagger> B) \<triangleright> (\<sigma> \<dagger> Q)"
+  by expr_simp
 
 subsection \<open> Evaluation \<close>
 
@@ -342,7 +357,7 @@ lemma unrest_sset_lens [unrest]: "\<lbrakk> mwb_lens x; mwb_lens y; x \<bowtie> 
 
 text \<open> If a variable is unrestricted in a substitution then it's application has no effect. \<close>
 
-lemma usubst_apply_unrest:
+lemma subst_apply_unrest:
   "\<lbrakk> vwb_lens x; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<langle>\<sigma>\<rangle>\<^sub>s x = var x"
 proof -
   assume 1: "vwb_lens x" and "$x \<sharp>\<^sub>s \<sigma>"

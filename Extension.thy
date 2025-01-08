@@ -58,6 +58,12 @@ lemma unrest_fin_pre [unrest]: "mwb_lens x \<Longrightarrow> $x\<^sup>> \<sharp>
 lemma unrest_fin_post [unrest]: "\<lbrakk> mwb_lens x; $x \<sharp> e \<rbrakk> \<Longrightarrow> $x\<^sup>> \<sharp> e\<^sup>>"
   by expr_auto
 
+lemma aext_get_fst [usubst]: "aext (get\<^bsub>x\<^esub>) fst\<^sub>L = get\<^bsub>ns_alpha fst\<^sub>L x\<^esub>"
+  by expr_simp
+
+lemma aext_get_snd [usubst]: "aext (get\<^bsub>x\<^esub>) snd\<^sub>L = get\<^bsub>ns_alpha snd\<^sub>L x\<^esub>"
+  by expr_simp
+
 subsection \<open> Substitutions \<close>
 
 definition subst_aext :: "'a subst \<Rightarrow> ('a \<Longrightarrow> 'b) \<Rightarrow> 'b subst"
