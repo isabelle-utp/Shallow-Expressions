@@ -69,6 +69,12 @@ lemma unrest_var_single [unrest]:
   "\<lbrakk> mwb_lens x; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> ($y)\<^sub>e"
   by (simp add: expr_defs lens_indep.lens_put_irr2 lens_indep_sym lens_override_def var_alpha_def)
 
+lemma unrest_pair [unrest]:
+  assumes "mwb_lens x" "mwb_lens y" "$x \<sharp> P" "$y \<sharp> P"
+  shows "$(x, y) \<sharp> P"
+  using assms
+  by expr_simp (simp add: lens_override_def lens_scene.rep_eq scene_override.rep_eq)
+
 lemma unrest_get [unrest]: "\<lbrakk> mwb_lens x; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> get\<^bsub>y\<^esub>"
   by (expr_simp, simp add: lens_indep.lens_put_irr2)
 
@@ -87,6 +93,11 @@ lemma unrest_disj [unrest]:
 lemma unrest_implies [unrest]:
   "\<lbrakk> x \<sharp> P; x \<sharp> Q \<rbrakk> \<Longrightarrow> x \<sharp> (P \<longrightarrow> Q)\<^sub>e"
   by (auto simp add: expr_defs)
+
+lemma unrest_expr_if [unrest]:
+  assumes "a \<sharp> P" "a \<sharp> Q" "a \<sharp> (e)\<^sub>e"
+  shows "a \<sharp> (P \<triangleleft> e \<triangleright> Q)"
+  using assms by expr_simp
 
 lemma unrest_uop:
   "\<lbrakk> x \<sharp> e \<rbrakk> \<Longrightarrow> x \<sharp> (\<guillemotleft>f\<guillemotright> e)\<^sub>e"

@@ -40,6 +40,10 @@ lemma unrest_ex_in [unrest]:
   "\<lbrakk> mwb_lens y; x \<subseteq>\<^sub>L y \<rbrakk> \<Longrightarrow> $x \<sharp> (\<exists> y \<Zspot> P)"
   by (simp add: ex_expr_def sublens_pres_mwb sublens_put_put unrest_lens)
 
+lemma unrest_ex_out [unrest]:
+  "\<lbrakk> mwb_lens x; $x \<sharp> P; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> (\<exists> y \<Zspot> P)"
+  by (simp add: ex_expr_def unrest_lens, metis lens_indep.lens_put_comm)
+
 lemma ex_as_subst: "vwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> e) = (\<exists> v. e\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>)\<^sub>e"
   by expr_auto
 

@@ -302,6 +302,10 @@ lemma unrest_subst_apply [unrest]:
   "\<lbrakk> $x \<sharp> P; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> $x \<sharp> (\<sigma> \<dagger> P)"
   by (expr_auto)
 
+lemma unrest_sset [unrest]:
+  "x \<bowtie> y \<Longrightarrow> $x \<sharp>\<^sub>s sset[$y, v]"
+  by (expr_auto, meson lens_indep_impl_scene_indep scene_override_commute_indep)
+
 subsection \<open> Conditional Substitution Laws \<close>
 
 lemma subst_cond_upd_1 [usubst]:
@@ -342,7 +346,10 @@ lemma get_subst_upd_indep [usubst_eval]:
 
 lemma unrest_ssubst: "(a \<sharp> P) \<longleftrightarrow> (\<forall> s'. sset a s' \<dagger> P = (P)\<^sub>e)"
   by (auto simp add: expr_defs fun_eq_iff)
-  
+
+lemma unrest_ssubst_expr: "(a \<sharp> (P)\<^sub>e) = (\<forall>s'. sset[a, s'] \<dagger> (P)\<^sub>e = (P)\<^sub>e)"
+  by (simp add: unrest_ssubst)
+
 lemma get_subst_sset_out [usubst_eval]: "\<lbrakk> vwb_lens x; var_alpha x \<bowtie>\<^sub>S a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> (sset a s' s) = get\<^bsub>x\<^esub> s"
   by (simp add: expr_defs var_alpha_def get_scene_override_indep)
 
