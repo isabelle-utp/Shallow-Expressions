@@ -146,7 +146,10 @@ lemma subst_default_id [simp]: "\<lblot>\<leadsto>\<rblot> \<circ>\<^sub>s \<sig
 lemma subst_lookup_one_lens [usubst]: "\<langle>\<sigma>\<rangle>\<^sub>s 1\<^sub>L = \<sigma>"
   by expr_simp
 
-lemma subst_apply_SEXP [usubst]: "subst_app \<sigma> [e]\<^sub>e = [subst_app \<sigma> e]\<^sub>e"
+text \<open> The following law can break expressions abstraction, so it is not by default a 
+  "usubst" law. \<close>
+
+lemma subst_apply_SEXP: "subst_app \<sigma> [e]\<^sub>e = [subst_app \<sigma> e]\<^sub>e"
   by expr_simp
 
 lemma subst_apply_twice [usubst]: 

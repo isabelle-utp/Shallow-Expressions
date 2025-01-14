@@ -44,6 +44,19 @@ lemma unrest_ex_out [unrest]:
   "\<lbrakk> mwb_lens x; $x \<sharp> P; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> (\<exists> y \<Zspot> P)"
   by (simp add: ex_expr_def unrest_lens, metis lens_indep.lens_put_comm)
 
+lemma subst_ex_out [usubst]: "\<lbrakk> mwb_lens x; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> \<sigma> \<dagger> (\<exists> x \<Zspot> P) = (\<exists> x \<Zspot> \<sigma> \<dagger> P)"
+  by (expr_simp)
+
+lemma subst_lit_ex_indep [usubst]:
+  "y \<bowtie> x \<Longrightarrow> \<sigma>(y \<leadsto> \<guillemotleft>v\<guillemotright>) \<dagger> (\<exists> x \<Zspot> P) = \<sigma> \<dagger> (\<exists> x \<Zspot> [y \<leadsto> \<guillemotleft>v\<guillemotright>] \<dagger> P)"
+  by (expr_simp, simp add: lens_indep.lens_put_comm)
+
+lemma subst_ex_in [usubst]:
+  "\<lbrakk> vwb_lens a; x \<subseteq>\<^sub>L a \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<dagger> (\<exists> a \<Zspot> P) = \<sigma> \<dagger> (\<exists> a \<Zspot> P)"
+  by (expr_simp, force)
+
+declare lens_plus_right_sublens [simp]
+
 lemma ex_as_subst: "vwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> e) = (\<exists> v. e\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>)\<^sub>e"
   by expr_auto
 
