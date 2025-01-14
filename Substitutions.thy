@@ -128,7 +128,7 @@ lemma subst_unrest [usubst]:
 lemma subst_lookup_id [usubst]: "\<langle>[\<leadsto>]\<rangle>\<^sub>s x = var x"
   by expr_simp
 
-lemma subst_lookup_aext [usubst]: "\<langle>a\<^sup>\<up>\<rangle>\<^sub>s x = get\<^bsub>ns_alpha a x\<^esub>"
+lemma subst_lookup_aext [usubst]: "\<langle>a\<^sup>\<up>\<rangle>\<^sub>s x = [get\<^bsub>ns_alpha a x\<^esub>]\<^sub>e"
   by expr_auto
 
 lemma subst_id_var: "[\<leadsto>] = ($\<^bold>v)\<^sub>e"
