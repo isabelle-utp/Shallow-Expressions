@@ -63,7 +63,7 @@ lemma ex_as_subst: "vwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> e) = (\<e
 lemma ex_twice [simp]: "mwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> \<exists> x \<Zspot> P) = (\<exists> x \<Zspot> P)"
   by (expr_simp)
 
-lemma ex_commute [simp]: "x \<bowtie> y \<Longrightarrow> (\<exists> x \<Zspot> \<exists> y \<Zspot> P) = (\<exists> y \<Zspot> \<exists> x \<Zspot> P)"
+lemma ex_commute: "x \<bowtie> y \<Longrightarrow> (\<exists> x \<Zspot> \<exists> y \<Zspot> P) = (\<exists> y \<Zspot> \<exists> x \<Zspot> P)"
   by (expr_auto, metis lens_indep_comm)+
   
 lemma ex_true [simp]: "(\<exists> x \<Zspot> (True)\<^sub>e) = (True)\<^sub>e"
