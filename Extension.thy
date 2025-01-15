@@ -96,4 +96,18 @@ lemma subst_aext_comp [usubst]:
   "vwb_lens a \<Longrightarrow> (\<sigma> \<up>\<^sub>s a) \<circ>\<^sub>s (\<rho> \<up>\<^sub>s a) = (\<sigma> \<circ>\<^sub>s \<rho>) \<up>\<^sub>s a"
   by expr_auto
 
+lemma subst_id_res: "mwb_lens a \<Longrightarrow> [\<leadsto>] \<down>\<^sub>s a = [\<leadsto>]"
+  by expr_auto
+
+lemma upd_subst_res_in: 
+  "\<lbrakk> mwb_lens a; x \<subseteq>\<^sub>L a \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<down>\<^sub>s a = (\<sigma> \<down>\<^sub>s a)(x \<restriction> a \<leadsto> e \<down> a)"
+  by (expr_simp, fastforce)
+
+lemma upd_subst_res_out: 
+  "\<lbrakk> mwb_lens a; x \<bowtie> a \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<down>\<^sub>s a = \<sigma> \<down>\<^sub>s a"
+  by (simp add: expr_defs lens_indep_sym)
+
+lemma subst_ext_lens_apply: "\<lbrakk> mwb_lens a; -$a \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> (a\<^sup>\<up> \<circ>\<^sub>s \<sigma>) \<dagger> P = ((\<sigma> \<down>\<^sub>s a) \<dagger> P) \<up> a"
+  by (expr_simp, simp add: lens_override_def scene_override_commute)
+
 end

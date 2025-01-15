@@ -125,7 +125,7 @@ lemma subst_unrest [usubst]:
   "\<lbrakk> vwb_lens x; $x \<sharp> v \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<dagger> v = \<sigma> \<dagger> v"
   by expr_auto
 
-lemma subst_lookup_id [usubst]: "\<langle>[\<leadsto>]\<rangle>\<^sub>s x = var x"
+lemma subst_lookup_id [usubst]: "\<langle>[\<leadsto>]\<rangle>\<^sub>s x = [var x]\<^sub>e"
   by expr_simp
 
 lemma subst_lookup_aext [usubst]: "\<langle>a\<^sup>\<up>\<rangle>\<^sub>s x = [get\<^bsub>ns_alpha a x\<^esub>]\<^sub>e"
@@ -300,6 +300,9 @@ lemma unrest_subst_empty [unrest]: "x \<sharp>\<^sub>s [\<leadsto>]"
 
 lemma unrest_subst_upd [unrest]: "\<lbrakk> vwb_lens x; x \<bowtie> y; $x \<sharp> (e)\<^sub>e; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> $x \<sharp>\<^sub>s \<sigma>(y \<leadsto> e)"
   by (expr_auto add: lens_indep_comm)
+
+lemma unrest_subst_upd_compl [unrest]: "\<lbrakk> vwb_lens x; y \<subseteq>\<^sub>L x; -$x \<sharp> (e)\<^sub>e; -$x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> -$x \<sharp>\<^sub>s \<sigma>(y \<leadsto> e)"
+  by (expr_auto, simp add: lens_override_def scene_override_commute)
 
 lemma unrest_subst_apply [unrest]:
   "\<lbrakk> $x \<sharp> P; $x \<sharp>\<^sub>s \<sigma> \<rbrakk> \<Longrightarrow> $x \<sharp> (\<sigma> \<dagger> P)"
