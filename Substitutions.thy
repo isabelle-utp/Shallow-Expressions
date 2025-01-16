@@ -271,6 +271,11 @@ lemma eq_substI:
   shows "P = Q"
   using assms by (expr_simp, metis vwb_lens.put_eq)
 
+lemma bool_eq_substI:
+  assumes "vwb_lens x" "P\<lbrakk>True/x\<rbrakk> = Q\<lbrakk>True/x\<rbrakk>" "P\<lbrakk>False/x\<rbrakk> = Q\<lbrakk>False/x\<rbrakk>"
+  shows "P = Q"
+  by (metis (full_types) assms eq_substI)
+
 lemma less_eq_substI:
   assumes "vwb_lens x" "\<And> v. P\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk> \<le> Q\<lbrakk>\<guillemotleft>v\<guillemotright>/x\<rbrakk>"
   shows "P \<le> Q"
