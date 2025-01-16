@@ -80,6 +80,10 @@ translations
   "_subst_aext P a" == "CONST subst_aext P a"
   "_subst_ares P a" == "CONST subst_ares P a"
 
+lemma unrest_subst_aext [unrest]: "x \<bowtie> a \<Longrightarrow> $x \<sharp>\<^sub>s (\<sigma> \<up>\<^sub>s a)"
+  by (expr_simp)
+     (metis lens_indep_def lens_override_def lens_scene.rep_eq scene_override.rep_eq)
+
 lemma subst_id_ext [usubst]:
   "vwb_lens x \<Longrightarrow> [\<leadsto>] \<up>\<^sub>s x = [\<leadsto>]"
   by expr_auto
