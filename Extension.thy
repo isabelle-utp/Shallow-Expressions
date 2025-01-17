@@ -96,6 +96,9 @@ lemma apply_subst_ext [alpha]:
   "vwb_lens x \<Longrightarrow> (\<sigma> \<dagger> e) \<up> x = (\<sigma> \<up>\<^sub>s x) \<dagger> (e \<up> x)"
   by (expr_auto)
 
+lemma subst_aext_compose [alpha]: "(\<sigma> \<up>\<^sub>s x) \<up>\<^sub>s y = \<sigma> \<up>\<^sub>s y:x"
+  by (expr_simp)
+
 lemma subst_aext_comp [usubst]:
   "vwb_lens a \<Longrightarrow> (\<sigma> \<up>\<^sub>s a) \<circ>\<^sub>s (\<rho> \<up>\<^sub>s a) = (\<sigma> \<circ>\<^sub>s \<rho>) \<up>\<^sub>s a"
   by expr_auto
