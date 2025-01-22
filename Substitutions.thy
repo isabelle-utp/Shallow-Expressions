@@ -387,7 +387,7 @@ qed
 
 text \<open> A tactic for proving unrestrictions by evaluating a special kind of substitution. \<close>
 
-method unrest uses add = (simp add: add unrest_ssubst var_alpha_combine usubst_eval)
+method unrest uses add = (simp add: add unrest unrest_ssubst_expr var_alpha_combine usubst usubst_eval)
 
 text \<open> A tactic for evaluating substitutions. \<close>
 
