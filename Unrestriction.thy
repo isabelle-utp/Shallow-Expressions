@@ -69,6 +69,39 @@ lemma unrest_var_single [unrest]:
   "\<lbrakk> mwb_lens x; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> ($y)\<^sub>e"
   by (simp add: expr_defs lens_indep.lens_put_irr2 lens_indep_sym lens_override_def var_alpha_def)
 
+lemma unrest_sublens:
+  assumes "mwb_lens x" "$x \<sharp> P" "y \<subseteq>\<^sub>L x"
+  shows "$y \<sharp> P"
+  by (metis assms sublens_pres_mwb sublens_put_put unrest_lens)
+
+text \<open> If two lenses are equivalent, and thus they characterise the same state-space regions,
+  then clearly unrestrictions over them are equivalent. \<close>
+    
+lemma unrest_equiv:
+  assumes "mwb_lens y" "x \<approx>\<^sub>L y" "$x \<sharp> P"
+  shows "$y \<sharp> P"
+  using assms lens_equiv_def sublens_pres_mwb unrest_sublens by blast
+
+text \<open> If we can show that an expression is unrestricted on a bijective lens, then is unrestricted
+  on the entire state-space. \<close>
+
+lemma bij_lens_unrest_all:
+  assumes "bij_lens x" "$x \<sharp> P"
+  shows "\<Sigma> \<sharp> P"
+  by (metis assms bij_lens_vwb lens_scene_top_iff_bij_lens univ_alpha_def var_alpha_def vwb_lens_iff_mwb_UNIV_src)
+
+lemma bij_lens_unrest_all_eq:
+  assumes "bij_lens x"
+  shows "(\<Sigma> \<sharp> P) \<longleftrightarrow> ($x \<sharp> P)"
+  by (metis assms bij_lens_vwb lens_scene_top_iff_bij_lens univ_alpha_def var_alpha_def vwb_lens_mwb)
+
+text \<open> If an expression is unrestricted by all variables, then it is unrestricted by any variable \<close>
+
+lemma unrest_all_var:
+  assumes "\<Sigma> \<sharp> e"
+  shows "$x \<sharp> e"
+  by (metis assms scene_top_greatest top_idem_scene univ_alpha_def unrest_subscene)
+
 lemma unrest_pair [unrest]:
   assumes "mwb_lens x" "mwb_lens y" "$x \<sharp> P" "$y \<sharp> P"
   shows "$(x, y) \<sharp> P"
