@@ -108,6 +108,12 @@ lemma unrest_pair [unrest]:
   using assms
   by expr_simp (simp add: lens_override_def lens_scene.rep_eq scene_override.rep_eq)
 
+lemma unrest_pair_split:
+  assumes "x \<bowtie> y" "vwb_lens x" "vwb_lens y"
+  shows "($(x, y) \<sharp> P) = (($x \<sharp> P) \<and> ($y \<sharp> P))"
+  using assms
+  by (meson lens_indep_sym lens_plus_right_sublens lens_plus_sub_comm plus_mwb_lens sublens_refl unrest_pair unrest_sublens vwb_lens_mwb)
+
 lemma unrest_get [unrest]: "\<lbrakk> mwb_lens x; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> get\<^bsub>y\<^esub>"
   by (expr_simp, simp add: lens_indep.lens_put_irr2)
 

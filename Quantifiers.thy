@@ -4,6 +4,8 @@ theory Quantifiers
   imports Liberation
 begin
 
+subsection \<open> Operators \<close>
+
 definition ex_expr :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) expr \<Rightarrow> (bool, 's) expr" where
 [expr_defs]: "ex_expr x e = (\<lambda> s. (\<exists> v. e (put\<^bsub>x\<^esub> s v)))"
 
@@ -26,6 +28,8 @@ translations
   "_ex_expr x P" == "CONST ex_expr x P"
   "_ex1_expr x P" == "CONST ex1_expr x P"
   "_all_expr x P" == "CONST all_expr x P"
+
+subsection \<open> Laws \<close>
 
 lemma ex_is_liberation: "mwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> P) = (P \\ $x)"
   by (expr_auto, metis mwb_lens_weak weak_lens.put_get)
@@ -84,5 +88,38 @@ lemma all_as_ex: "(\<forall> x \<Zspot> P) = (\<not> (\<exists> x \<Zspot> \<not
 
 lemma ex_as_all: "(\<exists> x \<Zspot> P) = (\<not> (\<forall> x \<Zspot> \<not> P))\<^sub>e"
   by (expr_auto)
+
+subsection \<open> Cylindric Algebra \<close>
+
+lemma ex_C1: "(\<exists> x \<Zspot> (False)\<^sub>e) = (False)\<^sub>e"
+  by (expr_auto)
+
+lemma ex_C2: "wb_lens x \<Longrightarrow> `P \<longrightarrow> (\<exists> x \<Zspot> P)`"
+  by (expr_simp, metis wb_lens.get_put)
+
+lemma ex_C3: "mwb_lens x \<Longrightarrow> (\<exists> x \<Zspot> (P \<and> (\<exists> x \<Zspot> Q)))\<^sub>e = ((\<exists> x \<Zspot> P) \<and> (\<exists> x \<Zspot> Q))\<^sub>e"
+  by (expr_auto)
+
+lemma ex_C4a: "x \<approx>\<^sub>L y \<Longrightarrow> (\<exists> x \<Zspot> \<exists> y \<Zspot> P) = (\<exists> y \<Zspot> \<exists> x \<Zspot> P)"
+  by (expr_simp, metis (mono_tags, lifting) lens.select_convs(2))
+
+lemma ex_C4b: "x \<bowtie> y \<Longrightarrow> (\<exists> x \<Zspot> \<exists> y \<Zspot> P) = (\<exists> y \<Zspot> \<exists> x \<Zspot> P)"
+  using ex_commute by blast
+
+lemma ex_C5:
+  fixes x :: "('a \<Longrightarrow> '\<alpha>)"
+  shows "($x = $x)\<^sub>e = (True)\<^sub>e"
+  by simp
+
+lemma ex_C6:
+  assumes "wb_lens x" "x \<bowtie> y" "x \<bowtie> z"
+  shows "($y = $z)\<^sub>e = (\<exists> x \<Zspot> $y = $x \<and> $x = $z)\<^sub>e"
+  using assms
+  by (expr_simp, metis lens_indep_def)
+
+lemma ex_C7:
+  assumes "weak_lens x" "x \<bowtie> y"
+  shows "((\<exists> x \<Zspot> $x = $y \<and> P) \<and> (\<exists> x \<Zspot> $x = $y \<and> \<not> P))\<^sub>e = (False)\<^sub>e"
+  using assms by (expr_simp, simp add: lens_indep_sym)
 
 end
