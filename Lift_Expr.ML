@@ -13,7 +13,7 @@ val state_id = "\<s>";
 fun lift_expr_aux ctx (Const (n', t), args) =
   let 
     open Syntax
-    val n = (if (Lexicon.is_marked n') then Lexicon.unmark_const n' else n')
+    val n = (if (Lexicon.is_marked_entity n') then Lexicon.unmark_const n' else n')
     val args' = map (lift_expr ctx) args
   in if (n = @{const_name lens_get} orelse n = @{const_name SEXP}) 
      then Term.list_comb (Const (n', t), args)

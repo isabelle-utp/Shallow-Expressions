@@ -13,7 +13,7 @@ consts unrest :: "'s scene \<Rightarrow> 'p \<Rightarrow> bool"
 definition unrest_expr :: "'s scene \<Rightarrow> ('b, 's) expr \<Rightarrow> bool" where
 [expr_defs]: "unrest_expr a e = (\<forall> s s'. e (s \<oplus>\<^sub>S s' on a) = e s)"
 
-adhoc_overloading unrest unrest_expr
+adhoc_overloading unrest \<rightleftharpoons> unrest_expr
 
 syntax
   "_unrest" :: "salpha \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<sharp>" 20)

@@ -47,8 +47,8 @@ definition [lens_defs]: "fun_collection_lens = fun_lens"
 definition [lens_defs]: "list_collection_lens = list_lens"
 
 adhoc_overloading 
-  collection_lens fun_collection_lens and
-  collection_lens list_collection_lens  
+  collection_lens \<rightleftharpoons> fun_collection_lens and
+  collection_lens \<rightleftharpoons> list_collection_lens  
 
 lemma vwb_fun_collection_lens [simp]: "vwb_lens (fun_collection_lens k)"
   by (simp add: fun_collection_lens_def fun_vwb_lens)

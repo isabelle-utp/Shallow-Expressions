@@ -289,7 +289,7 @@ simproc_setup subst_order ("subst_upd (subst_upd \<sigma> x u) y v") =
   \<open> (fn _ => fn ctx => fn ct => 
         case (Thm.term_of ct) of
           Const (@{const_name subst_upd}, _) $ (Const (@{const_name subst_upd}, _) $ s $ x $ u) $ y $ v
-            => if (YXML.content_of (Syntax.string_of_term ctx x) > YXML.content_of(Syntax.string_of_term ctx y))
+            => if (XML.content_of (YXML.parse_body (Syntax.string_of_term ctx x)) > XML.content_of (YXML.parse_body (Syntax.string_of_term ctx y)))
                then SOME (mk_meta_eq @{thm subst_upd_comm})
                else NONE  |
           _ => NONE) 

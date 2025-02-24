@@ -1,7 +1,7 @@
 section \<open> Variables as Lenses \<close>
 
 theory Variables
-  imports "Optics.Optics" "HOL-Library.Adhoc_Overloading"
+  imports "Optics.Optics"
 begin
 
 subsection \<open> Constructors \<close>
@@ -10,8 +10,8 @@ bundle Expression_Syntax
 begin
 
 no_notation   
-  Set.member ("op :") and
-  Set.member ("(_/ : _)" [51, 51] 50)
+  Set.member  (\<open>'(:')\<close>) and
+  Set.member  (\<open>(\<open>notation=\<open>infix :\<close>\<close>_/ : _)\<close> [51, 51] 50)
 
 end
 
@@ -213,8 +213,6 @@ text \<open> A variable can be decorated with an ampersand, to indicate it is a 
   a dollar to indicate its an unprimed relational variable, or a dollar and ``acute'' symbol to 
   indicate its a primed relational variable. Isabelle's parser is extensible so additional
   decorations can be and are added later. \<close>
-
-term "(-)"
 
 syntax \<comment> \<open> Variable sets \<close>
   "_salphaid"    :: "id_position \<Rightarrow> salpha" ("_" [990] 990)
