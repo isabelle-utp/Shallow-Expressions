@@ -9,7 +9,7 @@ subsection \<open> Partial Function Collection Lens \<close>
 definition pfun_collection_lens :: "'a \<Rightarrow> 'b \<Longrightarrow> 'a \<Zpfun> 'b" where
 [lens_defs]: "pfun_collection_lens = pfun_lens"
 
-adhoc_overloading collection_lens pfun_collection_lens
+adhoc_overloading collection_lens \<rightleftharpoons> pfun_collection_lens
 
 lemma pfun_collection_lens_mwb [simp]: "mwb_lens (pfun_collection_lens e)"
   by (simp add: pfun_collection_lens_def)
@@ -32,7 +32,7 @@ subsection \<open> Finite Function Collection Lens \<close>
 definition ffun_collection_lens :: "'a \<Rightarrow> 'b \<Longrightarrow> 'a \<Zffun> 'b" where
 [lens_defs]: "ffun_collection_lens = ffun_lens"
 
-adhoc_overloading collection_lens ffun_collection_lens
+adhoc_overloading collection_lens \<rightleftharpoons> ffun_collection_lens
 
 lemma ffun_collection_lens_mwb [simp]: "mwb_lens (ffun_collection_lens e)"
   by (simp add: ffun_collection_lens_def)
