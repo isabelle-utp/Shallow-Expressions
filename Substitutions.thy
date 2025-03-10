@@ -4,17 +4,31 @@ theory Substitutions
   imports Unrestriction
 begin
 
+subsection \<open> Types and Constants \<close>
+
+text \<open> A substitution is simply a function between two state spaces. Typically,
+  they are used to express mappings from variables to values (e.g. assignments). \<close>
+
 type_synonym ('s\<^sub>1, 's\<^sub>2) psubst = "'s\<^sub>1 \<Rightarrow> 's\<^sub>2"
 type_synonym 's subst = "'s \<Rightarrow> 's"
 
-definition subst_nil :: "('s\<^sub>1, 's\<^sub>2) psubst" ("\<lparr>\<leadsto>\<rparr>") 
-  where [expr_defs, code_unfold]: "\<lparr>\<leadsto>\<rparr> = (\<lambda> s. undefined)"
+text \<open> There are different ways of constructing an empty substitution. \<close>
 
 definition subst_id :: "'s subst" ("[\<leadsto>]") 
   where [expr_defs, code_unfold]: "subst_id = (\<lambda>s. s)"
 
+definition subst_nil :: "('s\<^sub>1, 's\<^sub>2) psubst" ("\<lparr>\<leadsto>\<rparr>") 
+  where [expr_defs, code_unfold]: "\<lparr>\<leadsto>\<rparr> = (\<lambda> s. undefined)"
+
 definition subst_default :: "('s\<^sub>1, 's\<^sub>2::default) psubst" ("\<lblot>\<leadsto>\<rblot>") 
   where [expr_defs, code_unfold]: "\<lblot>\<leadsto>\<rblot> = (\<lambda> s. default)"
+
+text \<open> We can update a substitution by adding a new variable maplet. \<close>
+
+definition subst_upd :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst"
+  where [expr_defs, code_unfold]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
+
+text \<open> The next two operators extend and restrict the alphabet of a substitution. \<close>
 
 definition subst_ext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>2, 's\<^sub>1) psubst" ("_\<^sup>\<up>" [999] 999) where
 [expr_defs, code_unfold]: "subst_ext a = get\<^bsub>a\<^esub>"
@@ -22,20 +36,30 @@ definition subst_ext :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow>
 definition subst_res :: "('s\<^sub>1 \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst" ("_\<^sub>\<down>" [999] 999) where
 [expr_defs, code_unfold]: "subst_res a = create\<^bsub>a\<^esub>"
 
+text \<open> Application of a substitution to an expression is effectively function composition. \<close>
+
 definition subst_app :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a, 's\<^sub>2) expr \<Rightarrow> ('a, 's\<^sub>1) expr" 
   where [expr_defs]: "subst_app \<sigma> e = (\<lambda> s. e (\<sigma> s))"
-
-syntax "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
-
-translations
-  "_subst_app \<sigma> e" == "CONST subst_app \<sigma> e"
-  "_subst_app \<sigma> e" <= "_subst_app \<sigma> (e)\<^sub>e"
 
 abbreviation "aext P a \<equiv> subst_app (a\<^sup>\<up>) P"
 abbreviation "ares P a \<equiv> subst_app (a\<^sub>\<down>) P"
 
+text \<open> We can also lookup the expression a variable is mapped to. \<close>
+
+definition subst_lookup :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr" ("\<langle>_\<rangle>\<^sub>s")
+  where [expr_defs, code_unfold]: "\<langle>\<sigma>\<rangle>\<^sub>s x = (\<lambda> s. get\<^bsub>x\<^esub> (\<sigma> s))"
+
 definition subst_comp :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>1) psubst \<Rightarrow> ('s\<^sub>3, 's\<^sub>2) psubst" (infixl "\<circ>\<^sub>s" 55) 
     where [expr_defs, code_unfold]: "subst_comp = comp"
+
+definition unrest_usubst :: "'s scene \<Rightarrow> 's subst \<Rightarrow> bool" 
+  where [expr_defs]: "unrest_usubst a \<sigma> = (\<forall> s s'. \<sigma> (s \<oplus>\<^sub>S s' on a) = (\<sigma> s) \<oplus>\<^sub>S s' on a)"
+
+definition par_subst :: "'s subst \<Rightarrow> 's scene \<Rightarrow> 's scene \<Rightarrow> 's subst \<Rightarrow> 's subst"
+  where [expr_defs]: "par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2 = (\<lambda> s. (s \<oplus>\<^sub>S (\<sigma>\<^sub>1 s) on A) \<oplus>\<^sub>S (\<sigma>\<^sub>2 s) on B)"
+
+definition subst_restrict :: "'s subst \<Rightarrow> 's scene \<Rightarrow> 's subst" where 
+[expr_defs]: "subst_restrict \<sigma> a = (\<lambda> s. s \<oplus>\<^sub>S \<sigma> s on a)"
 
 text \<open> Create a substitution that copies the region from the given scene from a given state.
   This is used primarily in calculating unrestriction conditions. \<close>
@@ -46,30 +70,12 @@ definition sset :: "'s scene \<Rightarrow> 's \<Rightarrow> 's subst"
 syntax "_sset" :: "salpha \<Rightarrow> logic \<Rightarrow> logic" ("sset[_, _]")
 translations "_sset a P" == "CONST sset a P"
 
-definition subst_upd :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr \<Rightarrow> ('s\<^sub>1, 's\<^sub>2) psubst"
-  where [expr_defs, code_unfold]: "subst_upd \<sigma> x e = (\<lambda> s. put\<^bsub>x\<^esub> (\<sigma> s) (e s))"
-
-definition subst_lookup :: "('s\<^sub>1, 's\<^sub>2) psubst \<Rightarrow> ('a \<Longrightarrow> 's\<^sub>2) \<Rightarrow> ('a, 's\<^sub>1) expr" ("\<langle>_\<rangle>\<^sub>s")
-  where [expr_defs, code_unfold]: "\<langle>\<sigma>\<rangle>\<^sub>s x = (\<lambda> s. get\<^bsub>x\<^esub> (\<sigma> s))"
-
-expr_constructor subst_lookup
-
-definition unrest_usubst :: "'s scene \<Rightarrow> 's subst \<Rightarrow> bool" 
-  where [expr_defs]: "unrest_usubst a \<sigma> = (\<forall> s s'. \<sigma> (s \<oplus>\<^sub>S s' on a) = (\<sigma> s) \<oplus>\<^sub>S s' on a)"
-
-syntax
-  "_unrest_usubst" :: "salpha \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<sharp>\<^sub>s" 20)
-
-translations
-  "_unrest_usubst x p" == "CONST unrest_usubst x p"                                           
-  "_unrest_usubst (_salphaset (_salphamk (x +\<^sub>L y))) P"  <= "_unrest_usubst (x +\<^sub>L y) P"
-
-definition par_subst :: "'s subst \<Rightarrow> 's scene \<Rightarrow> 's scene \<Rightarrow> 's subst \<Rightarrow> 's subst"
-  where [expr_defs]: "par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2 = (\<lambda> s. (s \<oplus>\<^sub>S (\<sigma>\<^sub>1 s) on A) \<oplus>\<^sub>S (\<sigma>\<^sub>2 s) on B)"
+subsection \<open> Syntax Translations \<close>
 
 nonterminal uexprs and smaplet and smaplets
 
 syntax
+  "_subst_app" :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<dagger>" 65)
   "_smaplet"        :: "[svid, logic] => smaplet" ("_ \<leadsto> _")
   ""                :: "smaplet => smaplets" ("_")
   "_SMaplets"       :: "[smaplet, smaplets] => smaplets" ("_,/ _")
@@ -84,8 +90,12 @@ syntax
   "_uexprs"         :: "[logic, uexprs] => uexprs" ("_,/ _")
   ""                :: "logic => uexprs" ("_")
   "_par_subst"      :: "logic \<Rightarrow> salpha \<Rightarrow> salpha \<Rightarrow> logic \<Rightarrow> logic" ("_ [_|_]\<^sub>s _" [100,0,0,101] 101)
-    
+  "_subst_restrict" :: "logic \<Rightarrow> salpha \<Rightarrow> logic" (infixl "\<restriction>\<^sub>s" 85)
+  "_unrest_usubst"  :: "salpha \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (infix "\<sharp>\<^sub>s" 20)
+
 translations
+  "_subst_app \<sigma> e"                    == "CONST subst_app \<sigma> e"
+  "_subst_app \<sigma> e"                    <= "_subst_app \<sigma> (e)\<^sub>e"
   "_SubstUpd m (_SMaplets xy ms)"     == "_SubstUpd (_SubstUpd m xy) ms"
   "_SubstUpd m (_smaplet x y)"        == "CONST subst_upd m x (y)\<^sub>e"
   "_smaplet (_svid_tuple (_of_svid_list (x +\<^sub>L y))) e" <= "_smaplet (x +\<^sub>L y) e"
@@ -105,12 +115,16 @@ translations
   "_subst P v x" <= "_subst (_sexp_quote P)  v x"
   "_subst P v (_svid_tuple (_of_svid_list (x +\<^sub>L y)))" <= "_subst P v (x +\<^sub>L y)"
   "_par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2" == "CONST par_subst \<sigma>\<^sub>1 A B \<sigma>\<^sub>2"
+  "_subst_restrict \<sigma> a" == "CONST subst_restrict \<sigma> a"
+  "_unrest_usubst x p" == "CONST unrest_usubst x p"
+  "_unrest_usubst (_salphaset (_salphamk (x +\<^sub>L y))) P"  <= "_unrest_usubst (x +\<^sub>L y) P"
 
 expr_constructor subst_app (1)
 expr_constructor subst_id
 expr_constructor subst_nil
 expr_constructor subst_default
 expr_constructor subst_upd
+expr_constructor subst_lookup
 
 ML_file \<open>Expr_Util.ML\<close>
 
@@ -340,6 +354,20 @@ lemma expr_if_bool_var_right: "vwb_lens x \<Longrightarrow> P \<triangleleft> $x
 lemma subst_expr_if [usubst]: "\<sigma> \<dagger> (P \<triangleleft> B \<triangleright> Q) = (\<sigma> \<dagger> P) \<triangleleft> (\<sigma> \<dagger> B) \<triangleright> (\<sigma> \<dagger> Q)"
   by expr_simp
 
+subsection \<open> Substitution Restriction Laws \<close>
+
+lemma subst_restrict_id [usubst]: "idem_scene a \<Longrightarrow> [\<leadsto>] \<restriction>\<^sub>s a = [\<leadsto>]"
+  by expr_simp
+
+lemma subst_restrict_out [usubst]: "\<lbrakk> vwb_lens x; vwb_lens a; x \<bowtie> a \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<restriction>\<^sub>s $a = \<sigma> \<restriction>\<^sub>s $a" 
+  by (expr_simp add: lens_indep.lens_put_irr2)
+
+lemma subst_restrict_in [usubst]: "\<lbrakk> vwb_lens x; vwb_lens y; x \<subseteq>\<^sub>L y \<rbrakk> \<Longrightarrow> \<sigma>(x \<leadsto> e) \<restriction>\<^sub>s $y = (\<sigma> \<restriction>\<^sub>s $y)(x \<leadsto> e)" 
+  by (expr_auto)
+
+lemma subst_restrict_twice [simp]: "\<sigma> \<restriction>\<^sub>s a \<restriction>\<^sub>s a = \<sigma> \<restriction>\<^sub>s a"
+  by expr_simp
+
 subsection \<open> Evaluation \<close>
 
 lemma subst_SEXP [usubst_eval]: "\<sigma> \<dagger> [\<lambda> s. e s]\<^sub>e = [\<lambda> s. e (\<sigma> s)]\<^sub>e"
@@ -372,6 +400,12 @@ lemma get_subst_ext [usubst_eval]: "get\<^bsub>x\<^esub> (subst_ext a s) = get\<
 
 lemma unrest_sset_lens [unrest]: "\<lbrakk> mwb_lens x; mwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp>\<^sub>s sset[$y, s]"
   by (simp add: sset_def unrest_subst_lens lens_indep_comm lens_override_def)
+
+lemma get_subst_restrict_out [usubst_eval]: "\<lbrakk> vwb_lens a; x \<bowtie> a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> ((\<sigma> \<restriction>\<^sub>s $a) s) = get\<^bsub>x\<^esub> s"
+  by (expr_simp)
+
+lemma get_subst_restrict_in [usubst_eval]: "\<lbrakk> vwb_lens a; x \<subseteq>\<^sub>L a \<rbrakk> \<Longrightarrow> get\<^bsub>x\<^esub> ((\<sigma> \<restriction>\<^sub>s $a) s) = get\<^bsub>x\<^esub> (\<sigma> s)"
+  by (expr_simp, force)
 
 text \<open> If a variable is unrestricted in a substitution then it's application has no effect. \<close>
 
