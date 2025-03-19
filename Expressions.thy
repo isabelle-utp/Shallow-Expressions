@@ -16,7 +16,8 @@ text \<open> An expression is represented simply as a function from the state sp
   and a more intuitive expression syntax. For example, an expression @{term "x + y"} where 
   $x$ and $y$ are both state variables, can be represented by @{term "\<lambda> s. get\<^bsub>x\<^esub> s + get\<^bsub>y\<^esub> s"} 
   when both variables are modelled using lenses. Rather than having to write $\lambda$-terms 
-  directly, it is more convenient to hide this threading of state behind a parser.
+  directly, it is more convenient to hide this threading of state behind a parser. We introduce
+  the expression bracket syntax, @{text "(_)\<^sub>e"} to support this.
 \<close>
 
 type_synonym ('a, 's) expr = "'s \<Rightarrow> 'a"
