@@ -7,7 +7,7 @@ begin
 
 text \<open> Create a type with invariants attached; similar to a Z schema. \<close>
 
-(* TODO: Allow names for each invariant. Change implement to avoid relying on string constructions. *)
+(* TODO: Allow names for each invariant. Change implementation to avoid relying on string constructions. *)
 
 ML \<open>
 val _ =

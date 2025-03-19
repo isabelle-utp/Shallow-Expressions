@@ -4,6 +4,11 @@ theory Liberation
   imports Extension
 begin
 
+text \<open> Liberation~\cite{Dongol19} is an operator that removes dependence on a number of variables.
+  It is similar to existential quantification, but is defined over a scene (a variable set). \<close>
+
+subsection \<open> Definition and Syntax \<close>
+
 definition liberate :: "('s \<Rightarrow> bool) \<Rightarrow> 's scene \<Rightarrow> ('s \<Rightarrow> bool)" where
 [expr_defs]: "liberate P x = (\<lambda> s. \<exists> s'. P (s \<oplus>\<^sub>S s' on x))"
 
@@ -15,6 +20,8 @@ translations
   "_liberate P x" <= "_liberate (P)\<^sub>e x"
 
 expr_constructor liberate (0)
+
+subsection \<open> Laws \<close>
 
 lemma liberate_lens [expr_simps]: 
   "mwb_lens x \<Longrightarrow> P \\ $x = (\<lambda>s. \<exists>s'. P (s \<triangleleft>\<^bsub>x\<^esub> s'))"

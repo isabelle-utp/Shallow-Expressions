@@ -1,10 +1,12 @@
-subsection \<open> Quantifying lenses \<close>
+subsection \<open> Quantifying Lenses \<close>
 
 theory Quantifiers
   imports Liberation
 begin
 
-subsection \<open> Operators \<close>
+text \<open> We define operators to existentially and universally quantify an expression over a lens. \<close>
+
+subsection \<open> Operators and Syntax \<close>
 
 definition ex_expr :: "('a \<Longrightarrow> 's) \<Rightarrow> (bool, 's) expr \<Rightarrow> (bool, 's) expr" where
 [expr_defs]: "ex_expr x e = (\<lambda> s. (\<exists> v. e (put\<^bsub>x\<^esub> s v)))"

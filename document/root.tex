@@ -1,0 +1,74 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{isabelle,isabellesym}
+
+% further packages required for unusual symbols (see also
+% isabellesym.sty), use only when needed
+
+\usepackage{amssymb}
+  %for \<leadsto>, \<box>, \<diamond>, \<sqsupset>, \<mho>, \<Join>,
+  %\<lhd>, \<lesssim>, \<greatersim>, \<lessapprox>, \<greaterapprox>,
+  %\<triangleq>, \<yen>, \<lozenge>
+
+%\usepackage{eurosym}
+  %for \<euro>
+
+\usepackage{stmaryrd}
+  %for \<Sqinter>
+
+%\usepackage{eufrak}
+  %for \<AA> ... \<ZZ>, \<aa> ... \<zz> (also included in amssymb)
+
+\usepackage{textcomp}
+  %for \<onequarter>, \<onehalf>, \<threequarters>, \<degree>, \<cent>,
+  %\<currency>
+
+% this should be the last package used
+\usepackage{pdfsetup}
+
+% urls in roman style, theory text in math-similar italics
+\urlstyle{rm}
+\isabellestyle{it}
+
+% for uniform font size
+%\renewcommand{\isastyle}{\isastyleminor}
+
+
+\begin{document}
+
+\title{Shallow Expressions}
+\author{Simon Foster}
+\maketitle
+
+\begin{abstract}
+\noindent Most verification techniques use expressions, for example when assigning to variables or 
+forming assertions over the state. Deep embeddings provide such expressions using a datatype, which 
+allows queries over the syntax, such as calculating the free variables, and performing substitutions. 
+Shallow embeddings, in contrast, model expressions as query functions over the state type, and are 
+more amenable to automating verification tasks. The goal of this library is provide an intuitive 
+implementation of shallow expressions, which nevertheless provides many of the benefits of a deep 
+embedding. We harness the Optics library to provide an algebraic semantics for state variables,
+and use syntax translations to provide an intutive lifted expression syntax. Furthermore, we
+provide a variety of meta-logic-style queries on expressions, such as dependencies
+on a state variable, and substitution of a variable for an expression. We also provide proof 
+methods, based on the simplifier, to automate the associated proof tasks.
+\end{abstract}
+
+\tableofcontents
+
+% sane default for proof documents
+\parindent 0pt\parskip 0.5ex
+
+% generated text of all theories
+\input{session}
+
+% optional bibliography
+\bibliographystyle{abbrv}
+\bibliography{root}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
