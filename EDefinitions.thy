@@ -5,6 +5,9 @@ theory EDefinitions
   keywords "edefinition" :: "thy_decl_block"
 begin
 
+text \<open> Here, we add a command that allows definition of a named expression. It mainly inserts
+  the expression brackets in the definitional equation. \<close>
+
 (* FIXME: Change interface so that it accepts typs and terms, rather than strings. *)
 
 ML \<open>

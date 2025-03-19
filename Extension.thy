@@ -4,7 +4,13 @@ theory Extension
   imports Substitutions
 begin
 
-subsection \<open> Expressions \<close>
+text \<open> It is often necessary to coerce an expression into a different state space using a lens,
+  for example when the state space grows to add additional variables. Extension and restriction
+  is provided by @{term aext} and @{term ares} respectively. Here, we provide syntax translations
+  and reasoning support for these.
+\<close>
+
+subsection \<open> Syntax \<close>
 
 syntax 
   "_aext"      :: "logic \<Rightarrow> svid \<Rightarrow> logic" (infixl "\<up>" 80)
@@ -26,6 +32,8 @@ expr_constructor aext
 expr_constructor ares
 
 named_theorems alpha
+
+subsection \<open> Laws \<close>
 
 lemma aext_var [alpha]: "($x)\<^sub>e \<up> a = ($a:x)\<^sub>e"
   by (simp add: expr_defs lens_defs)

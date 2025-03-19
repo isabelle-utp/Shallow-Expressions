@@ -4,7 +4,13 @@ theory Variables
   imports "Optics.Optics"
 begin
 
+text \<open> Here, we implement foundational constructors and syntax translations for state variables,
+  using lens manipulations, for use in shallow expressions. \<close>
+
 subsection \<open> Constructors \<close>
+
+text \<open> The following bundle allows us to override the colon operator, which we use for variable
+  namespaces. \<close>
 
 bundle Expression_Syntax
 begin
@@ -19,7 +25,7 @@ unbundle Expression_Syntax
 
 declare fst_vwb_lens [simp] and snd_vwb_lens [simp]
 
-text \<open> Variables can also be used to effectively define sets of variables. Here we define the
+text \<open> Lenses~\cite{Foster2020-IsabelleUTP} can also be used to effectively define sets of variables. Here we define the
   the universal alphabet ($\Sigma$) to be the bijective lens @{term "1\<^sub>L"}. This characterises
   the whole of the source type, and thus is effectively the set of all alphabet variables. \<close>
 
