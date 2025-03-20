@@ -59,6 +59,34 @@ methods, based on the simplifier, to automate the associated proof tasks.
 % sane default for proof documents
 \parindent 0pt\parskip 0.5ex
 
+\section{Introduction}
+
+This session provides a library for expressions in shallow embeddings, based on the Optics
+package~\cite{Optics-AFP}. It provides the following key features:
+
+\begin{enumerate}
+  \item Parse and print translations for converting between intuitive expression syntax,
+    and semantic expressions using lenses to model variables. The translation uses the type
+    system to determine whether each free variable in an expression is (1) a lens (i.e. a state 
+    variable); (2) another expression; (3) a literal, and gives the correct interpretation for each.
+    The lifting mechanism is manifested through the following bracket notation: $(\_)_e$.
+  \item Syntax for complex variable constructions, using the lens operators, such as simultaneous 
+    assignment and hierarchical state.
+  \item The ``unrestriction'' predicate ($x \mathop{\sharp} e$), which characterises whether an expression depends on a
+    particular variable or not, based on the lens laws. It can often be used as a replacement for 
+    syntactically checking for free variables in a deep embedding.
+  \item Semantic substitution of variables for expressions ($e[v/x]$), with support from the simplifies. A
+    notation is provided for expressing substitution objects as a sequence of simultaneous 
+    variable assignements.
+  \item Collection lenses, which can be used to model update of a component of a larger structure,
+    for example mutating an element of an array.
+  \item Supporting transformations and constructors for expressions, such as state extension, 
+    state restriction, and quantifiers.
+\end{enumerate}
+
+The majority of these concepts have been adapted from Isabelle/UTP, but have been generalised for
+use in other Isabelle-based verification tools.
+
 % generated text of all theories
 \input{session}
 

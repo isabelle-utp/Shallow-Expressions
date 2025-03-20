@@ -136,15 +136,16 @@ translations
   "_sexp_var (_svid_tuple (_of_svid_list (x +\<^sub>L y)))" <= "_sexp_var (x +\<^sub>L y)"
 
 text \<open> The main directive is the $e$ subscripted brackets, @{term "(e)\<^sub>e"}. This converts the 
-  expression $e$ to a boxed $\lambda$ term. Essentially, the parser behaviour is as follows:
+  expression $e$ to a boxed $\lambda$ term. Essentially, the behaviour is as follows:
 
   \begin{enumerate}
     \item a new $\lambda$ abstraction over the state variable $s$ is wrapped around $e$;
-    \item every occurrence of free lens @{term "$x"} in $e$ is replace by @{term "get\<^bsub>x\<^esub> s"};
-    \item every occurrence of an expression variable @{term "e"} is replaced by @{term "e s"}.
+    \item every occurrence of a free lens @{term "$x"} in $e$ is replaced by @{term "get\<^bsub>x\<^esub> s"};
+    \item every occurrence of an expression variable @{term "e"} is replaced by @{term "e s"};
+    \item every occurrence of any other free variable is left unchanged.
   \end{enumerate}
 
-  The pretty printer does this in reverse. Some examples follow. For now, we turn of the 
+  The pretty printer does this in reverse. Some examples follow. For now, we turn off the 
   pretty printer so that we can see the results of the parser.
 \<close>
 
