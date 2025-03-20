@@ -37,7 +37,7 @@
 \begin{document}
 
 \title{Shallow Expressions}
-\author{Simon Foster}
+\author{Simon Foster and Christian Pardillo Laursen}
 \maketitle
 
 \begin{abstract}
@@ -72,12 +72,12 @@ package~\cite{Optics-AFP}. It provides the following key features:
     The lifting mechanism is manifested through the bracket notation, $(\_)_e$, but can usually be hidden behind syntax.
   \item Syntax for complex state variable constructions, using the lens operators~\cite{Optics-AFP}, such as simultaneous 
     assignment, hierarchical state, and initial/final state variables.
-  \item The ``unrestriction'' predicate, $x \mathop{\sharp} e$, which characterises whether an expression $e$ depends on a
+  \item The ``unrestriction'' predicate~\cite{Oliveira07}, $x \mathop{\sharp} e$, which characterises whether an expression $e$ depends on a
     particular variable $x$ or not, based on the lens laws. It can often be used as a replacement for 
     syntactically checking for free variables in a deep embedding, as needed in several verification
     techniques.
-  \item Semantic substitution of variables for expressions, $e[v/x]$, with support from the simplifier. A
-    notation is provided for expressing substitution objects as a sequence of simultaneous 
+  \item Semantic substitution of variables for expressions, $e[v/x]$, with support for evaluation from 
+    the simplifier. A notation is provided for expressing substitution objects as a sequence of simultaneous 
     variable assignments, $[x_1 \leadsto e_1, x_2 \leadsto e_2, \cdots]$.
   \item Collection lenses, $x[i]$, which can be used to model updating a component of a larger structure,
     for example mutating an element of an array by its index.
@@ -87,7 +87,7 @@ package~\cite{Optics-AFP}. It provides the following key features:
 
 The majority of these concepts have been adapted from Isabelle/UTP~\cite{Foster2020-IsabelleUTP}, but 
 have been generalised for use in other Isabelle-based verification tools. Several proof methods are 
-provided, such as for discharging unrestriction conditions and evaluating substitutions.
+provided, such as for discharging unrestriction conditions (\texttt{unrest}) and evaluating substitutions (\texttt{subst\_eval}).
 
 % generated text of all theories
 \input{session}
