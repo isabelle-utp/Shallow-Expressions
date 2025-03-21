@@ -32,8 +32,12 @@ struct
         val term = Const (@{const_name "HOL.eq"}, dummyT) $ Syntax.free n $ expr
         val ctx' = snd (Specification.definition 
                        (SOME (Binding.name n, SOME (stateT --> typ), Mixfix.NoSyn)) [] [] 
-                       ((Binding.name (n ^ "_def"), named_expr_defs), mk_expr_def_eq ctx term) ctx)
-        in ctx' 
+                       ((Binding.name (n ^ "_def"), named_expr_defs), mk_expr_def_eq ctx term) (snd (Local_Theory.begin_nested ctx)))
+        (* When adding an expression in a locale, the named recorded below may be the 
+           localised version, which may not work correctly. This may lead to unexpected
+           behaviour when there are two locales each with a constant of the same name. *)
+        val ctx2 = NoLift_Const.nolift_const (Local_Theory.end_nested ctx') (n, [])
+        in ctx2
   end
 
 
