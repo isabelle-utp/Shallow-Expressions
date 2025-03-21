@@ -147,40 +147,6 @@ lemma var_alpha_subset [simp]:
   shows "var_alpha x \<le> var_alpha y \<longleftrightarrow> x \<subseteq>\<^sub>L y"
   by (simp add: assms(1) assms(2) sublens_iff_subscene var_alpha_def)
 
-subsection \<open> Converting scenes to frames \<close>
-
-lemma var_alpha_empty [frame]: "\<bottom>\<^sub>S = \<lbrakk>\<lbrace>\<rbrace>\<^sub>F\<rbrakk>\<^sub>F"
-  by (simp add: bot_frame.rep_eq)
-
-lemma var_alpha_top [frame]: "\<top>\<^sub>S = \<lbrakk>\<top>\<^sub>F\<rbrakk>\<^sub>F"
-  by (simp add: top_frame.rep_eq)
-
-lemma var_alpha_insert_frame [simp]:
-  "var_lens x \<Longrightarrow> var_alpha x \<squnion>\<^sub>S \<lbrakk>A\<rbrakk>\<^sub>F = \<lbrakk>lens_insert x A\<rbrakk>\<^sub>F"
-  by (simp add: lens_scene_insert_frame var_alpha_def)
-
-lemma var_alpha_uminus [simp]: "- \<lbrakk>A\<rbrakk>\<^sub>F = \<lbrakk>- A\<rbrakk>\<^sub>F"
-  by (simp add: uminus_frame.rep_eq)
-
-lemma var_alpha_minus [simp]: "\<lbrakk>A\<rbrakk>\<^sub>F - \<lbrakk>B\<rbrakk>\<^sub>F = \<lbrakk>A - B\<rbrakk>\<^sub>F"
-  by (simp add: minus_frame.rep_eq minus_scene_def)
-
-lemma var_alpha_union [simp]: "\<lbrakk>A\<rbrakk>\<^sub>F \<squnion>\<^sub>S \<lbrakk>B\<rbrakk>\<^sub>F = \<lbrakk>A \<union>\<^sub>F B\<rbrakk>\<^sub>F"
-  by (simp add: sup_frame.rep_eq)
-
-lemma var_alpha_inter [simp]: "\<lbrakk>A\<rbrakk>\<^sub>F \<sqinter>\<^sub>S \<lbrakk>B\<rbrakk>\<^sub>F = \<lbrakk>A \<inter>\<^sub>F B\<rbrakk>\<^sub>F"
-  by (simp add: inf_frame.rep_eq)
-                                                            
-lemma var_member_iff [simp]: "var_lens x \<Longrightarrow> x \<in>\<^sub>v \<lbrakk>A\<rbrakk>\<^sub>F \<longleftrightarrow> x \<in>\<^sub>F A"
-  by (simp add: lens_frame.rep_eq lens_member_def less_eq_frame.rep_eq var_alpha_def)
-
-lemma var_indep_iff [simp]: "ebasis_lens x \<Longrightarrow> var_alpha x \<bowtie>\<^sub>S \<lbrakk>A\<rbrakk>\<^sub>F \<longleftrightarrow> x \<notin>\<^sub>F A"
-  by (simp add: basis_lens_not_member_indep var_alpha_def)
-
-text \<open> We can transparently move from frames to scenes using the following coercion\<close>
-
-declare [[coercion of_frame]]
-
 subsection \<open> Syntax Translations \<close>
 
 text \<open> In order to support nice syntax for variables, we here set up some translations. The first
@@ -284,9 +250,6 @@ translations
   "_mk_alpha_list (_svid_list x xs)" \<rightharpoonup> "CONST var_alpha x \<squnion>\<^sub>S _mk_alpha_list xs"
   "_mk_alpha_list x" \<rightharpoonup> "CONST var_alpha x"
 
-  "_mk_frame_list (_svid_list x xs)" \<rightharpoonup> "CONST lens_insert x (_mk_frame_list xs)"
-  "_mk_frame_list x" \<rightharpoonup> "CONST lens_insert x \<lbrace>\<rbrace>\<^sub>F"
-
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
   "_svid_coview a" => "\<C>\<^bsub>a\<^esub>"
 
@@ -307,17 +270,6 @@ translations
   "_salphavar x" \<rightleftharpoons> "CONST var_alpha x"
   "_salphaset A" \<rightharpoonup> "_mk_alpha_list A"  
   "_sframeid A" \<rightharpoonup> "A"
-  "_sframeunion x y" \<rightharpoonup> "x \<union>\<^sub>F y"
-  "_sframeinter x y" \<rightharpoonup> "x \<inter>\<^sub>F y"
-  "_sframeminus x y" \<rightharpoonup> "x - y"
-  "_sframecompl x"  \<rightharpoonup> "- x"
-  "_sframe_all" \<rightharpoonup> "\<top>\<^sub>F"
-  "_sframe_none" \<rightharpoonup> "\<lbrace>\<rbrace>\<^sub>F"
-  "_sframe_pre A" \<rightharpoonup> "A ;\<^sub>F fst\<^sub>L"
-  "_sframe_post A" \<rightharpoonup> "A ;\<^sub>F snd\<^sub>L"
-  "_sframe_enum A" \<rightharpoonup> "A"
-  "_sframe_alpha A" \<rightharpoonup> "CONST of_frame A"
-  "_sframeset A" \<rightharpoonup> "_mk_frame_list A"
   "(_svid_list x (_salphamk y))" \<leftharpoondown> "_salphamk (x +\<^sub>L y)" 
   "x" \<leftharpoondown> "_salphamk x"
   "_salpha_all" \<rightleftharpoons> "CONST univ_alpha"

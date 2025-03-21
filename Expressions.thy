@@ -259,7 +259,7 @@ method expr_lens_simp uses add =
    ;((simp add: fun_eq_iff prod.case_eq_if expr_defs lens_defs add)? ; \<comment> \<open> Explode the rest \<close>
      (simp add: expr_defs lens_defs add)?))
 
-method expr_simp uses add = (expr_lens_simp add: alpha_defs alpha_splits add)
+method expr_simp uses add = (expr_lens_simp add: alpha_splits add)
 
 text \<open> Methods for dealing with tautologies \<close>
 
@@ -276,7 +276,7 @@ text \<open> A method for simplifying shallow expressions to HOL terms and apply
 
 method expr_auto uses add =
   (expr_simp add: add; 
-   (auto simp add: alpha_splits lens_defs alpha_defs add)?; 
+   (auto simp add: alpha_splits lens_defs add)?; 
    (rename_alpha_vars)? \<comment> \<open> Rename any logical variables with v subscripts \<close>
   )
 
