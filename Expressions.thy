@@ -7,7 +7,7 @@ begin
 
 subsection \<open> Types and Constructs \<close>
 
-named_theorems expr_defs
+named_theorems expr_defs and named_expr_defs
 
 text \<open> An expression is represented simply as a function from the state space @{typ "'s"} to
   the return type @{typ "'a"}, which is the simplest shallow model for Isabelle/HOL. 
@@ -256,8 +256,8 @@ text \<open> Proof methods for simplifying shallow expressions to HOL terms. The
 
 method expr_lens_simp uses add = 
   ((simp add: expr_simps)? \<comment> \<open> Perform any possible simplifications retaining the lens structure \<close>
-   ;((simp add: fun_eq_iff prod.case_eq_if expr_defs lens_defs add)? ; \<comment> \<open> Explode the rest \<close>
-     (simp add: expr_defs lens_defs add)?))
+   ;((simp add: fun_eq_iff prod.case_eq_if expr_defs named_expr_defs lens_defs add)? ; \<comment> \<open> Explode the rest \<close>
+     (simp add: expr_defs named_expr_defs lens_defs add)?))
 
 method expr_simp uses add = (expr_lens_simp add: alpha_defs alpha_splits add)
 
