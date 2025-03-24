@@ -1,7 +1,7 @@
 section \<open> Schemas \<close>
 
 theory Schemas
-  imports EDefinitions
+  imports Named_Expressions
   keywords "schema" :: "thy_decl_block"
 begin
 
@@ -50,13 +50,13 @@ val _ =
                      else "(" ^ foldr1 (fn (x, _) => "_, " ^ x) (map (fn _ => "_") (1 upto length (fst x))) ^ ") "
                    val ty = Syntax.read_typ ctx (varl ^ n ^ " => bool")
                    val ctx' = Specification.abbreviation Syntax.mode_default (SOME (Binding.make (n, Position.none), SOME ty, NoSyn)) [] (Logic.mk_equals (Free (n, dummyT), Const (cn, dummyT))) false ctx
-               in NoLift_Const.nolift_const (Local_Theory.exit_global ctx') (cn, [])
+               in Local_Theory.exit_global (NoLift_Const.nolift_const (cn, []) ctx')
                end)
            #> (fn thy =>
                 let
                   val ctx = Named_Target.theory_init thy
                   val Const (cn, _) = Proof_Context.read_const {proper = false, strict = false} ctx n
-                in NoLift_Const.nolift_const thy (cn, []) end)
+                in Local_Theory.exit_global (NoLift_Const.nolift_const (cn, []) ctx) end)
 )              
         end));
 \<close>
