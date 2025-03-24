@@ -2,7 +2,7 @@ section \<open> Expressions \<close>
 
 theory Expressions
   imports Variables
-  keywords "pretty_exprs" "full_exprs" "lit_vars" "expr_vars" "expr_ctr" "expr_constructor" :: "thy_decl_block"
+  keywords "pretty_exprs" "full_exprs" "lit_vars" "expr_vars" "expr_mark_vars" "expr_no_mark_vars" "expr_ctr" "expr_constructor" :: "thy_decl_block"
 begin
 
 subsection \<open> Types and Constructs \<close>
@@ -121,7 +121,7 @@ parse_translation \<open>
 print_translation \<open>
   [(@{const_syntax "SEXP"}
    , fn ctx => fn ts =>
-     if (FullExprs.get (Proof_Context.theory_of ctx)) 
+     if (#full_exprs (Expr_Config.get (Proof_Context.theory_of ctx)))
      then Term.list_comb (Syntax.const @{syntax_const "_sexp_pqt"}, ts)
      else
      Syntax.const @{syntax_const "_sexp_quote"} 
@@ -145,70 +145,9 @@ text \<open> The main directive is the $e$ subscripted brackets, @{term "(e)\<^s
     \item every occurrence of any other free variable is left unchanged.
   \end{enumerate}
 
-  The pretty printer does this in reverse. Some examples follow. For now, we turn off the 
-  pretty printer so that we can see the results of the parser.
-\<close>
+  The pretty printer does this in reverse. \<close>
 
-full_exprs
-
-term "(f + g)\<^sub>e"
-term "(f + g)\<^sup>e"
-
-text \<open> The default behaviour of our parser is to recognise identifiers as expression variables.
-  So, the above expression becomes the term @{term "[\<lambda>\<s>. f \<s> + g \<s>]\<^sub>e"}. We can easily change
-  this: \<close>
-
-lit_vars
-
-term "(f + g)\<^sub>e"
-
-text \<open> Now, @{term f} and @{term g} are both parsed as literals, and so the term is 
-  @{term "[\<lambda>\<s>. f + g]\<^sub>e"}. Alternatively, we could have a lens in the expression: \<close>
-
-term "($x + g)\<^sub>e"
-
-text \<open> This gives the term @{term "[\<lambda>\<s>. get\<^bsub>x\<^esub> \<s> + g]\<^sub>e"}. Although we have default behaviours
-  for parsing, we can use different markup to coerce identifiers to particular variable kinds. \<close>
-
-term "($x + @g)\<^sub>e"
-
-text \<open> This gives @{term "[\<lambda>\<s>. get\<^bsub>x\<^esub> \<s> + g \<s>]\<^sub>e"}, the we have requested that @{term "g"} is 
-  treated as an expression variable. We can do similar with literal, as show below. \<close>
-
-term "(f + \<guillemotleft>x\<guillemotright>)\<^sub>e"
-
-text \<open> Some further examples follow. \<close>
-
-term "(\<guillemotleft>f\<guillemotright> (@e))\<^sub>e"
-
-term "(@f + @g)\<^sub>e"
-
-term "(@x)\<^sub>e"
-
-term "($x:y:z)\<^sub>e"
-
-term "(($x:y):z)\<^sub>e"
-
-term "(x::nat)\<^sub>e"
-
-term "(\<forall> x::nat. x > 2)\<^sub>e"
-
-term "SEXP(\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v)"
-
-term "(v \<in> $xs \<union> ($f) ys \<union> {} \<and> @e)\<^sub>e"
-
-pretty_exprs
-expr_vars
-
-term "($x\<^sup>< = $x\<^sup>>)\<^sub>e"
-
-term "($x.1 = $y.2)\<^sub>e"
-
-text \<open> The pretty printer works even when we don't use the parser, as shown below. \<close>
-
-term "[\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v]\<^sub>e"
-
-text \<open> A grammar category for lifted expressions \<close>
+text \<open> Below is a grammar category for lifted expressions. \<close>
 
 nonterminal sexpr
 

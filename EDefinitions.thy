@@ -2,13 +2,13 @@ section \<open> Lifted Expression Definitions \<close>
 
 theory EDefinitions
   imports Expressions
-  keywords "edefinition" :: "thy_decl_block"
+  keywords "edefinition" "expression" :: "thy_decl_block" and "over"
 begin
 
-text \<open> Here, we add a command that allows definition of a named expression. It mainly inserts
-  the expression brackets in the definitional equation. \<close>
+text \<open> Here, we add a command that allows definition of a named expression. It provides a more
+  concise version of @{command definition} and inserts the expression brackets. \<close>
 
-(* FIXME: Change interface so that it accepts typs and terms, rather than strings. *)
+named_theorems named_expr_defs
 
 ML \<open>
 structure Expr_Def =
@@ -29,7 +29,20 @@ struct
       (Option.map (fn x => fst (Proof_Context.read_var x ctx)) decl) [] [] 
       ((fst attr, map (Attrib.check_src ctx) (expr_defs @ snd attr)), mk_expr_def_eq ctx term) ctx
 
-end
+  fun named_expr n t st expr thy =
+    let val named_expr_defs = @{attributes [named_expr_defs]}
+        val ctx = Named_Target.theory_init thy
+        val term = Const (@{const_name "HOL.eq"}, dummyT) $ Syntax.free n $ (Syntax.parse_term ctx expr)
+        val stateT = Syntax.read_typ ctx st
+        val typ = Syntax.read_typ ctx t
+        val ctx' = snd (Specification.definition 
+                       (SOME (Binding.name n, SOME (stateT --> typ), Mixfix.NoSyn)) [] [] 
+                       ((Binding.name (n ^ "_def"), named_expr_defs), mk_expr_def_eq ctx term) ctx)
+        val thy' = NoLift_Const.nolift_const (Local_Theory.exit_global ctx') (n, [])
+        in thy' 
+  end
+
+end;
 
 val _ =
 let
@@ -40,6 +53,27 @@ in
       Parse_Spec.if_assumes -- Parse.for_fixes >> (fn (((decl, (attr, term)), _), _) =>
         (fn ctx => snd (expr_def attr decl (Syntax.parse_term ctx term) ctx))))
 end
-\<close>               
+
+val _ =
+let
+  open Expr_Def;
+  val named_expr_defs = @{attributes [named_expr_defs]}
+in
+  Outer_Syntax.command \<^command_keyword>\<open>expression\<close> "define named expressions"
+    ((((Parse.name -- Scan.optional (@{keyword "::"} |-- Parse.typ) "_" -- Scan.optional (@{keyword "over"} |-- Parse.typ) "_") --| @{keyword "is"}) -- Parse.term)  >> (fn (((n, t), st), expr) => 
+        Toplevel.theory 
+          (fn thy => 
+            let val ctx = Named_Target.theory_init thy
+                val term = Const (@{const_name "HOL.eq"}, dummyT) $ Syntax.free n $ (Syntax.parse_term ctx expr)
+                val stateT = Syntax.read_typ ctx st
+                val typ = Syntax.read_typ ctx t
+                val ctx' = snd (Specification.definition 
+                             (SOME (Binding.name n, SOME (stateT --> typ), Mixfix.NoSyn)) [] [] 
+                             ((fst (Binding.name (n ^ "_def"), named_expr_defs), map (Attrib.check_src ctx) (expr_defs @ snd (Binding.name (n ^ "_def"), named_expr_defs))), mk_expr_def_eq ctx term) ctx)
+                val thy' = NoLift_Const.nolift_const (Local_Theory.exit_global ctx') (n, [])
+                in thy' end)))
+end;
+
+\<close>
 
 end

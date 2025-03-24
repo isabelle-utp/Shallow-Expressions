@@ -36,7 +36,7 @@ struct
         (* When adding an expression in a locale, the named recorded below may be the 
            localised version, which may not work correctly. This may lead to unexpected
            behaviour when there are two locales each with a constant of the same name. *)
-        val ctx2 = NoLift_Const.nolift_const (Local_Theory.end_nested ctx') (n, [])
+        val ctx2 = NoLift_Const.nolift_const (n, []) (Local_Theory.end_nested ctx')
         in ctx2
   end
 
