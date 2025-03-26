@@ -53,6 +53,9 @@ definition var_fst :: "('a \<times> 'b \<Longrightarrow> 's) \<Rightarrow> ('a \
 definition var_snd :: "('a \<times> 'b \<Longrightarrow> 's) \<Rightarrow> ('b \<Longrightarrow> 's)" where
 [lens_defs]: "var_snd x = snd\<^sub>L ;\<^sub>L x" 
 
+definition var_pair :: "('a \<Longrightarrow> 's) \<Rightarrow> ('b \<Longrightarrow> 's) \<Rightarrow> ('a \<times> 'b \<Longrightarrow> 's)" where
+[lens_defs]: "var_pair x y = x +\<^sub>L y"
+
 abbreviation var_member :: "('a \<Longrightarrow> 's) \<Rightarrow> 's scene \<Rightarrow> bool" (infix "\<in>\<^sub>v" 50) where
 "x \<in>\<^sub>v A \<equiv> var_alpha x \<le> A"
 
@@ -279,7 +282,7 @@ translations
   "_svid_snd x" \<rightleftharpoons> "CONST var_snd x"
   "_svid_prod x y" \<rightleftharpoons> "x \<times>\<^sub>L y"
   "_svid_pow2 x" \<rightharpoonup> "x \<times>\<^sub>L x"
-  "_mk_svid_list (_svid_list x xs)" \<rightharpoonup> "x +\<^sub>L _mk_svid_list xs"
+  "_mk_svid_list (_svid_list x xs)" \<rightharpoonup> "CONST var_pair x (_mk_svid_list xs)"
   "_mk_svid_list x" \<rightharpoonup> "x"
   "_mk_alpha_list (_svid_list x xs)" \<rightharpoonup> "CONST var_alpha x \<squnion>\<^sub>S _mk_alpha_list xs"
   "_mk_alpha_list x" \<rightharpoonup> "CONST var_alpha x"
@@ -290,9 +293,12 @@ translations
   "_svid_view a" => "\<V>\<^bsub>a\<^esub>"
   "_svid_coview a" => "\<C>\<^bsub>a\<^esub>"
 
-  "_svid_list (_svid_tuple (_of_svid_list (x +\<^sub>L y))) (_of_svid_list z)" \<leftharpoondown> "_of_svid_list ((x +\<^sub>L y) +\<^sub>L z)"
-  "_svid_list x (_of_svid_list y)"    \<leftharpoondown> "_of_svid_list (x +\<^sub>L y)"
+  "_svid_list (_svid_tuple (_of_svid_list (CONST var_pair x y))) (_of_svid_list z)" \<leftharpoondown> "_of_svid_list (CONST var_pair (CONST var_pair x y) z)"
+  "_svid_list x (_of_svid_list y)"    \<leftharpoondown> "_of_svid_list (CONST var_pair x y)"
   "x"                                 \<leftharpoondown> "_of_svid_list x"
+
+  "_svid_tuple (_svid_list x y)" \<leftharpoondown> "CONST var_pair x y"
+  "_svid_list x ys" \<leftharpoondown> "_svid_list x (_svid_tuple ys)"
 
   \<comment> \<open> Alphabets \<close>
   "_salphaparen a" \<rightharpoonup> "a"
