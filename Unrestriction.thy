@@ -112,6 +112,7 @@ lemma unrest_pair_split:
   assumes "x \<bowtie> y" "vwb_lens x" "vwb_lens y"
   shows "($(x, y) \<sharp> P) = (($x \<sharp> P) \<and> ($y \<sharp> P))"
   using assms
+  by (metis lens_equiv_scene lens_indep_sym lens_plus_comm lens_plus_right_sublens plus_vwb_lens sublens_refl unrest_pair unrest_sublens var_alpha_def var_pair_def vwb_lens_def)
 
 lemma unrest_get [unrest]: "\<lbrakk> mwb_lens x; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> get\<^bsub>y\<^esub>"
   by (expr_simp, simp add: lens_indep.lens_put_irr2)
