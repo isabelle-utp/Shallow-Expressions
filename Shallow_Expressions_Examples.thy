@@ -65,16 +65,27 @@ type_synonym 's prog = "'s \<times> 's \<Rightarrow> bool"
 definition seq :: "'s prog \<Rightarrow> 's prog \<Rightarrow> 's prog" (infixr ";;" 85) where
 [expr_defs]: "seq P Q = (\<exists> s. P\<lbrakk>\<guillemotleft>s\<guillemotright>/\<^bold>v\<^sup>>\<rbrakk> \<and> Q\<lbrakk>\<guillemotleft>s\<guillemotright>/\<^bold>v\<^sup><\<rbrakk>)\<^sub>e"
 
-definition ifthenelse :: "(bool, 's) expr \<Rightarrow> 's prog \<Rightarrow> 's prog \<Rightarrow> 's prog" ("IF _ THEN _ ELSE _" [0, 0, 84] 84) where
-[expr_defs]: "ifthenelse p C D = (if p\<^sup>< then C else D)\<^sub>e"
+definition ifthenelse :: "(bool, 's) expr \<Rightarrow> 's prog \<Rightarrow> 's prog \<Rightarrow> 's prog" where
+[expr_defs]: "ifthenelse b P Q = (if b\<^sup>< then P else Q)\<^sub>e"
 
 definition assign :: "('a \<Longrightarrow> 's) \<Rightarrow> ('a, 's) expr \<Rightarrow> 's prog"  where
 [expr_defs]: "assign x e = ($x\<^sup>> = e\<^sup>< \<and> \<^bold>v\<^sup>> \<simeq>\<^bsub>\<guillemotleft>x\<guillemotright>\<^esub> \<^bold>v\<^sup><)\<^sub>e"
 
-syntax "_assign" :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("_ ::= _" [86, 87] 87)
-translations "_assign x e" == "CONST assign x (e)\<^sub>e"
+syntax 
+  "_assign" :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("_ ::= _" [86, 87] 87)
+  "_ifthenelse" :: "logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("IF _ THEN _ ELSE _" [0, 0, 84] 84)
+
+text \<open> The syntax translations insert the expression brackets, which means the expressions
+  are lifted, without this being visible to the user. \<close>
+
+translations 
+  "_assign x e" == "CONST assign x (e)\<^sub>e"
+  "_ifthenelse b P Q" == "CONST ifthenelse (b)\<^sub>e P Q"
 
 lemma seq_assoc: "P ;; (Q ;; R) = (P ;; Q) ;; R"
+  by expr_auto
+
+lemma ifthenelse_seq_distr: "(IF B THEN P ELSE Q) ;; R = IF B THEN P ;; R ELSE Q ;; R"
   by expr_auto
 
 lemma assign_twice:
