@@ -68,8 +68,11 @@ definition seq :: "'s prog \<Rightarrow> 's prog \<Rightarrow> 's prog" (infixr 
 definition ifthenelse :: "(bool, 's) expr \<Rightarrow> 's prog \<Rightarrow> 's prog \<Rightarrow> 's prog" ("IF _ THEN _ ELSE _" [0, 0, 84] 84) where
 [expr_defs]: "ifthenelse p C D = (if p\<^sup>< then C else D)\<^sub>e"
 
-definition assign :: "('a \<Longrightarrow> 's) \<Rightarrow> ('a, 's) expr \<Rightarrow> 's prog" ("_ ::= _" [86, 87] 87) where
+definition assign :: "('a \<Longrightarrow> 's) \<Rightarrow> ('a, 's) expr \<Rightarrow> 's prog"  where
 [expr_defs]: "assign x e = ($x\<^sup>> = e\<^sup>< \<and> \<^bold>v\<^sup>> \<simeq>\<^bsub>\<guillemotleft>x\<guillemotright>\<^esub> \<^bold>v\<^sup><)\<^sub>e"
+
+syntax "_assign" :: "svid \<Rightarrow> logic \<Rightarrow> logic" ("_ ::= _" [86, 87] 87)
+translations "_assign x e" == "CONST assign x (e)\<^sub>e"
 
 lemma seq_assoc: "P ;; (Q ;; R) = (P ;; Q) ;; R"
   by expr_auto
@@ -83,12 +86,42 @@ lemma assign_twice:
   done
 
 lemma assign_commute:
-  assumes "mwb_lens x" "mwb_lens y" "x \<bowtie> y" "$y \<sharp> e" "$x \<sharp> f"
+  assumes "mwb_lens x" "mwb_lens y" "x \<bowtie> y" "$y \<sharp> (e)\<^sub>e" "$x \<sharp> (f)\<^sub>e"
   shows "(x ::= e ;; y ::= f) = (y ::= f ;; x ::= e)"
   using assms
   apply expr_simp
-  apply auto
+  apply safe
   apply (metis lens_indep_def mwb_lens_weak weak_lens.put_get)+
   done
 
+lemma assign_combine:
+  assumes "mwb_lens x" "mwb_lens y" "x \<bowtie> y" "$x \<sharp> (f)\<^sub>e"
+  shows "(x ::= e ;; y ::= f) = (x, y) ::= (e, f)"
+  using assms
+  apply expr_simp
+  apply safe
+  apply (simp_all add: lens_indep.lens_put_comm)
+  apply (metis mwb_lens_weak weak_lens.put_get)
+  done
+
+text \<open> Below, we apply the assignment commutativity law in a small example: \<close>
+
+lit_vars
+
+lemma assign_commute_example: 
+  "adam:name ::= ''Adam'' ;; bella:name ::= ''Bella'' = 
+   bella:name ::= ''Bella'' ;; adam:name ::= ''Adam''"
+proof (rule assign_commute)
+  \<comment> \<open> We show the two variables satisfy the lens axioms \<close>
+  show "mwb_lens (adam:name)\<^sub>v" by simp
+  show "mwb_lens (bella:name)\<^sub>v" by simp
+
+  \<comment> \<open> We show the two variables are independent \<close>
+  show "(adam:name)\<^sub>v \<bowtie> (bella:name)\<^sub>v" by simp
+
+  \<comment> \<open> We show that neither assigned expression depends on the opposite variable \<close>
+  show "$bella:name \<sharp> (''Adam'')\<^sub>e" by unrest
+  show "$adam:name \<sharp> (''Bella'')\<^sub>e" by unrest
+qed
+  
 end
