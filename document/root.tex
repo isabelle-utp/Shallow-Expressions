@@ -37,7 +37,7 @@
 \begin{document}
 
 \title{Shallow Expressions}
-\author{Simon Foster and Christian Pardillo Laursen}
+\author{Simon Foster}
 \maketitle
 
 \begin{abstract}
@@ -48,7 +48,7 @@ Shallow embeddings, in contrast, model expressions as query functions over the s
 more amenable to automating verification tasks. The goal of this library is provide an intuitive 
 implementation of shallow expressions, which nevertheless provides many of the benefits of a deep 
 embedding. We harness the Optics library to provide an algebraic semantics for state variables,
-and use syntax translations to provide an intutive lifted expression syntax. Furthermore, we
+and use syntax translations to provide an intuitive lifted expression syntax. Furthermore, we
 provide a variety of meta-logic-style queries on expressions, such as dependencies
 on a state variable, and substitution of a variable for an expression. We also provide proof 
 methods, based on the simplifier, to automate the associated proof tasks.
@@ -72,7 +72,8 @@ package~\cite{Optics-AFP}. It provides the following key features:
     The lifting mechanism is manifested through the bracket notation, $(\_)_e$, but can usually be hidden behind syntax.
   \item Syntax for complex state variable constructions, using the lens operators~\cite{Optics-AFP}, such as simultaneous 
     assignment, hierarchical state, and initial/final state variables.
-  \item The ``unrestriction'' predicate~\cite{Oliveira07}, $x \mathop{\sharp} e$, which characterises whether an expression $e$ depends on a
+  \item The ``unrestriction'' predicate~\cite{Oliveira07,Foster2020-IsabelleUTP}, $x \mathop{\sharp} e$, 
+    which characterises whether an expression $e$ depends on a
     particular variable $x$ or not, based on the lens laws. It can often be used as a replacement for 
     syntactically checking for free variables in a deep embedding, as needed in several verification
     techniques.
@@ -88,6 +89,9 @@ package~\cite{Optics-AFP}. It provides the following key features:
 The majority of these concepts have been adapted from Isabelle/UTP~\cite{Foster2020-IsabelleUTP}, but 
 have been generalised for use in other Isabelle-based verification tools. Several proof methods are 
 provided, such as for discharging unrestriction conditions (\texttt{unrest}) and evaluating substitutions (\texttt{subst\_eval}).
+
+The Shallow Expressions library has been applied in the IsaVODEs tool~\cite{Munive2024IsaVODES}, for 
+verifying hybrid systems, and Isabelle/ITrees~\cite{Foster2024ITrees}, for verification of process-algebraic languages. 
 
 % generated text of all theories
 \input{session}
