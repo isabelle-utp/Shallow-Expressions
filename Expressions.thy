@@ -2,7 +2,7 @@ section \<open> Expressions \<close>
 
 theory Expressions
   imports Variables
-  keywords "pretty_exprs" "full_exprs" "lit_vars" "expr_vars" "expr_mark_vars" "expr_no_mark_vars" "expr_ctr" "expr_constructor" :: "thy_decl_block"
+  keywords "expr_ctr" "expr_constructor" :: "thy_decl_block"
 begin
 
 subsection \<open> Types and Constructs \<close>
@@ -66,14 +66,14 @@ ML_file \<open>Lift_Expr_Options.ML\<close>
 
 text \<open> We create a number of commands for configuring the way the parser works. \<close> 
 
-full_exprs
-pretty_exprs
+(*full_exprs*)
+(*pretty_exprs*)
 
 text \<open> We can disable pretty printing of $\lambda$ expressions using \textbf{full\_exprs} and
   re-enable pretty printing with \textbf{pretty\_exprs}. \<close>
 
-lit_vars
-expr_vars
+(*lit_vars*)
+(*expr_vars*)
 
 text \<open> Expressions, of course, can contain variables. However, a variable can denote one of
   three things: (1) a state variable (i.e. a lens); (2) a placeholder for a value (i.e. a
@@ -121,7 +121,7 @@ parse_translation \<open>
 print_translation \<open>
   [(@{const_syntax "SEXP"}
    , fn ctx => fn ts =>
-     if (#full_exprs (Expr_Config.get (Proof_Context.theory_of ctx)))
+     if not (Config.get ctx Lift_Expr.pretty_print_exprs)
      then Term.list_comb (Syntax.const @{syntax_const "_sexp_pqt"}, ts)
      else
      Syntax.const @{syntax_const "_sexp_quote"} 

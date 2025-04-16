@@ -9,7 +9,7 @@ subsection \<open> Basic Expressions and Queries \<close>
 text \<open> We define some basic variables using the @{command alphabet} command, process some simple
   expressions, and then perform some unrestriction queries and substitution transformations. \<close>
 
-lit_vars
+declare [[literal_variables]]
 
 alphabet st =
   v1 :: int
@@ -18,11 +18,11 @@ alphabet st =
 
 term "(v1 > a)\<^sub>e"
 
-full_exprs
+declare [[pretty_print_exprs=false]]
 
 term "(v1 > a)\<^sub>e"
 
-pretty_exprs
+declare [[pretty_print_exprs]]
 
 lemma "$v2 \<sharp> (v1 > 5)\<^sub>e"
   by unrest
@@ -58,7 +58,7 @@ text \<open> We give a predicative semantics to a simple imperative programming 
   conditional, and assignment, using lenses and shallow expressions. We then use these definitions
   to prove some basic laws of programming. \<close>
 
-expr_vars
+declare [[literal_variables=false]]
 
 type_synonym 's prog = "'s \<times> 's \<Rightarrow> bool"
 
@@ -117,7 +117,7 @@ lemma assign_combine:
 
 text \<open> Below, we apply the assignment commutativity law in a small example: \<close>
 
-lit_vars
+declare [[literal_variables]]
 
 lemma assign_commute_example: 
   "adam:name ::= ''Adam'' ;; bella:name ::= ''Bella'' = 
