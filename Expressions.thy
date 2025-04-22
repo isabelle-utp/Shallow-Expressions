@@ -2,7 +2,7 @@ section \<open> Expressions \<close>
 
 theory Expressions
   imports Variables
-  keywords "expr_ctr" "expr_constructor" :: "thy_decl_block"
+  keywords "expr_constructor" :: "thy_decl_block"
 begin
 
 subsection \<open> Types and Constructs \<close>
@@ -62,28 +62,9 @@ text \<open> The lifting parser creates a parser directive that converts an expr
   @{const SEXP} boxed $\lambda$-term that gives it a semantics. A pretty printer converts
   a boxed $\lambda$-term back to an expression. \<close>
 
-ML_file \<open>Lift_Expr_Options.ML\<close>
-
-text \<open> We create a number of commands for configuring the way the parser works. \<close> 
-
-(*full_exprs*)
-(*pretty_exprs*)
-
-text \<open> We can disable pretty printing of $\lambda$ expressions using \textbf{full\_exprs} and
-  re-enable pretty printing with \textbf{pretty\_exprs}. \<close>
-
-(*lit_vars*)
-(*expr_vars*)
-
-text \<open> Expressions, of course, can contain variables. However, a variable can denote one of
-  three things: (1) a state variable (i.e. a lens); (2) a placeholder for a value (i.e. a
-  HOL literal); and (3) a placeholder for another expression. The command \textbf{lit\_vars}
-  selects option (2) as the default behaviour, and \textbf{expr\_vars} selects option (3). \<close>
-
 nonterminal sexp
 
-text \<open> Next, we create some syntactic constants and define parse and print translations for
-  them. \<close>
+text \<open> We create some syntactic constants and define parse and print translations for them. \<close>
 
 syntax
   "_sexp_state"      :: "id"
@@ -99,10 +80,30 @@ syntax
   "_sexp_select"     :: "logic \<Rightarrow> svid \<Rightarrow> logic" ("_:_" [1000, 999] 1000)
   "_sexp_if"         :: "logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("(3_ \<triangleleft> _ \<triangleright>/ _)" [52,0,53] 52)
 
+ML_file \<open>Lift_Expr.ML\<close>
+
+text \<open> We create a number of attributes for configuring the way the parser works. \<close> 
+
+declare [[pretty_print_exprs=true]]
+
+
+text \<open> We can toggle pretty printing of $\lambda$ expressions using @{attribute pretty_print_exprs}. \<close>
+
+declare [[literal_variables=false]]
+
+text \<open> Expressions, of course, can contain variables. However, a variable can denote one of
+  three things: (1) a state variable (i.e. a lens); (2) a placeholder for a value (i.e. a
+  HOL literal); and (3) a placeholder for another expression. The attribute @{attribute literal_variables}
+  selects option (2) as the default behaviour when true, and option (3) when false. \<close>
+
 expr_constructor expr_select
 expr_constructor expr_if
 
-ML_file \<open>Lift_Expr.ML\<close>
+text \<open> Some constants should not be lifted, since they are effectively constructors for expressions.
+  The command @{command expr_constructor} allows us to specify such constants to not be lifted.
+  This being the case, the arguments are left unlifted, unless included in a list of numbers
+  before the constant name. The state is passed as the final argument to expression constructors.
+\<close>
 
 parse_translation \<open> 
   [(@{syntax_const "_sexp_state"}, fn ctx => fn term => Syntax.free Lift_Expr.state_id),
