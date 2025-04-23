@@ -1,4 +1,4 @@
-session "Shallow-Expressions-Z" = "Shallow-Expressions" +
+session "Shallow_Expressions_Z" = "Shallow_Expressions" +
   options [document = false]
   sessions
     "Z_Toolkit"

@@ -30,8 +30,22 @@ lemma "$v2 \<sharp> (v1 > 5)\<^sub>e"
 lemma "(v1 > 5)\<^sub>e\<lbrakk>v2/v1\<rbrakk> = (v2 > 5)\<^sub>e"
   by subst_eval 
 
-text \<open> We can define an expression using the command below, which automatically performs expression
-  lifting. \<close>
+text \<open> We sometimes would like to define constructors for expressions. Unlike for other functions,
+  the arguments should not be lifted, but the state should be passed to the constructor
+  constant. An example is given below: \<close>
+
+definition v1_greater :: "int \<Rightarrow> (bool, st) expr" where
+"v1_greater x = (v1 > x)\<^sub>e"
+
+expr_constructor v1_greater
+
+text \<open> Definition @{const v1_greater} is a constructor for an expression, and so it should not
+  be lifted. Therefore we use the command @{command expr_constructor} to specify this, which
+  modifies the behaviour of the lifting parser, and means that @{term "(v1_greater 7)\<^sub>e"} is 
+  correctly translated. \<close>
+
+text \<open> In addition, we can define an expression using the command below, which automatically performs 
+  expression lifting in the defining term. These constants are also set as expression constructors. \<close>
 
 expression v1_is_big over st is "v1 > 100"
 
