@@ -1,4 +1,4 @@
-session "Shallow-Expressions" = "Optics" + 
+session "Shallow_Expressions" = "Optics" + 
   options [document = pdf, document_output = "output"]
   sessions
     "HOL-Library"

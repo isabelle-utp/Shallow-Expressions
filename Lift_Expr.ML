@@ -1,5 +1,29 @@
+structure NoLift = Theory_Data
+  (type T = int list Symtab.table
+   val empty = Symtab.empty
+   val merge = Symtab.merge (K true));
+
+structure NoLift_Const =
+struct
+
+fun nolift_const (n, opt) ctx =  
+      let open Proof_Context; open Syntax
+      in case read_const {proper = true, strict = false} ctx n of
+         Const (c, _) => Local_Theory.background_theory (NoLift.map (Symtab.update (c, (map Value.parse_int opt)))) ctx |
+         _ => raise Match
+      end;
+end;
+
+Outer_Syntax.local_theory @{command_keyword "expr_constructor"} "declare that certain constants are expression constructors; the parameter indicates which arguments should be lifted"
+    (Scan.repeat1 (Parse.term -- Scan.optional (Parse.$$$ "(" |-- Parse.!!! (Scan.repeat1 Parse.number --| Parse.$$$ ")")) [])
+     >> (fn ns => 
+         (fn ctx => Library.foldl (fn (ctx, n) => NoLift_Const.nolift_const n ctx) (ctx, ns))));
+
 signature LIFT_EXPR =
 sig
+val literal_variables: bool Config.T
+val pretty_print_exprs: bool Config.T
+val mark_state_variables: bool Config.T
 val state_id: string
 val lift_expr: Proof.context -> term -> term
 val mk_lift_expr: Proof.context -> term -> term
@@ -8,6 +32,11 @@ end
 
 structure Lift_Expr: LIFT_EXPR =
 struct
+
+val literal_variables = Attrib.setup_config_bool \<^binding>\<open>literal_variables\<close> (K false);
+val pretty_print_exprs = Attrib.setup_config_bool \<^binding>\<open>pretty_print_exprs\<close> (K true);
+val mark_state_variables = Attrib.setup_config_bool \<^binding>\<open>mark_state_variables\<close> (K true);
+
 val state_id = "\<s>";
 
 fun lift_expr_aux ctx (Const (n', t), args) =
@@ -61,7 +90,7 @@ lift_expr_aux ctx (Free (n, t), args) =
                 case t' of 
                  Type (\<^type_name>\<open>lens_ext\<close>, _) => const @{const_name lens_get} $ Free (n, t') $ free state_id |
                  \<comment> \<open> Otherwise, we leave it alone, or apply it to the state variable if it's an expression constructor \<close>
-                 _ => if (#lit_vars (Expr_Config.get (Proof_Context.theory_of ctx)))
+                 _ => if Config.get ctx literal_variables
                         then Free (n, t) else Free (n, t) $ Syntax.free state_id
           in Term.list_comb (trm, map (lift_expr ctx) args) end
   end |
@@ -78,14 +107,14 @@ fun mk_lift_expr ctx e =
 
 fun print_expr_aux ctx (f, args) =
   let open Proof_Context
-      fun sexp_evar x = if #lit_vars (Expr_Config.get (theory_of ctx)) then Syntax.const "_sexp_evar" $ x else x
+      fun sexp_evar x = if Config.get ctx literal_variables then Syntax.const "_sexp_evar" $ x else x
   in
   case (f, args) of
     (Const (@{syntax_const "_free"}, _), (Free (n, t) :: Const (@{syntax_const "_sexp_state"}, _) :: r)) => 
      sexp_evar (Term.list_comb (Syntax.const @{syntax_const "_free"} $ Free (n, t)
                               , map (print_expr ctx) r)) |
     (Const (@{const_syntax lens_get}, _), [x, Const (@{syntax_const "_sexp_state"}, _)])
-      => if #mark_vars (Expr_Config.get (theory_of ctx)) then Syntax.const @{syntax_const "_sexp_var"} $ x else x |
+      => if Config.get ctx mark_state_variables then Syntax.const @{syntax_const "_sexp_var"} $ x else x |
     (Free (n, t), [Const (@{syntax_const "_sexp_state"}, _)]) 
       => sexp_evar (Free (n, t)) | 
     _ => if (length args > 0)

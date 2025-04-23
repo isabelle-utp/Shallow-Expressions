@@ -7,16 +7,16 @@ begin
 text \<open> Some examples of lifted expressions follow. For now, we turn off the pretty printer so that 
   we can see the results of the parser.\<close>
 
-full_exprs
+declare [[pretty_print_exprs=false]]
 
 term "(f + g)\<^sub>e" \<comment> \<open> Lift an expression and insert @{const SEXP} for pretty printing \<close>
 term "(f + g)\<^sup>e" \<comment> \<open> Lift an expression and don't insert @{const SEXP} \<close>
 
 text \<open> The default behaviour of our parser is to recognise identifiers as expression variables.
   So, the above expression becomes the term @{term "[\<lambda>\<s>. f \<s> + g \<s>]\<^sub>e"}. We can easily change
-  this using the command @{command lit_vars} (literal variables): \<close>
+  this using the attribute @{attribute literal_variables}: \<close>
 
-lit_vars
+declare [[literal_variables]]
 
 term "(f + g)\<^sub>e"
 
@@ -58,8 +58,7 @@ term "(v \<in> $xs \<union> ($f) ys \<union> {} \<and> @e)\<^sub>e"
 
 text \<open> We now turn pretty printing back on, so we can see how the user sees expressions. \<close>
 
-pretty_exprs
-expr_vars
+declare [[pretty_print_exprs, literal_variables=false]]
 
 term "($x\<^sup>< = $x\<^sup>>)\<^sub>e"
 
@@ -70,9 +69,9 @@ text \<open> The pretty printer works even when we don't use the parser, as show
 term "[\<lambda> \<s>. get\<^bsub>x\<^esub> \<s> + e \<s> + v]\<^sub>e"
 
 text \<open> By default, dollars are printed next to free variables that are lenses. However, we can
-  alter this behaviour with the @{command expr_no_mark_vars} command: \<close>
+  alter this behaviour with the attribute @{attribute mark_state_variables}: \<close>
 
-expr_no_mark_vars 
+declare [[mark_state_variables=false]]
 
 term "($x + e + v)\<^sub>e"
 
