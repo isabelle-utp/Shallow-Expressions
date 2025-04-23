@@ -1,7 +1,7 @@
 section \<open> Z Stores \<close>
 
 theory Z_Store
-  imports "Shallow-Expressions.Named_Expressions" "Z_Toolkit.Relation_Lib"
+  imports "Shallow_Expressions.Named_Expressions" "Z_Toolkit.Relation_Lib"
   keywords "zstore" "zexpr" :: "thy_decl_block"
 begin
 
