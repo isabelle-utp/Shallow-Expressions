@@ -30,9 +30,10 @@ lemma "$v2 \<sharp> (v1 > 5)\<^sub>e"
 lemma "(v1 > 5)\<^sub>e\<lbrakk>v2/v1\<rbrakk> = (v2 > 5)\<^sub>e"
   by subst_eval 
 
-text \<open> We sometimes would like to define constructors for expressions. Unlike for other functions,
-  the arguments should not be lifted, but the state should be passed to the constructor
-  constant. An example is given below: \<close>
+text \<open> We sometimes would like to define ``constructors'' for expressions. These are functions that
+  produce expressions, and may also have expressions as arguments. Unlike for other functions,
+  during lifting the state is not passed to the arguments, but is passed to the constructor
+  constant itself. An example is given below: \<close>
 
 definition v1_greater :: "int \<Rightarrow> (bool, st) expr" where
 "v1_greater x = (v1 > x)\<^sub>e"
@@ -42,7 +43,35 @@ expr_constructor v1_greater
 text \<open> Definition @{const v1_greater} is a constructor for an expression, and so it should not
   be lifted. Therefore we use the command @{command expr_constructor} to specify this, which
   modifies the behaviour of the lifting parser, and means that @{term "(v1_greater 7)\<^sub>e"} is 
-  correctly translated. \<close>
+  correctly translated. 
+
+  If it is desired that one or more of the arguments is an expression, then this can be specified 
+  using an optional list of numbers. In the example below, the first argument is an expression. \<close>
+
+definition v1_greater' :: "(int, st) expr \<Rightarrow> (bool, st) expr" where
+"v1_greater' x = (v1 > @x)\<^sub>e"
+
+expr_constructor v1_greater' (0)
+
+term "(v1_greater' (v1 + 1))\<^sub>e"
+
+text \<open> We also sometimes wish to have functions that return expressions, whose arguments should be 
+  lifted. We can achieve this using the @{command expr_function} command: \<close>
+
+definition v1_less :: "int \<Rightarrow> (bool, st) expr" where
+"v1_less x = (v1 < x)\<^sub>e"
+
+expr_function v1_less
+
+text \<open> This means, we can parse terms like @{term "(v1_less (v1 + 1))\<^sub>e"} -- notice that this returns
+  an expression and takes an expression as an input. Alternatively, we can achieve the same effect
+  with the @{command edefinition} command, which is like @{command definition}, but uses the expression
+  parse and lifts the arguments as expressions. It is typically used for user-level functions that
+  depend on the state. \<close>
+
+edefinition v1_less' where "v1_less' x = (v1 < x)"
+
+term "(v1_less' (v1 + 1))\<^sub>e"
 
 text \<open> In addition, we can define an expression using the command below, which automatically performs 
   expression lifting in the defining term. These constants are also set as expression constructors. \<close>
@@ -50,6 +79,11 @@ text \<open> In addition, we can define an expression using the command below, w
 expression v1_is_big over st is "v1 > 100"
 
 expression inc_v1 over "st \<times> st" is "v1\<^sup>> = v1\<^sup>< + 1"
+
+text \<open> Definitional equations for named expressions are collected in the theorem attribute 
+  @{thm named_expr_defs}. \<close>
+
+thm named_expr_defs
 
 subsection \<open> Hierarchical State \<close>
 

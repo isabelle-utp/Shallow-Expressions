@@ -2,7 +2,7 @@ section \<open> Expressions \<close>
 
 theory Expressions
   imports Variables
-  keywords "expr_constructor" :: "thy_decl_block"
+  keywords "expr_constructor" "expr_function" :: "thy_decl_block"
 begin
 
 subsection \<open> Types and Constructs \<close>

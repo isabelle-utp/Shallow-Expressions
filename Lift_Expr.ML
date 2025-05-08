@@ -1,23 +1,46 @@
-structure NoLift = Theory_Data
-  (type T = int list Symtab.table
-   val empty = Symtab.empty
-   val merge = Symtab.merge (K true));
+structure ExprFun = Theory_Data
+  (type T = Symset.T
+   val empty = Symset.empty
+   val merge = Symset.merge);
 
-structure NoLift_Const =
+structure ExprFun_Const =
 struct
 
-fun nolift_const (n, opt) ctx =  
+fun exprfun_const n ctx =  
       let open Proof_Context; open Syntax
       in case read_const {proper = true, strict = false} ctx n of
-         Const (c, _) => Local_Theory.background_theory (NoLift.map (Symtab.update (c, (map Value.parse_int opt)))) ctx |
+         Const (c, _) => Local_Theory.background_theory (ExprFun.map (Symset.insert c)) ctx |
          _ => raise Match
       end;
 end;
 
-Outer_Syntax.local_theory @{command_keyword "expr_constructor"} "declare that certain constants are expression constructors; the parameter indicates which arguments should be lifted"
+Outer_Syntax.local_theory @{command_keyword "expr_function"} 
+    "declare that certain constants are functions returning expressions"
+    (Scan.repeat1 (Parse.term )
+     >> (fn ns => 
+         (fn ctx => Library.foldl (fn (ctx, n) => ExprFun_Const.exprfun_const n ctx) (ctx, ns))));
+
+structure ExprCtr = Theory_Data
+  (type T = int list Symtab.table
+   val empty = Symtab.empty
+   val merge = Symtab.merge (K true));
+
+structure ExprCtr_Const =
+struct
+
+fun exprctr_const (n, opt) ctx =  
+      let open Proof_Context; open Syntax
+      in case read_const {proper = true, strict = false} ctx n of
+         Const (c, _) => Local_Theory.background_theory (ExprCtr.map (Symtab.update (c, (map Value.parse_int opt)))) ctx |
+         _ => raise Match
+      end;
+end;
+
+Outer_Syntax.local_theory @{command_keyword "expr_constructor"} 
+    "declare that certain constants are expression constructors; the parameter indicates which arguments should not be lifted"
     (Scan.repeat1 (Parse.term -- Scan.optional (Parse.$$$ "(" |-- Parse.!!! (Scan.repeat1 Parse.number --| Parse.$$$ ")")) [])
      >> (fn ns => 
-         (fn ctx => Library.foldl (fn (ctx, n) => NoLift_Const.nolift_const n ctx) (ctx, ns))));
+         (fn ctx => Library.foldl (fn (ctx, n) => ExprCtr_Const.exprctr_const n ctx) (ctx, ns))));
 
 signature LIFT_EXPR =
 sig
@@ -50,9 +73,10 @@ fun lift_expr_aux ctx (Const (n', t), args) =
      then Term.list_comb (hd args, tl args')
      else if (n = @{syntax_const "_sexp_evar"})
      then Term.list_comb (hd args $ free state_id, tl args')
-     else if (member (op =) (Symtab.keys (NoLift.get (Proof_Context.theory_of ctx))) n)
+     else if Symset.member (ExprFun.get (Proof_Context.theory_of ctx)) n then Term.list_comb (Const (n', t), args') $ free state_id 
+     else if (member (op =) (Symtab.keys (ExprCtr.get (Proof_Context.theory_of ctx))) n)
      (* FIXME: Allow some parameters of an expression constructor to be ignored and not lifted *) 
-     then let val (SOME aopt) = Symtab.lookup (NoLift.get (Proof_Context.theory_of ctx)) n in
+     then let val (SOME aopt) = (Symtab.lookup (ExprCtr.get (Proof_Context.theory_of ctx)) n) in
           Term.list_comb 
             (Const (n', t)
             , map_index (fn (i, t) => 
