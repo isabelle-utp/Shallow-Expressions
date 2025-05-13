@@ -49,6 +49,7 @@ val pretty_print_exprs: bool Config.T
 val mark_state_variables: bool Config.T
 val state_id: string
 val lift_expr: Proof.context -> term -> term
+val read_lift_term: Proof.context -> string -> term
 val mk_lift_expr: Proof.context -> term -> term
 val print_expr: Proof.context -> term -> term
 end
@@ -151,5 +152,7 @@ fun print_expr_aux ctx (f, args) =
 and 
 print_expr ctx (Abs (n, t, e)) = Abs (n, t, print_expr ctx e) |
 print_expr ctx e = print_expr_aux ctx (Term.strip_comb e)
+
+fun read_lift_term ctx = Syntax.check_term ctx o lift_expr ctx o Syntax.parse_term ctx
 
 end
