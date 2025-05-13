@@ -18,7 +18,7 @@ struct
         (fst (dest_Free (fst (Term.strip_comb c))),
         @{const Trueprop} $ (Const (@{const_name "HOL.eq"}, b) $ c $ (Syntax.const @{const_name SEXP} 
             $ (lambda (Syntax.free Lift_Expr.state_id) 
-                      (Lift_Expr.lift_expr ctx (Term_Position.strip_positions t)))))) |
+                      (Lift_Expr.lift_expr ctx dummyT (Term_Position.strip_positions t)))))) |
       _ => raise Match;
 
   val expr_defs = [[Token.make_string (Binding.name_of @{binding expr_defs}, Position.none)]];
