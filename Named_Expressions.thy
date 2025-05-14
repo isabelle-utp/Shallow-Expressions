@@ -15,28 +15,34 @@ struct
   fun mk_expr_def_eq ctx term =
     case (Type.strip_constraints term) of
       Const (@{const_name "HOL.eq"}, b) $ c $ t => 
+        (fst (dest_Free (fst (Term.strip_comb c))),
         @{const Trueprop} $ (Const (@{const_name "HOL.eq"}, b) $ c $ (Syntax.const @{const_name SEXP} 
             $ (lambda (Syntax.free Lift_Expr.state_id) 
-                      (Lift_Expr.lift_expr ctx (Term_Position.strip_positions t))))) |
+                      (Lift_Expr.lift_expr ctx dummyT (Term_Position.strip_positions t)))))) |
       _ => raise Match;
 
   val expr_defs = [[Token.make_string (Binding.name_of @{binding expr_defs}, Position.none)]];
 
   fun expr_def attr decl term ctx =
-    Specification.definition 
-      (Option.map (fn x => fst (Proof_Context.read_var x ctx)) decl) [] [] 
-      ((fst attr, map (Attrib.check_src ctx) (expr_defs @ snd attr)), mk_expr_def_eq ctx term) ctx
+  let val named_expr_defs = @{attributes [named_expr_defs]}
+      val (n, eq) = mk_expr_def_eq ctx term
+      val (thm, ctx0) = Specification.definition 
+                   (Option.map (fn x => fst (Proof_Context.read_var x ctx)) decl) [] [] 
+                   ((fst attr, map (Attrib.check_src ctx) (named_expr_defs @ snd attr)), eq) (snd (Local_Theory.begin_nested ctx))
+      val ctx1 = ExprFun_Const.exprfun_const n (Local_Theory.end_nested ctx0)
+  in (thm, ctx1)
+  end
 
   fun named_expr n typ stateT expr ctx =
     let val named_expr_defs = @{attributes [named_expr_defs]}
         val term = Const (@{const_name "HOL.eq"}, dummyT) $ Syntax.free n $ expr
         val ctx' = snd (Specification.definition 
                        (SOME (Binding.name n, SOME (stateT --> typ), Mixfix.NoSyn)) [] [] 
-                       ((Binding.name (n ^ "_def"), named_expr_defs), mk_expr_def_eq ctx term) (snd (Local_Theory.begin_nested ctx)))
+                       ((Binding.name (n ^ "_def"), named_expr_defs), snd (mk_expr_def_eq ctx term)) (snd (Local_Theory.begin_nested ctx)))
         (* When adding an expression in a locale, the named recorded below may be the 
            localised version, which may not work correctly. This may lead to unexpected
            behaviour when there are two locales each with a constant of the same name. *)
-        val ctx2 = NoLift_Const.nolift_const (n, []) (Local_Theory.end_nested ctx')
+        val ctx2 = ExprFun_Const.exprfun_const n (Local_Theory.end_nested ctx')
         in ctx2
   end
 

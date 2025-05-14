@@ -1,7 +1,7 @@
 section \<open> Collections from Z Toolkit \<close>
 
 theory Collections_Z
-  imports "Shallow-Expressions.Collections" "Z_Toolkit.Relation_Lib"
+  imports "Shallow_Expressions.Collections" "Z_Toolkit.Relation_Lib"
 begin
 
 subsection \<open> Partial Function Collection Lens \<close>

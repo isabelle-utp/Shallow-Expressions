@@ -119,7 +119,7 @@ translations
   "_unrest_usubst x p" == "CONST unrest_usubst x p"
   "_unrest_usubst (_salphaset (_salphamk (x +\<^sub>L y))) P"  <= "_unrest_usubst (x +\<^sub>L y) P"
 
-expr_constructor subst_app (1)
+expr_constructor subst_app (1) \<comment> \<open> Only the second parameter (1) should be treated as a lifted expression. \<close> 
 expr_constructor subst_id
 expr_constructor subst_nil
 expr_constructor subst_default

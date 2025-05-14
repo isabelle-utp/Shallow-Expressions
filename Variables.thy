@@ -104,6 +104,17 @@ lemma var_snd_indep_1 [simp]: "x \<bowtie> y \<Longrightarrow> var_snd x \<bowti
 lemma var_snd_indep_2 [simp]: "x \<bowtie> y \<Longrightarrow> x \<bowtie> var_snd y"
   by (simp add: var_snd_def lens_indep_right_ext)
 
+lemma mwb_var_pair [simp]: "\<lbrakk> mwb_lens x; mwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> mwb_lens (var_pair x y)"
+  by (simp add: var_pair_def plus_mwb_lens)
+
+lemma vwb_var_pair [simp]: "\<lbrakk> vwb_lens x; vwb_lens y; x \<bowtie> y \<rbrakk> \<Longrightarrow> vwb_lens (var_pair x y)"
+  by (simp add: var_pair_def)
+
+lemma var_pair_pres_indep [simp]:
+  "\<lbrakk> x \<bowtie> y; x \<bowtie> z \<rbrakk> \<Longrightarrow> x \<bowtie> var_pair y z"
+  "\<lbrakk> x \<bowtie> y; x \<bowtie> z \<rbrakk> \<Longrightarrow> var_pair y z \<bowtie> x"
+  by (simp_all add: var_pair_def lens_indep_sym)
+
 definition res_alpha :: "('a \<Longrightarrow> 'b) \<Rightarrow> ('c \<Longrightarrow> 'b) \<Rightarrow> 'a \<Longrightarrow> 'c" where
 [lens_defs]: "res_alpha x a = x /\<^sub>L a"
 

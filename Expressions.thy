@@ -2,7 +2,7 @@ section \<open> Expressions \<close>
 
 theory Expressions
   imports Variables
-  keywords "expr_constructor" :: "thy_decl_block"
+  keywords "expr_constructor" "expr_function" :: "thy_decl_block"
 begin
 
 subsection \<open> Types and Constructs \<close>
@@ -112,11 +112,11 @@ parse_translation \<open>
       case terms of
         [Const (@{const_syntax SEXP}, t) $ e] => Const (@{const_name SEXP}, t) $ e |
         [e] =>
-            Syntax.const @{const_name SEXP} $ Lift_Expr.mk_lift_expr ctx e),
+            Syntax.const @{const_name SEXP} $ Lift_Expr.mk_lift_expr ctx dummyT e),
    (@{syntax_const "_sexp_quote_1way"}
    , fn ctx => fn terms =>
       case terms of
-        [e] => Lift_Expr.mk_lift_expr ctx e)]
+        [e] => Lift_Expr.mk_lift_expr ctx dummyT e)]
 \<close>
 
 print_translation \<open>
@@ -158,7 +158,7 @@ parse_translation \<open>
   [(@{syntax_const "_sexpr"}, fn ctx => fn [e] => 
     Syntax.const @{const_name SEXP} 
             $ (lambda (Syntax.free Lift_Expr.state_id) 
-                      (Lift_Expr.lift_expr ctx (Term_Position.strip_positions e))))]
+                      (Lift_Expr.lift_expr ctx dummyT (Term_Position.strip_positions e))))]
 \<close>
 
 subsection \<open> Reasoning \<close>

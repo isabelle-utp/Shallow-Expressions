@@ -1,7 +1,7 @@
 section \<open> Expression Test Cases and Examples \<close>
 
 theory Expressions_Tests
-  imports Expressions
+  imports Expressions Named_Expressions
 begin
 
 text \<open> Some examples of lifted expressions follow. For now, we turn off the pretty printer so that 
@@ -83,7 +83,25 @@ alphabet st =
 
 term "(x + e + v)\<^sub>e"
 
+expression x_is_big over st is "x > 1000"
+
+term "(x_is_big \<longrightarrow> x > 0)\<^sub>e"
+
 text \<open> Here, @{term x} is a lens defined by the @{command alphabet} command, and so the lifting
   translation treats it as a state variable. This is hidden from the user. \<close>
+
+dataspace testspace =
+   variables z :: int
+
+declare [[literal_variables]]
+
+context testspace
+begin
+
+edefinition "z_is_bigger y = (z > y)"
+
+term "(z_is_bigger (z + 1))\<^sub>e"
+
+end
 
 end
