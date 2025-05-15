@@ -71,7 +71,7 @@ fun mk_zstore (raw_params, binding) raw_parent raw_fields invs thy =
                 let
                   val ctx = Named_Target.theory_init thy
                   val Const (cn, _) = Proof_Context.read_const {proper = false, strict = false} ctx invn
-                in Local_Theory.exit_global (NoLift_Const.nolift_const (cn, []) ctx) end)
+                in Local_Theory.exit_global (ExprCtr_Const.exprctr_const (cn, []) ctx) end)
         end
 end
 
@@ -94,6 +94,6 @@ in
             let val ctx = Named_Target.theory_init thy
                 val term = Const (@{const_name "HOL.eq"}, dummyT) $ Syntax.free n $ (Syntax.parse_term ctx expr)
                 val ctx' = snd (expr_def (Binding.name (n ^ "_def"), [z_defs]) NONE term ctx) 
-                val thy' = Local_Theory.exit_global (NoLift_Const.nolift_const (n, []) ctx')
+                val thy' = Local_Theory.exit_global (ExprCtr_Const.exprctr_const (n, []) ctx')
                 in thy' end)))
 end
