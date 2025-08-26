@@ -91,6 +91,17 @@ lemma all_as_ex: "(\<forall> x \<Zspot> P) = (\<not> (\<exists> x \<Zspot> \<not
 lemma ex_as_all: "(\<exists> x \<Zspot> P) = (\<not> (\<forall> x \<Zspot> \<not> P))\<^sub>e"
   by (expr_auto)
 
+lemma all_unrest: "\<lbrakk> mwb_lens x; $x \<sharp> P \<rbrakk> \<Longrightarrow> (\<forall> x \<Zspot> P) = P"
+  by expr_simp
+
+lemma unrest_all_in [unrest]:
+  "\<lbrakk> mwb_lens y; x \<subseteq>\<^sub>L y \<rbrakk> \<Longrightarrow> $x \<sharp> (\<forall> y \<Zspot> P)"
+  by (simp add: all_as_ex unrest_ex_in unrest_uop)
+
+lemma unrest_all_out [unrest]:
+  "\<lbrakk> mwb_lens x; $x \<sharp> P; x \<bowtie> y \<rbrakk> \<Longrightarrow> $x \<sharp> (\<forall> y \<Zspot> P)"
+  by (simp add: all_expr_def unrest_lens, metis lens_indep.lens_put_comm)
+
 subsection \<open> Cylindric Algebra \<close>
 
 lemma ex_C1: "(\<exists> x \<Zspot> (False)\<^sub>e) = (False)\<^sub>e"
