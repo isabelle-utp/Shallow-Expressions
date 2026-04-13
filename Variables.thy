@@ -214,6 +214,7 @@ syntax \<comment> \<open> Identifiers \<close>
   ""              :: "svid \<Rightarrow> svids" ("_")
   "_svid_list"    :: "svid \<Rightarrow> svids \<Rightarrow> svids" ("_,/ _")
   "_svid_alpha"   :: "svid" ("\<^bold>v")
+  "_svid_empty" :: "svid" ("\<^bold>0")
   "_svid_index"   :: "id_position \<Rightarrow> logic \<Rightarrow> svid" ("_'(_')" [999] 999)
   "_svid_tuple"   :: "svids \<Rightarrow> svid" ("'(_')")
   "_svid_dot"     :: "svid \<Rightarrow> svid \<Rightarrow> svid" ("_:_" [999,998] 998)
@@ -283,6 +284,7 @@ translations
   "_svid x" \<rightharpoonup> "x"
   "_svlongid x" \<rightharpoonup> "x"
   "_svid_alpha" \<rightleftharpoons> "CONST univ_var"
+  "_svid_empty" == "CONST zero_lens"
   "_svid_tuple xs" \<rightharpoonup> "_mk_svid_list xs"
   "_svid_dot x y" \<rightleftharpoons> "CONST ns_alpha x y"
   "_svid_index x i" \<rightharpoonup> "x i"
